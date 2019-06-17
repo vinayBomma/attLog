@@ -37,7 +37,8 @@ export default {
       links: [
           {icon: "home", text: 'Home', route: '/'},
           {icon: 'insert_chart', text: 'Statistics', route: 'statistics'},
-          {icon: 'settings', text: 'Settings', route: 'settings'}
+          {icon: 'settings', text: 'Settings', route: 'settings'},
+          {icon: 'signup' , text: "signup", route: 'signup'}
       ]
     };
   }
