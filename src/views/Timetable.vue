@@ -1,5 +1,7 @@
 <template>
-  <div></div>
+  <div>
+    <p>Timetable View</p>
+  </div>
 </template>
 
 <script>
