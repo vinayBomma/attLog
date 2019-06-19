@@ -1,8 +1,10 @@
 <template>
   <div>
-    <p>Sign in Page</p>
-    <v-btn v-on:click="googleLogin">Sign in with Google</v-btn>
+    <v-btn v-on:click="googleLogin">
+      <img src="../../public/google.png" class="mr-2">Sign In
+    </v-btn>
     <v-btn v-on:click="googleLogout">Signout</v-btn>
+
   </div>
 </template>
 
@@ -17,18 +19,9 @@ export default {
       const provider = new firebase.auth.GoogleAuthProvider();
 
       firebase.auth().signInWithRedirect(provider);
-
-      // let user = firebase.auth().currentUser
-      // if (user){
-      //   console.log('Current User: ', user)
-      //   this.$router.push({name: 'home'})
-      // }else{
-      //   console.log('No Current User')
-      // }
     },
     googleLogout() {
       firebase.auth().signOut().then(() => {
-        console.log('Signout Successful')
         this.$router.push({name: 'signup'})
       })
         .catch(err => {
@@ -44,12 +37,10 @@ export default {
 
       firebase.auth().onAuthStateChanged((user) => {
         if (user){
-          console.log('New Sign in')
           this.$router.push({name: 'home'})
           console.log(user.email)
-          // this.userData = user.displayName
         }else{
-          console.log('No user signed')
+          console.log('No User Found')
         }
       })
   }

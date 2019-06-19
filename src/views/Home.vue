@@ -5,16 +5,17 @@
         <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
           <v-card>
             <v-card-title primary-title>{{ val }}</v-card-title>
-            <v-radio-group row id="logData">
-              <v-radio
-                label="Present"
-                value="Present"
-                class="ml-2"
-                v-on:change="getVal('present', val)"
-              ></v-radio>
-              <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
-              <v-radio label="Cancelled" value="Cancelled" v-on:change="getVal('cancelled', val)"></v-radio>
-            </v-radio-group>
+            <v-layout justify-start column>
+              <v-flex xs12 sm6 md4>
+                <v-radio-group row id="logData">
+                  <v-radio label="Present" value="Present" v-on:change="getVal('present', val)"
+                  ></v-radio>
+                  <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
+                  <v-radio label="Cancelled" value="Cancelled" v-on:change="getVal('cancelled', val)"
+                  ></v-radio>
+                </v-radio-group>
+              </v-flex>
+            </v-layout>
           </v-card>
         </v-flex>
         <v-btn color="blue" v-on:click="submit()">Save</v-btn>
@@ -24,7 +25,6 @@
 </template>
 
 <script>
-
 import db from "../firebase/init";
 export default {
   data() {

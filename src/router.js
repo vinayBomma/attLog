@@ -48,8 +48,8 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-    if (to.matched.some(rec => rec.meta.requiresAuth)) {
-      let user = firebase.auth().currentUser
+  if (to.matched.some(rec => rec.meta.requiresAuth)) {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         console.log('Success: ', user)
         next()
@@ -59,9 +59,10 @@ router.beforeEach((to, from, next) => {
           name: 'signup'
         })
       }
-    }else{
-      next()
-    }
-  })
+    })
+  } else {
+    next()
+  }
+})
 
 export default router;
