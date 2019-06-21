@@ -2,3 +2,6 @@ beforeCreate
 save button
 stats subj menu
 calendar in top right in home.vue
+edit and delete timetable
+sign in navbar functionality
+404 page

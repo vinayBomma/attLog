@@ -7,6 +7,7 @@ import About from './views/About.vue'
 import Statistics from './views/Statistics.vue'
 import Timetable from './views/Timetable.vue'
 import Signup from './views/Signup.vue'
+import addSubjects from './views/addSubjects.vue'
 
 Vue.use(Router)
 
@@ -37,13 +38,24 @@ const router = new Router({
     {
       path: '/timetable',
       name: 'timetable',
-      component: Timetable
+      component: Timetable,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/add_subjects',
+      name: 'add_subjects',
+      component: addSubjects,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/signup',
       name: 'signup',
       component: Signup,
-    }
+    },
   ]
 })
 
@@ -51,11 +63,11 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(rec => rec.meta.requiresAuth)) {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        console.log('Success: ', user)
+        console.log('User Login Success')
         next()
       } else {
         console.log('Fail')
-        next({
+        next({  
           name: 'signup'
         })
       }

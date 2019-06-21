@@ -79,7 +79,7 @@ export default {
   created() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        console.log("okay yeah this is working");
+        console.log("User Logged In");
         this.isUser = true;
         this.userPhoto = user.photoURL;
         this.userName = user.displayName;
@@ -87,10 +87,12 @@ export default {
         this.links = [
           { icon: "home", text: "Home", route: "/" },
           { icon: "insert_chart", text: "Statistics", route: "statistics" },
-          { icon: "calendar_today", text: "Timetable", route: "timetable" }
+          { icon: "calendar_today", text: "Timetable", route: "timetable" },
+          { icon: "add", text: "Add Subjects", route: "add_subjects" },
+          { icon: "settings", text: "Settings", route: "settings" },
         ];
       } else {
-        console.log("okay this seems to be working too");
+        console.log("User not logged in");
         this.isUser = false;
         this.userPhoto = null;
         this.userName = null;
