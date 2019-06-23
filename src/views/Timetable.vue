@@ -2,13 +2,13 @@
   <div>
     <template>
       <v-tabs v-model="currentItem" color="transparent" fixed-tabs show-arrows slider-color="blue">
-        <v-tab v-for="item in items" :key="item" :href="'#tab-' + item">{{ item }}</v-tab>
+        <v-tab v-for="item in items" :key="item" :href="'#' + item">{{ item }}</v-tab>
       </v-tabs>
     </template>
     <v-tabs-items v-model="currentItem">
-      <v-tab-item v-for="(item, index) in items" :key="index" :value="'tab-' + item">
+      <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
         <template v-if="hasSubjects">
-          <draggable v-model="subjects" group="people" @start="drag=true" @end="drag=false">
+          <draggable v-model="subjects" @start="drag=true" @end="drag=false">
             <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
               <v-card flat class="pa-3">
                 <v-icon left>reorder</v-icon>
@@ -39,8 +39,7 @@ export default {
   data() {
     return {
       dialog: false,
-      currentItem: "tab-Monday",
-      dragging: -1,
+      currentItem: "Monday",
       items: [
         "Monday",
         "Tuesday",
@@ -50,23 +49,37 @@ export default {
         "Saturday"
       ],
       hasSubjects: null,
-      subjects: []
+      subjects: [],
+      orderedSubs: [],
+      defSubs: []
     };
   },
   methods: {
-    submitTable(){
-      console.log(this.subjects)
+    submitTable() {
+      this.orderedSubs = this.subjects;
+      this.subjects = this.defSubs;
+
+      let obj = {};
+      obj[this.currentItem] = this.orderedSubs;
+
+      db.collection("attData").doc("test").set(obj, { merge: true });
+
+      if(this.currentItem){
+        this.subjects = this.orderedSubs
+      }
+
     }
   },
-  created() {
+  mounted() {
     db.collection("attData")
       .doc("test")
       .get()
       .then(res => {
-        if (!res.data().subjects) {
+        if (!res.data().allSubjects) {
           console.log("No subjects found");
         } else {
-          this.subjects = res.data().subjects;
+          this.subjects = res.data().allSubjects;
+          this.defSubs = this.subjects;
           this.hasSubjects = true;
         }
       })
