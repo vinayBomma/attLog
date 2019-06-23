@@ -2,11 +2,11 @@
   <div>
     <v-container>
       <template v-if="hasSubjects">
-          <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
+          <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
             <v-card flat class="pa-3">
               <v-icon left>reorder</v-icon>
               <span>{{sub}}</span>
-              <v-card-actions v-if="index === subjects.length - 1">
+              <v-card-actions v-if="index === select.length - 1">
                 <v-btn color="blue" absolute bottom right fab>
                   <v-icon>add</v-icon>
                 </v-btn>
@@ -47,7 +47,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" flat @click="dialog = false">Close</v-btn>
-                <v-btn color="blue darken-1" flat @click="testFun">Save</v-btn>
+                <v-btn color="blue darken-1" flat @click="saveSubjects">Save</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -58,20 +58,23 @@
 </template>
 
 <script>
+import db from '../firebase/init'
+
 export default {
   data() {
     return {
       dialog: false,
       select: ["Maths", "History"],
       hasSubjects: null,
-      subjects: null
     };
   },
   methods: {
-    testFun() {
+    saveSubjects() {
       this.hasSubjects = true;
-      this.subjects = this.select;
-      console.log(this.select);
+
+      db.collection('attData').doc('test').set({
+        subjects: this.select
+      })
       this.dialog = false;
     }
   }

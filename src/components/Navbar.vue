@@ -5,7 +5,8 @@
       <!-- <v-toolbar-title>Test</v-toolbar-title> -->
       <v-spacer></v-spacer>
       <v-btn v-if="isUser === false">
-        <img src="../../public/google.png" class="mr-2">Sign In</v-btn>
+        <img src="../../public/google.png" class="mr-2">Sign In
+      </v-btn>
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
@@ -37,6 +38,20 @@
           <v-list-tile-content>
             <v-list-tile-title>{{ link.text }}</v-list-tile-title>
           </v-list-tile-content>
+        </v-list-tile>
+
+        <v-divider v-if="isUser"></v-divider>
+
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon>brightness_3</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Night Mode</v-list-tile-title>
+          </v-list-tile-content>
+          <v-list-tile-action>
+            <v-switch></v-switch>
+          </v-list-tile-action>
         </v-list-tile>
         <!-- <v-list-tile v-for="link in links" v-bind:key="link.text" router v-bind:to="link.route">
           <v-list-tile-action>
@@ -89,7 +104,7 @@ export default {
           { icon: "insert_chart", text: "Statistics", route: "statistics" },
           { icon: "calendar_today", text: "Timetable", route: "timetable" },
           { icon: "add", text: "Add Subjects", route: "add_subjects" },
-          { icon: "settings", text: "Settings", route: "settings" },
+          { icon: "settings", text: "Settings", route: "settings" }
         ];
       } else {
         console.log("User not logged in");
