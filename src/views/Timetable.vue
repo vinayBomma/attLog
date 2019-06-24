@@ -62,11 +62,9 @@ export default {
       let obj = {};
       obj[this.currentItem] = this.orderedSubs;
 
-      db.collection("attData").doc("test").set(obj, { merge: true });
-
-      if(this.currentItem){
-        this.subjects = this.orderedSubs
-      }
+      db.collection("attData").doc("test").set({
+        timetable: obj
+      }, { merge: true });
 
     }
   },

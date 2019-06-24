@@ -4,7 +4,7 @@
       <template v-if="hasSubjects">
         <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
           <v-card flat class="pa-3">
-            <v-icon left>reorder</v-icon>
+            <v-icon left>description</v-icon>
             <span>{{sub}}</span>
             <v-card-actions v-if="index === select.length - 1">
               <v-dialog v-model="dialog">
@@ -103,12 +103,19 @@ export default {
   methods: {
     saveSubjects() {
       this.hasSubjects = true;
+      let obj = {}
+      
+      for(let i=0;i<this.select.length;i++){
+        obj[this.select[i]] = []
+      }
 
       db.collection("attData")
         .doc("test")
         .set({
-          allSubjects: this.select
+          allSubjects: this.select,
+          data: obj
         }, {merge: true});
+
       this.dialog = false;
     }
   },

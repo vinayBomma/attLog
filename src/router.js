@@ -63,7 +63,6 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(rec => rec.meta.requiresAuth)) {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        console.log('User Login Success')
         next()
       } else {
         console.log('Fail')

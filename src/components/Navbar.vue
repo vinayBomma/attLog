@@ -7,6 +7,7 @@
       <v-btn v-if="isUser === false">
         <img src="../../public/google.png" class="mr-2">Sign In
       </v-btn>
+      <!-- <v-icon v-else-if=""></v-icon> -->
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
@@ -53,14 +54,7 @@
             <v-switch></v-switch>
           </v-list-tile-action>
         </v-list-tile>
-        <!-- <v-list-tile v-for="link in links" v-bind:key="link.text" router v-bind:to="link.route">
-          <v-list-tile-action>
-            <v-icon>{{ link.icon }}</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title class="grey--text">{{ link.text }}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>-->
+
       </v-list>
     </v-navigation-drawer>
   </nav>
@@ -102,7 +96,7 @@ export default {
         this.links = [
           { icon: "home", text: "Home", route: "/" },
           { icon: "insert_chart", text: "Statistics", route: "statistics" },
-          { icon: "calendar_today", text: "Timetable", route: "timetable" },
+          { icon: "today", text: "Timetable", route: "timetable" },
           { icon: "add", text: "Add Subjects", route: "add_subjects" },
           { icon: "settings", text: "Settings", route: "settings" }
         ];
@@ -117,7 +111,7 @@ export default {
         ];
       }
     });
-  }
+  },
 };
 </script>
 
