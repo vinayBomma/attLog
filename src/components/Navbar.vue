@@ -7,7 +7,19 @@
       <v-btn v-if="isUser === false">
         <img src="../../public/google.png" class="mr-2">Sign In
       </v-btn>
-      <!-- <v-icon v-else-if=""></v-icon> -->
+
+      <template v-if="$route.name === 'home'">
+        <v-dialog v-model="modal" :return-value.sync="date" lazy full-width width="290px">
+          <template v-slot:activator="{ on }">
+            <v-icon v-model="date" v-on="on">today</v-icon>
+          </template>
+          <v-date-picker v-model="date">
+            <v-spacer></v-spacer>
+            <v-btn flat color="primary" @click="modal = false">Cancel</v-btn>
+            <v-btn flat color="primary" @click="saveDate">OK</v-btn>
+          </v-date-picker>
+        </v-dialog>
+      </template>
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
@@ -54,7 +66,6 @@
             <v-switch></v-switch>
           </v-list-tile-action>
         </v-list-tile>
-
       </v-list>
     </v-navigation-drawer>
   </nav>
@@ -62,13 +73,20 @@
 
 <script>
 import firebase from "firebase";
+import { bus } from "../main";
+
 export default {
   data() {
     return {
+      date: new Date().toISOString().substr(0, 10),
+      currentMonth: new Date().getMonth(),
+      currentDate: null,
+      modal: false,
       drawer: false,
       isUser: null,
       userPhoto: null,
       userName: null,
+      disIcon: null,
       links: []
     };
   },
@@ -83,6 +101,44 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    saveDate() {
+      let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ];
+      let months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sept",
+        "Oct",
+        "Nov",
+        "Dec"
+      ];
+
+      let obj = {}
+
+      this.currentMonth = months[new Date(this.date).getMonth()]
+      this.currentDate = new Date(this.date).getDate();
+      this.date = days[new Date(this.date).getDay()];
+
+      obj['date'] = this.date
+      obj['currentMonth'] = this.currentMonth
+      obj['currentDate'] = this.currentDate
+
+      bus.$emit("dateValue", obj);
+      this.modal = false;
     }
   },
   created() {
@@ -111,7 +167,7 @@ export default {
         ];
       }
     });
-  },
+  }
 };
 </script>
 

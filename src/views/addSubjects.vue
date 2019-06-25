@@ -105,7 +105,7 @@ export default {
       this.hasSubjects = true;
       let obj = {}
       
-      for(let i=0;i<this.select.length;i++){
+      for(var i in this.select){
         obj[this.select[i]] = []
       }
 

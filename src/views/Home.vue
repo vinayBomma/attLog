@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-subheader>{{ day }}</v-subheader>
+    <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
     <v-container>
       <v-layout row wrap>
         <template v-if="hasSubjects">
@@ -39,6 +39,7 @@
 
 <script>
 import db from "../firebase/init";
+import { bus } from "../main";
 
 export default {
   data() {
@@ -48,7 +49,9 @@ export default {
       absent: [],
       cancelled: [],
       hasSubjects: null,
-      day: null
+      day: null,
+      currentDate: null,
+      currentMonth: null
     };
   },
   methods: {
@@ -83,7 +86,6 @@ export default {
       console.log(this.absent);
       console.log(this.cancelled);
 
-      
       // db.collection("attData")
       //   .doc("test")
       //   .set(
@@ -95,10 +97,56 @@ export default {
       //     { merge: true }
       //   )
 
-      // this.$router.push({ name: "about" });
+      let obj = {}
+
+      for(let i in this.subj){
+        obj[this.subj[i]] = {
+          'present': 0,
+          'absent': 0,
+          'cancelled': 0,
+          'total': 0
+        }
+
+        if(this.present.includes(this.subj[i])){
+          obj[this.subj[i]].present += 1
+          obj[this.subj[i]].total += 1
+        } else if(this.absent.includes(this.subj[i])){
+          obj[this.subj[i]].absent += 1
+          obj[this.subj[i]].total += 1
+        } else if(this.cancelled.includes(this.subj[i])){
+          obj[this.subj[i]].cancelled += 1
+        }
+      }
+
+      db.collection("attData").doc('test').set({
+        data: obj
+      }, {merge: true})
+
+      this.$router.push({ name: "home" });
     }
   },
   created() {
+    bus.$on("dateValue", data => {
+      this.day = data.date;
+      this.currentMonth = data.currentMonth
+      this.currentDate = data.currentDate
+
+      db.collection("attData")
+        .doc("test")
+        .get()
+        .then(res => {
+          let dayValue = res.data()["timetable"][this.day];
+
+          if (dayValue) {
+            this.subj = dayValue;
+            this.hasSubjects = true;
+            console.log(`TimeTable Found for ${this.day}`);
+          } else {
+            console.log(`No timetable for ${this.day}`);
+          }
+        });
+    });
+
     let days = [
       "Sunday",
       "Monday",
@@ -108,6 +156,23 @@ export default {
       "Friday",
       "Saturday"
     ];
+
+    let months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sept",
+      "Oct",
+      "Nov",
+      "Dec"
+    ];
+    this.currentMonth = months[new Date().getMonth()];
+    this.currentDate = new Date().getDate();
     this.day = days[new Date().getDay()];
 
     // Code to fix the padding issue, make required changes
@@ -120,58 +185,16 @@ export default {
       .doc("test")
       .get()
       .then(res => {
-        if (this.day === "Monday") {
-          if (res.data().timetable.Monday) {
-            this.subj = res.data().timetable.Monday;
-            this.hasSubjects = true;
-          } else {
-            console.log("No timetable for ", this.day);
-          }
-        } else if (this.day === "Tuesday") {
-          if (res.data().timetable.Tuesday) {
-            this.subj = res.data().timetable.Tuesday;
-            this.hasSubjects = true;
-          } else {
-            console.log("No timetable for ", this.day);
-          }
-        } else if (this.day === "Wednesday") {
-          if (res.data().timetable.Wednesday) {
-            this.subj = res.data().timetable.Wednesday;
-            this.hasSubjects = true;
-          } else {
-            console.log("No timetable for ", this.day);
-          }
-        } else if (this.day === "Thursday") {
-          if (res.data().timetable.Thursday) {
-            this.subj = res.data().timetable.Thursday;
-            this.hasSubjects = true;
-          } else {
-            console.log("No timetable for ", this.day);
-          }
-        } else if (this.day === "Friday") {
-          if (res.data().timetable.Friday) {
-            this.subj = res.data().timetable.Friday;
-            this.hasSubjects = true;
-          } else {
-            console.log("No timetable for ", this.day);
-          }
-        } else if (this.day === "Saturday") {
-          if (res.data().timetable.Saturday) {
-            this.subj = res.data().timetable.Saturday;
-            this.hasSubjects = true;
-          } else {
-            console.log("No timetable for ", this.day);
-          }
+        let dayValue = res.data()["timetable"][this.day];
+
+        if (dayValue) {
+          this.subj = dayValue;
+          this.hasSubjects = true;
+          console.log(`TimeTable Found for ${this.day}`);
+        } else {
+          console.log(`No timetable for ${this.day}`);
         }
       });
   }
 };
-
-// db.collection("attData")
-//   .doc("test")
-//   .set({
-//     present: this.present,
-//     absent: this.absent,
-//     cancelled: this.cancelled
-//   });
 </script>
