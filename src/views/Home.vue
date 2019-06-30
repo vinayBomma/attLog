@@ -20,8 +20,9 @@
               </v-radio-group>
             </v-card>
           </v-flex>
-          <v-btn color="blue" v-on:click="submit()">Save</v-btn>
+          <v-btn color="blue" v-on:click="submit()">Save</v-btn>         
         </template>
+
 
         <!-- Make this card better -->
         <v-flex xs12 sm6 md4 pa-1 v-else>
@@ -34,6 +35,9 @@
         </v-flex>
       </v-layout>
     </v-container>
+    <v-snackbar v-model="snackbar" multi-line top>Attendance logged
+     <!-- <v-btn @click="snackbar === false">Close</v-btn>  -->
+    </v-snackbar> 
   </div>
 </template>
 
@@ -44,6 +48,7 @@ import { bus } from "../main";
 export default {
   data() {
     return {
+      snackbar: false,
       subj: [],
       present: [],
       absent: [],
@@ -82,54 +87,76 @@ export default {
       }
     },
     submit: function() {
-      console.log(this.present);
-      console.log(this.absent);
-      console.log(this.cancelled);
+      // console.log(this.present);
+      // console.log(this.absent);
+      // console.log(this.cancelled);
 
-      // db.collection("attData")
-      //   .doc("test")
-      //   .set(
-      //     {
-      //       present: this.present,
-      //       absent: this.absent,
-      //       cancelled: this.cancelled
-      //     },
-      //     { merge: true }
-      //   )
+      let obj = {}, userData, dbData;
 
-      let obj = {}
+      db.collection("attData")
+        .doc("test")
+        .get()
+        .then(res => {
+          for (let i in this.subj) {
+            let someValue = this.subj[i];
 
-      for(let i in this.subj){
-        obj[this.subj[i]] = {
-          'present': 0,
-          'absent': 0,
-          'cancelled': 0,
-          'total': 0
-        }
+            userData = res.data().data[someValue];
 
-        if(this.present.includes(this.subj[i])){
-          obj[this.subj[i]].present += 1
-          obj[this.subj[i]].total += 1
-        } else if(this.absent.includes(this.subj[i])){
-          obj[this.subj[i]].absent += 1
-          obj[this.subj[i]].total += 1
-        } else if(this.cancelled.includes(this.subj[i])){
-          obj[this.subj[i]].cancelled += 1
-        }
-      }
+            if (userData) {
 
-      db.collection("attData").doc('test').set({
-        data: obj
-      }, {merge: true})
+              obj[someValue] = {
+                present: userData.present,
+                absent: userData.absent,
+                cancelled: userData.cancelled,
+                total: userData.total
+              };
+
+              if (this.present.includes(someValue)) {
+                obj[someValue].present += 1;
+                obj[someValue].total += 1;
+              } else if (this.absent.includes(someValue)) {
+                obj[someValue].absent += 1;
+                obj[someValue].total += 1;
+              } else if (this.cancelled.includes(someValue)) {
+                obj[someValue].cancelled += 1;
+              }
+
+            } else {
+              obj[someValue] = {
+                present: 0,
+                absent: 0,
+                cancelled: 0,
+                total: 0
+              };
+
+              if (this.present.includes(someValue)) {
+                obj[someValue].present += 1;
+                obj[someValue].total += 1;
+              } else if (this.absent.includes(someValue)) {
+                obj[someValue].absent += 1;
+                obj[someValue].total += 1;
+              } else if (this.cancelled.includes(someValue)) {
+                obj[someValue].cancelled += 1;
+              }
+            }
+
+            if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
+              dbData = obj
+              db.collection("attData").doc("test").set({data: dbData}, { merge: true });
+            }
+
+          }
+        });
 
       this.$router.push({ name: "home" });
+      this.snackbar = true
     }
   },
   created() {
     bus.$on("dateValue", data => {
       this.day = data.date;
-      this.currentMonth = data.currentMonth
-      this.currentDate = data.currentDate
+      this.currentMonth = data.currentMonth;
+      this.currentDate = data.currentDate;
 
       db.collection("attData")
         .doc("test")

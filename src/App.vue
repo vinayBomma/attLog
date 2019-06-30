@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app :dark="dark">
     <Navbar></Navbar>
     <v-content>
       <router-view></router-view>
@@ -17,7 +17,7 @@ export default {
   },
   data () {
     return {
-      //
+      dark: true
     }
   }
 }
