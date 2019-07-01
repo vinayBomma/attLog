@@ -1,17 +1,41 @@
 <template>
   <section>
+    <v-flex xs5 pt-1 pl-1>
+      <v-select :items="items" value="Python" solo></v-select>
+    </v-flex>
     <v-container>
       <v-layout row wrap>
-        <v-flex xs12 sm6 md4 pa-1>
+        <v-flex xs12 sm12 md4 pl-1 pr-1 pb-1>
           <v-card>
             <div id="doughnut" style="display: block;">
               <canvas id="mychart1" width="400" height="300" class="pa-2"></canvas>
             </div>
           </v-card>
         </v-flex>
+        <v-flex xs6 sm6 md4 pa-1>
+          <v-card>
+            <v-card-title>
+              <v-progress-circular rotate="360" size="100" width="15" color="teal" :value="value" >{{value}}%</v-progress-circular>
+            </v-card-title>
+            <h4 class="text-xs-center">Attendance</h4>
+          </v-card>
+        </v-flex>
+
+        <v-flex xs6 sm6 md4 pa-1>
+          <v-card>
+            <v-card-title>
+              <v-progress-circular rotate='360' size='100' width='15' color='teal' :value='value'>{{value}}%</v-progress-circular>
+            </v-card-title>
+            <h4 class="text-xs-center">Attendance</h4>
+          </v-card>
+        </v-flex>
+
         <v-flex xs12 sm6 md4 pa-1>
           <v-card>
-            <v-progress-circular rotate='360' size='100' width='15' color='teal' :value='value'>{{value}}</v-progress-circular>
+            <v-card-title>
+              <h3>History</h3>
+              <v-date-picker v-model="date1" no-title readonly :events="arrayEvents" event-color="green lighten-1" full-width></v-date-picker>
+            </v-card-title>
           </v-card>
         </v-flex>
       </v-layout>
@@ -27,8 +51,11 @@ import db from "../firebase/init";
 export default {
   data() {
     return {
+      arrayEvents: null,
+      date1: new Date().toISOString().substr(0, 10),
       value: 75,
-      planetChart
+      planetChart,
+      items: ['Python', 'Vuejs', 'Nodejs', 'Django', 'Accounting']
     };
   },
   methods: {
@@ -42,6 +69,13 @@ export default {
     }
   },
   mounted() {
+    this.arrayEvents = [...Array(6)].map(() => {
+      const day = Math.floor(Math.random() * 30)
+      const d = new Date()
+      d.setDate(day)
+      return d.toISOString().substr(0, 10)
+    })
+
     db.collection("attData")
       .doc("test")
       .get()
@@ -79,6 +113,7 @@ export default {
                   "rgba(255, 159, 64, 1)"
                 ],
                 borderWidth: 1
+                // fill: false
               }
             ]
           }
@@ -175,4 +210,5 @@ export default {
 //   }
 // });
 </script>
+
 

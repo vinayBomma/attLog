@@ -1,10 +1,4 @@
-import db from './firebase/init'
 
-// let planetChartData = {}
-
-db.collection('attData').doc('test').get().then((res) => {
-  // let obj = res.data().data['Django']
-  // let subjData = [obj.present, obj.absent, obj.cancelled, obj.total]
 
   // planetChartData = {
   //   type: 'pie',
@@ -36,8 +30,7 @@ db.collection('attData').doc('test').get().then((res) => {
 
   // planetChartData.data.datasets.data = subjData
   // console.log(planetChartData.data.datasets.data)
- 
-})
+
 
 // export default planetChartData;
 
