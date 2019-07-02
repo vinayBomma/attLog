@@ -6,3 +6,7 @@ sign in navbar functionality
 404 page
 add timetable deleting all chips page issue
 line chart along with pie chart
+loading screen after signing in
+subject twice in one day timetable
+
+release without history and night mode, get basic functionality right

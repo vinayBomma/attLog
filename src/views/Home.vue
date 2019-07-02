@@ -56,7 +56,9 @@ export default {
       hasSubjects: null,
       day: null,
       currentDate: null,
-      currentMonth: null
+      currentMonth: null,
+      currentYear: null,
+      currentFullDate: null,
     };
   },
   methods: {
@@ -87,11 +89,19 @@ export default {
       }
     },
     submit: function() {
+      for (let i in this.subj){
+        if(this.present.includes(this.subj[i]) || this.absent.includes(this.subj[i]) || this.cancelled.includes(this.subj[i])){
+          // console.log('good to go')
+        }else{
+          // console.log('dont piss me off')
+        }
+      }
       // console.log(this.present);
       // console.log(this.absent);
       // console.log(this.cancelled);
 
       let obj = {}, userData, dbData;
+      let isoDate = new Date().toISOString().substr(0, 10);
 
       db.collection("attData")
         .doc("test")
@@ -99,12 +109,13 @@ export default {
         .then(res => {
           for (let i in this.subj) {
             let someValue = this.subj[i];
-
             userData = res.data().data[someValue];
 
-            if (userData) {
-
+            if (userData !== undefined) {
               obj[someValue] = {
+                presentDates: userData.presentDates,
+                absentDates: userData.absentDates,
+                cancelledDates: userData.cancelledDates,
                 present: userData.present,
                 absent: userData.absent,
                 cancelled: userData.cancelled,
@@ -114,15 +125,117 @@ export default {
               if (this.present.includes(someValue)) {
                 obj[someValue].present += 1;
                 obj[someValue].total += 1;
+
+                if(!this.currentFullDate){
+
+                  if(obj[someValue].absentDates.includes(isoDate)){
+                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(isoDate), 1);
+                  }
+                  
+                  if(obj[someValue].cancelledDates.includes(isoDate)){
+                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(isoDate), 1);
+                  }
+                  
+                  if(obj[someValue].presentDates.includes(isoDate)){
+                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(isoDate), 1);
+                  }
+
+                  obj[someValue].presentDates.push(isoDate)
+                }else{
+
+                  if(obj[someValue].absentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+                  
+                  if(obj[someValue].cancelledDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+                  
+                  if(obj[someValue].presentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+
+                  obj[someValue].presentDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
+                }
+                
               } else if (this.absent.includes(someValue)) {
                 obj[someValue].absent += 1;
                 obj[someValue].total += 1;
+                
+                if(!this.currentFullDate){
+
+                  if(obj[someValue].absentDates.includes(isoDate)){
+                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(isoDate), 1);
+                  }
+                  
+                  if(obj[someValue].cancelledDates.includes(isoDate)){
+                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(isoDate), 1);
+                  }
+                  
+                  if(obj[someValue].presentDates.includes(isoDate)){
+                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(isoDate), 1);
+                  }
+
+                  obj[someValue].absentDates.push(isoDate)
+                }else{
+
+                  if(obj[someValue].absentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+                  
+                  if(obj[someValue].cancelledDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+                  
+                  if(obj[someValue].presentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+
+                  obj[someValue].absentDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
+                }
+
               } else if (this.cancelled.includes(someValue)) {
                 obj[someValue].cancelled += 1;
+
+                if(!this.currentFullDate){
+
+                  if(obj[someValue].absentDates.includes(isoDate)){
+                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(isoDate), 1);
+                  }
+                  
+                  if(obj[someValue].cancelledDates.includes(isoDate)){
+                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(isoDate), 1);
+                  }
+                  
+                  if(obj[someValue].presentDates.includes(isoDate)){
+                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(isoDate), 1);
+                  }
+
+                  obj[someValue].cancelledDates.push(isoDate)
+                }else{
+
+                  if(obj[someValue].absentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+                  
+                  if(obj[someValue].cancelledDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+                  
+                  if(obj[someValue].presentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
+                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  }
+
+                  obj[someValue].cancelledDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
+                }
+
               }
 
             } else {
               obj[someValue] = {
+                presentDates: [],
+                absentDates: [],
+                cancelledDates: [],
                 present: 0,
                 absent: 0,
                 cancelled: 0,
@@ -132,20 +245,52 @@ export default {
               if (this.present.includes(someValue)) {
                 obj[someValue].present += 1;
                 obj[someValue].total += 1;
+                
+                if(!this.currentFullDate){
+                  obj[someValue].presentDates.push(isoDate)
+                }else{
+                  obj[someValue].presentDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
+                }
+
               } else if (this.absent.includes(someValue)) {
                 obj[someValue].absent += 1;
                 obj[someValue].total += 1;
+                
+                if(!this.currentFullDate){
+                  obj[someValue].absentDates.push(isoDate)
+                }else{
+                  obj[someValue].absentDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
+                }
+
               } else if (this.cancelled.includes(someValue)) {
                 obj[someValue].cancelled += 1;
+                
+                if(!this.currentFullDate){
+                  obj[someValue].cancelledDates.push(isoDate)
+                }else{
+                  obj[someValue].cancelledDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
+                }
+                
               }
             }
 
             if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
               dbData = obj
               db.collection("attData").doc("test").set({data: dbData}, { merge: true });
-            }
 
+              db.collection("attData").doc("test").set({
+                attendance: {
+                  today: {
+                    'present': this.present,
+                    'absent': this.absent,
+                    'cancelled': this.cancelled
+                  }
+                }
+              }, { merge: true });
+            }
           }
+        }).catch((err) => {
+          console.log('Errarta: ', err)
         });
 
       this.$router.push({ name: "home" });
@@ -157,6 +302,8 @@ export default {
       this.day = data.date;
       this.currentMonth = data.currentMonth;
       this.currentDate = data.currentDate;
+      this.currentYear = data.currentYear;
+      this.currentFullDate = data.currentFullDate;
 
       db.collection("attData")
         .doc("test")

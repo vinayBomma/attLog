@@ -1,6 +1,6 @@
 <template>
   <section>
-    <v-flex xs5 pt-1 pl-1>
+    <v-flex xs5 pt-2 pl-2>
       <v-select :items="items" value="Python" solo></v-select>
     </v-flex>
     <v-container>
@@ -34,7 +34,7 @@
           <v-card>
             <v-card-title>
               <h3>History</h3>
-              <v-date-picker v-model="date1" no-title readonly :events="arrayEvents" event-color="green lighten-1" full-width></v-date-picker>
+              <v-date-picker v-model="date1" no-title readonly :events="dateEvent" :event-color="date => date[9] % 2 ? 'red' : 'yellow'" full-width></v-date-picker>
             </v-card-title>
           </v-card>
         </v-flex>
@@ -52,6 +52,7 @@ export default {
   data() {
     return {
       arrayEvents: null,
+      moreEvents: null,
       date1: new Date().toISOString().substr(0, 10),
       value: 75,
       planetChart,
@@ -66,6 +67,12 @@ export default {
         data: dbData.data,
         options: chartData.options
       });
+    },
+    dateEvent (date) {
+        const [,, day] = date.split('-')
+        if ([12, 17, 28].includes(parseInt(day, 10))) return true
+        if ([1, 19, 22].includes(parseInt(day, 10))) return ['red', 'green']
+        return false
     }
   },
   mounted() {

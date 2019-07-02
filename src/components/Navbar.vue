@@ -79,8 +79,10 @@ export default {
   data() {
     return {
       date: new Date().toISOString().substr(0, 10),
-      currentMonth: new Date().getMonth(),
       currentDate: null,
+      currentMonth: null,
+      currentFullDate: null,
+      currentYear: null,
       modal: false,
       drawer: false,
       isUser: null,
@@ -131,11 +133,15 @@ export default {
 
       this.currentMonth = months[new Date(this.date).getMonth()]
       this.currentDate = new Date(this.date).getDate();
+      this.currentYear = new Date(this.date).getFullYear();
+      this.currentFullDate = this.date
       this.date = days[new Date(this.date).getDay()];
 
       obj['date'] = this.date
       obj['currentMonth'] = this.currentMonth
       obj['currentDate'] = this.currentDate
+      obj['currentYear'] = this.currentYear
+      obj['currentFullDate'] = this.currentFullDate
 
       bus.$emit("dateValue", obj);
       this.modal = false;

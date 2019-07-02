@@ -76,7 +76,7 @@ export default {
         if (!res.data().allSubjects) {
           console.log("No subjects found");
         } else {
-          this.subjects = res.data().allSubjects;
+          this.subjects = res.data().timetable[this.currentItem];
           this.defSubs = this.subjects;
           this.hasSubjects = true;
         }
