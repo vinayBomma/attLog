@@ -20,6 +20,12 @@
           </v-date-picker>
         </v-dialog>
       </template>
+
+      <template v-if="$route.name === 'timetable'">
+        <v-icon class="mr-4" @click="test">restore</v-icon>
+        <v-icon @click="some">delete_outline</v-icon>
+      </template>
+
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
@@ -145,6 +151,12 @@ export default {
 
       bus.$emit("dateValue", obj);
       this.modal = false;
+    },
+    test(){
+      console.log('clicked restore')
+    },
+    some(){
+      console.log('opened the bin')
     }
   },
   created() {

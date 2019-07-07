@@ -1,25 +1,27 @@
 <template>
   <div>
     <template>
-      <v-tabs v-model="currentItem" color="transparent" fixed-tabs show-arrows slider-color="blue">
+      <v-tabs v-model="currentItem" color="transparent" fixed-tabs show-arrows slider-color="blue" @change="tabChange">
         <v-tab v-for="item in items" :key="item" :href="'#' + item">{{ item }}</v-tab>
       </v-tabs>
     </template>
     <v-tabs-items v-model="currentItem">
       <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
-        <template v-if="hasSubjects">
-          <draggable v-model="subjects" @start="drag=true" @end="drag=false">
-            <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
-              <v-card flat class="pa-3">
-                <v-icon left>reorder</v-icon>
-                <span>{{ sub }}</span>
-              </v-card>
-            </v-flex>
-          </draggable>
-          <v-layout row>
-            <v-btn @click="submitTable">Submit</v-btn>
-          </v-layout>
-        </template>
+        <!-- <template v-if> -->
+          <template v-if="hasSubjects">
+            <draggable v-model="subjects" @start="drag=true" @end="drag=false">
+              <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
+                <v-card flat class="pa-3">
+                  <v-icon left>reorder</v-icon>
+                  <span>{{ sub }}</span>
+                </v-card>
+              </v-flex>
+            </draggable>
+            <v-layout row>
+              <v-btn @click="submitTable">Submit</v-btn>
+            </v-layout>
+          </template>
+        <!-- </template> -->
         <v-card flat v-else-if="!hasSubjects">
           <v-card-text>No Subjects Added</v-card-text>
         </v-card>
@@ -62,10 +64,31 @@ export default {
       let obj = {};
       obj[this.currentItem] = this.orderedSubs;
 
-      db.collection("attData").doc("test").set({
-        timetable: obj
-      }, { merge: true });
-
+      db.collection("attData")
+        .doc("test")
+        .set(
+          {
+            timetable: obj
+          },
+          { merge: true }
+        );
+    },
+    tabChange(){
+      db.collection("attData")
+      .doc("test")
+      .get()
+      .then(res => {
+        if (res.data().timetable[this.currentItem] === undefined) {
+          this.subjects = res.data().allSubjects
+        } else {
+          this.subjects = res.data().timetable[this.currentItem];
+          this.defSubs = this.subjects;
+          this.hasSubjects = true;
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
     }
   },
   mounted() {
@@ -73,9 +96,11 @@ export default {
       .doc("test")
       .get()
       .then(res => {
-        if (!res.data().allSubjects) {
-          console.log("No subjects found");
-        } else {
+        if (res.data().timetable === undefined) {
+          this.subjects = res.data().allSubjects;
+          this.defSubs = this.subjects;
+          this.hasSubjects = true;
+        }else {
           this.subjects = res.data().timetable[this.currentItem];
           this.defSubs = this.subjects;
           this.hasSubjects = true;

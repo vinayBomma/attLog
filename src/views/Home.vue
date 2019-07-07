@@ -20,9 +20,8 @@
               </v-radio-group>
             </v-card>
           </v-flex>
-          <v-btn color="blue" v-on:click="submit()">Save</v-btn>         
+          <v-btn color="blue" :disabled="disabled" v-on:click="submit()">Save</v-btn>
         </template>
-
 
         <!-- Make this card better -->
         <v-flex xs12 sm6 md4 pa-1 v-else>
@@ -35,9 +34,10 @@
         </v-flex>
       </v-layout>
     </v-container>
-    <v-snackbar v-model="snackbar" multi-line top>Attendance logged
-     <!-- <v-btn @click="snackbar === false">Close</v-btn>  -->
-    </v-snackbar> 
+    <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
+      {{ msg }}
+      <v-btn flat @click="snackbar === false">Close</v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -49,6 +49,10 @@ export default {
   data() {
     return {
       snackbar: false,
+      msg: null,
+      timeout: 3000,
+      color: undefined,
+      disabled: false,
       subj: [],
       present: [],
       absent: [],
@@ -59,6 +63,8 @@ export default {
       currentMonth: null,
       currentYear: null,
       currentFullDate: null,
+      attendData: [],
+      sendReq: true
     };
   },
   methods: {
@@ -89,10 +95,37 @@ export default {
       }
     },
     submit: function() {
-      for (let i in this.subj){
-        if(this.present.includes(this.subj[i]) || this.absent.includes(this.subj[i]) || this.cancelled.includes(this.subj[i])){
-          // console.log('good to go')
-        }else{
+      let cDate;
+
+      if (!this.currentFullDate) {
+        cDate = new Date().toISOString().substr(0, 10);
+      } else {
+        cDate = new Date(this.currentFullDate).toISOString().substr(0, 10);
+      }
+
+      if (this.attendData.includes(cDate)) {
+        this.color = "error";
+        this.msg = "Attendance Cannot Be Relogged";
+        this.snackbar = true;
+        this.sendReq = false;
+      } else {
+        this.color = undefined;
+        this.msg = "Attendance Logged";
+        this.snackbar = true;
+        this.sendReq = true;
+      }
+
+      for (let i in this.subj) {
+        if (
+          this.present.includes(this.subj[i]) ||
+          this.absent.includes(this.subj[i]) ||
+          this.cancelled.includes(this.subj[i])
+        ) {
+          //
+        } else {
+          this.color = "error";
+          this.msg = "Enter Data for all subjects";
+          this.snackbar = true;
           // console.log('dont piss me off')
         }
       }
@@ -100,201 +133,198 @@ export default {
       // console.log(this.absent);
       // console.log(this.cancelled);
 
-      let obj = {}, userData, dbData;
+      let obj = {},
+        userData,
+        dbData;
       let isoDate = new Date().toISOString().substr(0, 10);
 
-      db.collection("attData")
-        .doc("test")
-        .get()
-        .then(res => {
-          for (let i in this.subj) {
-            let someValue = this.subj[i];
-            userData = res.data().data[someValue];
+      if (this.sendReq) {
+        db.collection("attData")
+          .doc("test")
+          .get()
+          .then(res => {
+            for (let i in this.subj) {
+              let someValue = this.subj[i];
+              userData = res.data().data[someValue];
 
-            if (userData !== undefined) {
-              obj[someValue] = {
-                presentDates: userData.presentDates,
-                absentDates: userData.absentDates,
-                cancelledDates: userData.cancelledDates,
-                present: userData.present,
-                absent: userData.absent,
-                cancelled: userData.cancelled,
-                total: userData.total
-              };
+              if (Object.keys(res.data().data["TOC"]).length !== 0) {
+                obj[someValue] = {
+                  weekdays: userData.weekdays,
+                  presentDates: userData.presentDates,
+                  absentDates: userData.absentDates,
+                  cancelledDates: userData.cancelledDates,
+                  present: userData.present,
+                  absent: userData.absent,
+                  cancelled: userData.cancelled,
+                  total: userData.total
+                };
 
-              if (this.present.includes(someValue)) {
-                obj[someValue].present += 1;
-                obj[someValue].total += 1;
+                if (this.present.includes(someValue)) {
+                  obj[someValue].present += 1;
+                  obj[someValue].total += 1;
 
-                if(!this.currentFullDate){
-
-                  if(obj[someValue].absentDates.includes(isoDate)){
-                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(isoDate), 1);
-                  }
-                  
-                  if(obj[someValue].cancelledDates.includes(isoDate)){
-                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(isoDate), 1);
-                  }
-                  
-                  if(obj[someValue].presentDates.includes(isoDate)){
-                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(isoDate), 1);
+                  if (obj[someValue].absentDates.includes(cDate)) {
+                    obj[someValue].absentDates.splice(
+                      obj[someValue].absentDates.indexOf(cDate),
+                      1
+                    );
                   }
 
-                  obj[someValue].presentDates.push(isoDate)
-                }else{
-
-                  if(obj[someValue].absentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
-                  }
-                  
-                  if(obj[someValue].cancelledDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
-                  }
-                  
-                  if(obj[someValue].presentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  if (obj[someValue].cancelledDates.includes(cDate)) {
+                    obj[someValue].cancelledDates.splice(
+                      obj[someValue].cancelledDates.indexOf(cDate),
+                      1
+                    );
                   }
 
-                  obj[someValue].presentDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
+                  if (obj[someValue].presentDates.includes(cDate)) {
+                    obj[someValue].presentDates.splice(
+                      obj[someValue].presentDates.indexOf(cDate),
+                      1
+                    );
+                  }
+
+                  obj[someValue].presentDates.push(cDate);
+                  obj[someValue].weekdays[new Date().getDay()] += 1;
+                } else if (this.absent.includes(someValue)) {
+                  obj[someValue].absent += 1;
+                  obj[someValue].total += 1;
+
+                  if (obj[someValue].absentDates.includes(cDate)) {
+                    obj[someValue].absentDates.splice(
+                      obj[someValue].absentDates.indexOf(cDate),
+                      1
+                    );
+                  }
+
+                  if (obj[someValue].cancelledDates.includes(cDate)) {
+                    obj[someValue].cancelledDates.splice(
+                      obj[someValue].cancelledDates.indexOf(cDate),
+                      1
+                    );
+                  }
+
+                  if (obj[someValue].presentDates.includes(cDate)) {
+                    obj[someValue].presentDates.splice(
+                      obj[someValue].presentDates.indexOf(cDate),
+                      1
+                    );
+                  }
+
+                  obj[someValue].absentDates.push(cDate);
+                  obj[someValue].weekdays[new Date().getDay()] -= 1;
+                } else if (this.cancelled.includes(someValue)) {
+                  obj[someValue].cancelled += 1;
+                  obj[someValue].total += 1;
+
+                  if (obj[someValue].absentDates.includes(cDate)) {
+                    obj[someValue].absentDates.splice(
+                      obj[someValue].absentDates.indexOf(cDate),
+                      1
+                    );
+                  }
+
+                  if (obj[someValue].cancelledDates.includes(cDate)) {
+                    obj[someValue].cancelledDates.splice(
+                      obj[someValue].cancelledDates.indexOf(cDate),
+                      1
+                    );
+                  }
+
+                  if (obj[someValue].presentDates.includes(cDate)) {
+                    obj[someValue].presentDates.splice(
+                      obj[someValue].presentDates.indexOf(cDate),
+                      1
+                    );
+                  }
+
+                  obj[someValue].cancelledDates.push(cDate);
                 }
-                
-              } else if (this.absent.includes(someValue)) {
-                obj[someValue].absent += 1;
-                obj[someValue].total += 1;
-                
-                if(!this.currentFullDate){
+              } else {
+                obj[someValue] = {
+                  weekdays: [0, 0, 0, 0, 0, 0, 0],
+                  presentDates: [],
+                  absentDates: [],
+                  cancelledDates: [],
+                  present: 0,
+                  absent: 0,
+                  cancelled: 0,
+                  total: 0
+                };
 
-                  if(obj[someValue].absentDates.includes(isoDate)){
-                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(isoDate), 1);
-                  }
-                  
-                  if(obj[someValue].cancelledDates.includes(isoDate)){
-                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(isoDate), 1);
-                  }
-                  
-                  if(obj[someValue].presentDates.includes(isoDate)){
-                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(isoDate), 1);
-                  }
+                if (this.present.includes(someValue)) {
+                  obj[someValue].present += 1;
+                  obj[someValue].total += 1;
 
-                  obj[someValue].absentDates.push(isoDate)
-                }else{
+                  if (!this.currentFullDate) {
+                    obj[someValue].presentDates.push(isoDate);
+                    obj[someValue].weekdays[new Date().getDay()] += 1;
+                  } else {
+                    obj[someValue].presentDates.push(
+                      new Date(this.currentFullDate).toISOString().substr(0, 10)
+                    );
+                    obj[someValue].weekdays[
+                      new Date(this.currentFullDate).getDay()
+                    ] += 1;
+                  }
+                } else if (this.absent.includes(someValue)) {
+                  obj[someValue].absent += 1;
+                  obj[someValue].total += 1;
 
-                  if(obj[someValue].absentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
+                  if (!this.currentFullDate) {
+                    obj[someValue].absentDates.push(isoDate);
+                    obj[someValue].weekdays[new Date().getDay()] -= 1;
+                  } else {
+                    obj[someValue].absentDates.push(
+                      new Date(this.currentFullDate).toISOString().substr(0, 10)
+                    );
+                    obj[someValue].weekdays[
+                      new Date(this.currentFullDate).getDay()
+                    ] -= 1;
                   }
-                  
-                  if(obj[someValue].cancelledDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
-                  }
-                  
-                  if(obj[someValue].presentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
-                  }
+                } else if (this.cancelled.includes(someValue)) {
+                  obj[someValue].cancelled += 1;
+                  obj[someValue].total += 1;
 
-                  obj[someValue].absentDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
+                  if (!this.currentFullDate) {
+                    obj[someValue].cancelledDates.push(isoDate);
+                  } else {
+                    obj[someValue].cancelledDates.push(
+                      new Date(this.currentFullDate).toISOString().substr(0, 10)
+                    );
+                  }
                 }
-
-              } else if (this.cancelled.includes(someValue)) {
-                obj[someValue].cancelled += 1;
-
-                if(!this.currentFullDate){
-
-                  if(obj[someValue].absentDates.includes(isoDate)){
-                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(isoDate), 1);
-                  }
-                  
-                  if(obj[someValue].cancelledDates.includes(isoDate)){
-                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(isoDate), 1);
-                  }
-                  
-                  if(obj[someValue].presentDates.includes(isoDate)){
-                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(isoDate), 1);
-                  }
-
-                  obj[someValue].cancelledDates.push(isoDate)
-                }else{
-
-                  if(obj[someValue].absentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].absentDates.splice(obj[someValue].absentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
-                  }
-                  
-                  if(obj[someValue].cancelledDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].cancelledDates.splice(obj[someValue].cancelledDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
-                  }
-                  
-                  if(obj[someValue].presentDates.includes(new Date(this.currentFullDate).toISOString().substr(0, 10))){
-                    obj[someValue].presentDates.splice(obj[someValue].presentDates.indexOf(new Date(this.currentFullDate).toISOString().substr(0, 10)), 1);
-                  }
-
-                  obj[someValue].cancelledDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
-                }
-
               }
 
-            } else {
-              obj[someValue] = {
-                presentDates: [],
-                absentDates: [],
-                cancelledDates: [],
-                present: 0,
-                absent: 0,
-                cancelled: 0,
-                total: 0
-              };
+              if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
+                dbData = obj;
+                db.collection("attData")
+                  .doc("test")
+                  .set({ data: dbData }, { merge: true });
 
-              if (this.present.includes(someValue)) {
-                obj[someValue].present += 1;
-                obj[someValue].total += 1;
-                
-                if(!this.currentFullDate){
-                  obj[someValue].presentDates.push(isoDate)
-                }else{
-                  obj[someValue].presentDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
-                }
-
-              } else if (this.absent.includes(someValue)) {
-                obj[someValue].absent += 1;
-                obj[someValue].total += 1;
-                
-                if(!this.currentFullDate){
-                  obj[someValue].absentDates.push(isoDate)
-                }else{
-                  obj[someValue].absentDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
-                }
-
-              } else if (this.cancelled.includes(someValue)) {
-                obj[someValue].cancelled += 1;
-                
-                if(!this.currentFullDate){
-                  obj[someValue].cancelledDates.push(isoDate)
-                }else{
-                  obj[someValue].cancelledDates.push(new Date(this.currentFullDate).toISOString().substr(0, 10))
-                }
-                
-              }
-            }
-
-            if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
-              dbData = obj
-              db.collection("attData").doc("test").set({data: dbData}, { merge: true });
-
-              db.collection("attData").doc("test").set({
-                attendance: {
-                  today: {
-                    'present': this.present,
-                    'absent': this.absent,
-                    'cancelled': this.cancelled
+                if (this.attendData.length === 0) {
+                  this.attendData.push(cDate);
+                } else if (this.attendData.length > 0) {
+                  if (this.attendData.includes(cDate)) {
+                    this.attendData.splice(this.attendData.indexOf(cDate), 1);
+                    this.attendData.push(cDate);
+                  } else {
+                    this.attendData.push(cDate);
                   }
                 }
-              }, { merge: true });
+
+                db.collection("attData")
+                  .doc("test")
+                  .set({ attendance: this.attendData }, { merge: true });
+              }
             }
-          }
-        }).catch((err) => {
-          console.log('Errarta: ', err)
-        });
+          })
+          .catch(err => {
+            console.log("Errarta: ", err);
+          });
+      }
 
       this.$router.push({ name: "home" });
-      this.snackbar = true
     }
   },
   created() {
@@ -320,6 +350,19 @@ export default {
           }
         });
     });
+
+    db.collection("attData")
+      .doc("test")
+      .get()
+      .then(res => {
+        let attDates = res.data().attendance;
+
+        if (attDates === undefined || attDates.length === 0) {
+          this.attendData = [];
+        } else if (attDates.length > 0) {
+          this.attendData = attDates;
+        }
+      });
 
     let days = [
       "Sunday",
@@ -350,6 +393,7 @@ export default {
     this.day = days[new Date().getDay()];
 
     // Code to fix the padding issue, make required changes
+
     // if(window.screen.width > 370){
     //   document.getElementById('devWidth').className += "ml-2"
     //   console.log(document.getElementById('devWidth'))
