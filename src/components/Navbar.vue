@@ -22,8 +22,8 @@
       </template>
 
       <template v-if="$route.name === 'timetable'">
-        <v-icon class="mr-4" @click="test">restore</v-icon>
-        <v-icon @click="some">delete_outline</v-icon>
+        <v-icon class="mr-4" @click="restore">restore</v-icon>
+        <v-icon @click="deleteSub">delete_outline</v-icon>
       </template>
 
     </v-toolbar>
@@ -152,11 +152,11 @@ export default {
       bus.$emit("dateValue", obj);
       this.modal = false;
     },
-    test(){
-      console.log('clicked restore')
+    restore(){
+      bus.$emit('restoreBtn')
     },
-    some(){
-      console.log('opened the bin')
+    deleteSub(){
+      bus.$emit('deleteBtn')
     }
   },
   created() {
@@ -172,7 +172,7 @@ export default {
           { icon: "insert_chart", text: "Statistics", route: "statistics" },
           { icon: "today", text: "Timetable", route: "timetable" },
           { icon: "add", text: "Add Subjects", route: "add_subjects" },
-          { icon: "settings", text: "Settings", route: "settings" }
+          // { icon: "settings", text: "Settings", route: "settings" }
         ];
       } else {
         console.log("User not logged in");

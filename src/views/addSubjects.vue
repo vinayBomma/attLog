@@ -97,7 +97,7 @@ export default {
     return {
       dialog: false,
       select: ["Maths", "History"],
-      hasSubjects: null
+      hasSubjects: null,
     };
   },
   methods: {
@@ -105,19 +105,44 @@ export default {
       this.hasSubjects = true;
       let obj = {}
       
-      for(var i in this.select){
-        obj[this.select[i]] = []
-      }
+      db.collection('attData').doc('test').get().then((res) => {
+        for(var i in this.select){
 
-      db.collection("attData")
-        .doc("test")
-        .set({
-          allSubjects: this.select,
-          data: obj
-        }, {merge: true});
+          if(res.data().data !== undefined){ 
+
+            if(res.data().data[this.select[i]] !== undefined){
+
+              if(Object.keys(res.data().data[this.select[i]]).length !== 0){
+                obj[this.select[i]] = res.data().data[this.select[i]]
+              }else if(Object.keys(res.data().data[this.select[i]]).length === 0){
+                obj[this.select[i]] = []
+              }
+
+            }else if(res.data().data[this.select[i]] === undefined){
+              obj[this.select[i]] = []
+            }
+          }else{
+            obj[this.select[i]] = []
+          }
+          
+          if(this.select.indexOf(this.select[i]) === this.select.length - 1){
+            db.collection("attData").doc("test").set({
+              allSubjects: this.select,
+              data: obj
+            }, {merge: true});
+          }          
+        }
+      })
+
+      // if(this.select.indexOf(this.select[i]) === this.select.length - 1){
+      //   db.collection("attData").doc("test").set({
+      //     allSubjects: this.select,
+      //     data: obj
+      //   }, {merge: true});
+      // }
 
       this.dialog = false;
-    }
+    },
   },
   created() {
     db.collection("attData")

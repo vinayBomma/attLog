@@ -12,5 +12,6 @@ weekdays db storage
 reset attendance
 interactive faq
 
+statistics default override
 
 release without history and night mode, get basic functionality right

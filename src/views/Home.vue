@@ -121,12 +121,11 @@ export default {
           this.absent.includes(this.subj[i]) ||
           this.cancelled.includes(this.subj[i])
         ) {
-          //
         } else {
           this.color = "error";
           this.msg = "Enter Data for all subjects";
           this.snackbar = true;
-          // console.log('dont piss me off')
+          this.sendReq = false
         }
       }
       // console.log(this.present);
