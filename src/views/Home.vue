@@ -43,11 +43,13 @@
 
 <script>
 import db from "../firebase/init";
+import firebase from "firebase";
 import { bus } from "../main";
 
 export default {
   data() {
     return {
+      userDB: null,
       snackbar: false,
       msg: null,
       timeout: 3000,
@@ -125,7 +127,7 @@ export default {
           this.color = "error";
           this.msg = "Enter Data for all subjects";
           this.snackbar = true;
-          this.sendReq = false
+          this.sendReq = false;
         }
       }
       // console.log(this.present);
@@ -138,15 +140,14 @@ export default {
       let isoDate = new Date().toISOString().substr(0, 10);
 
       if (this.sendReq) {
-        db.collection("attData")
-          .doc("test")
+        this.userDB
           .get()
           .then(res => {
             for (let i in this.subj) {
               let someValue = this.subj[i];
               userData = res.data().data[someValue];
 
-              if (Object.keys(res.data().data["TOC"]).length !== 0) {
+              if (Object.keys(res.data().data[someValue]).length !== 0) {
                 obj[someValue] = {
                   weekdays: userData.weekdays,
                   presentDates: userData.presentDates,
@@ -162,80 +163,17 @@ export default {
                   obj[someValue].present += 1;
                   obj[someValue].total += 1;
 
-                  if (obj[someValue].absentDates.includes(cDate)) {
-                    obj[someValue].absentDates.splice(
-                      obj[someValue].absentDates.indexOf(cDate),
-                      1
-                    );
-                  }
-
-                  if (obj[someValue].cancelledDates.includes(cDate)) {
-                    obj[someValue].cancelledDates.splice(
-                      obj[someValue].cancelledDates.indexOf(cDate),
-                      1
-                    );
-                  }
-
-                  if (obj[someValue].presentDates.includes(cDate)) {
-                    obj[someValue].presentDates.splice(
-                      obj[someValue].presentDates.indexOf(cDate),
-                      1
-                    );
-                  }
-
                   obj[someValue].presentDates.push(cDate);
                   obj[someValue].weekdays[new Date().getDay()] += 1;
                 } else if (this.absent.includes(someValue)) {
                   obj[someValue].absent += 1;
                   obj[someValue].total += 1;
 
-                  if (obj[someValue].absentDates.includes(cDate)) {
-                    obj[someValue].absentDates.splice(
-                      obj[someValue].absentDates.indexOf(cDate),
-                      1
-                    );
-                  }
-
-                  if (obj[someValue].cancelledDates.includes(cDate)) {
-                    obj[someValue].cancelledDates.splice(
-                      obj[someValue].cancelledDates.indexOf(cDate),
-                      1
-                    );
-                  }
-
-                  if (obj[someValue].presentDates.includes(cDate)) {
-                    obj[someValue].presentDates.splice(
-                      obj[someValue].presentDates.indexOf(cDate),
-                      1
-                    );
-                  }
-
                   obj[someValue].absentDates.push(cDate);
                   obj[someValue].weekdays[new Date().getDay()] -= 1;
                 } else if (this.cancelled.includes(someValue)) {
                   obj[someValue].cancelled += 1;
                   obj[someValue].total += 1;
-
-                  if (obj[someValue].absentDates.includes(cDate)) {
-                    obj[someValue].absentDates.splice(
-                      obj[someValue].absentDates.indexOf(cDate),
-                      1
-                    );
-                  }
-
-                  if (obj[someValue].cancelledDates.includes(cDate)) {
-                    obj[someValue].cancelledDates.splice(
-                      obj[someValue].cancelledDates.indexOf(cDate),
-                      1
-                    );
-                  }
-
-                  if (obj[someValue].presentDates.includes(cDate)) {
-                    obj[someValue].presentDates.splice(
-                      obj[someValue].presentDates.indexOf(cDate),
-                      1
-                    );
-                  }
 
                   obj[someValue].cancelledDates.push(cDate);
                 }
@@ -297,9 +235,7 @@ export default {
 
               if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
                 dbData = obj;
-                db.collection("attData")
-                  .doc("test")
-                  .set({ data: dbData }, { merge: true });
+                this.userDB.set({ data: dbData }, { merge: true });
 
                 if (this.attendData.length === 0) {
                   this.attendData.push(cDate);
@@ -312,9 +248,10 @@ export default {
                   }
                 }
 
-                db.collection("attData")
-                  .doc("test")
-                  .set({ attendance: this.attendData }, { merge: true });
+                this.userDB.set(
+                  { attendance: this.attendData },
+                  { merge: true }
+                );
               }
             }
           })
@@ -327,6 +264,11 @@ export default {
     }
   },
   created() {
+    let user = firebase.auth().currentUser;
+    if (user) {
+      this.userDB = db.collection("attData").doc(user.uid);
+    }
+
     bus.$on("dateValue", data => {
       this.day = data.date;
       this.currentMonth = data.currentMonth;
@@ -334,34 +276,30 @@ export default {
       this.currentYear = data.currentYear;
       this.currentFullDate = data.currentFullDate;
 
-      db.collection("attData")
-        .doc("test")
-        .get()
-        .then(res => {
-          let dayValue = res.data()["timetable"][this.day];
-
-          if (dayValue) {
-            this.subj = dayValue;
-            this.hasSubjects = true;
-            console.log(`TimeTable Found for ${this.day}`);
-          } else {
-            console.log(`No timetable for ${this.day}`);
-          }
-        });
+      this.userDB.get().then(res => {
+        let dayValue = res.data()["timetable"][this.day];
+        if (dayValue) {
+          this.subj = dayValue;
+          this.hasSubjects = true;
+          console.log(`TimeTable Found for ${this.day}`);
+        } else {
+          this.hasSubjects = false;
+          console.log(`No timetable for ${this.day}`);
+        }
+      });
     });
 
-    db.collection("attData")
-      .doc("test")
-      .get()
-      .then(res => {
+    this.userDB.get().then(res => {
+      if(res.data().attendance !== undefined){
         let attDates = res.data().attendance;
 
         if (attDates === undefined || attDates.length === 0) {
           this.attendData = [];
-        } else if (attDates.length > 0) {
+        }else if (attDates.length > 0) {
           this.attendData = attDates;
-        }
-      });
+        }      
+      }
+    });
 
     let days = [
       "Sunday",
@@ -398,20 +336,22 @@ export default {
     //   console.log(document.getElementById('devWidth'))
     // }
 
-    db.collection("attData")
-      .doc("test")
-      .get()
-      .then(res => {
-        let dayValue = res.data()["timetable"][this.day];
+    this.userDB.get().then(res => {
+      if(res.data().timetable !== undefined){
+        if(res.data().timetable[this.day] !== undefined){
+          let dayValue = res.data()["timetable"][this.day];
+          if (dayValue) {
+            this.subj = dayValue;
+            this.hasSubjects = true;
+            console.log(`TimeTable Found for ${this.day}`);
+          }else {
+            this.hasSubjects = false;
+            console.log(`No timetable for ${this.day}`);
+          }
+        }  
+      }
 
-        if (dayValue) {
-          this.subj = dayValue;
-          this.hasSubjects = true;
-          console.log(`TimeTable Found for ${this.day}`);
-        } else {
-          console.log(`No timetable for ${this.day}`);
-        }
-      });
+    });
   }
 };
 </script>

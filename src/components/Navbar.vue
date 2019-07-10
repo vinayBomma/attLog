@@ -4,9 +4,9 @@
       <v-toolbar-side-icon v-on:click="drawer = !drawer"></v-toolbar-side-icon>
       <!-- <v-toolbar-title>Test</v-toolbar-title> -->
       <v-spacer></v-spacer>
-      <v-btn v-if="isUser === false">
+      <!-- <v-btn v-if="isUser === false">
         <img src="../../public/google.png" class="mr-2">Sign In
-      </v-btn>
+      </v-btn>-->
 
       <template v-if="$route.name === 'home'">
         <v-dialog v-model="modal" :return-value.sync="date" lazy full-width width="290px">
@@ -22,10 +22,21 @@
       </template>
 
       <template v-if="$route.name === 'timetable'">
-        <v-icon class="mr-4" @click="restore">restore</v-icon>
+        <v-dialog v-model="ttModal" full-width>
+          <template v-slot:activator="{ on }">
+            <v-icon class="mr-4" @click="ttModal = true" v-on="on">restore</v-icon>
+          </template>
+          <v-card>
+            <v-card-title>This will reset the timetable for this day. Are You Sure?</v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn flat color="blue" @click="ttModal = false">No</v-btn>
+              <v-btn flat color="blue" @click="restore">Yes</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
         <v-icon @click="deleteSub">delete_outline</v-icon>
       </template>
-
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
@@ -36,7 +47,7 @@
       <v-layout column align-center v-if="userPhoto">
         <v-flex class="mt-5">
           <v-avatar size="100">
-            <img :src="userPhoto">
+            <img :src="userPhoto" />
           </v-avatar>
         </v-flex>
       </v-layout>
@@ -59,9 +70,9 @@
           </v-list-tile-content>
         </v-list-tile>
 
-        <v-divider v-if="isUser"></v-divider>
+        <!-- <v-divider v-if="isUser"></v-divider> -->
 
-        <v-list-tile>
+        <!-- <v-list-tile>
           <v-list-tile-action>
             <v-icon>brightness_3</v-icon>
           </v-list-tile-action>
@@ -71,7 +82,7 @@
           <v-list-tile-action>
             <v-switch></v-switch>
           </v-list-tile-action>
-        </v-list-tile>
+        </v-list-tile>-->
       </v-list>
     </v-navigation-drawer>
   </nav>
@@ -85,6 +96,8 @@ export default {
   data() {
     return {
       date: new Date().toISOString().substr(0, 10),
+      ttModal: false,
+      sendBus: null,
       currentDate: null,
       currentMonth: null,
       currentFullDate: null,
@@ -135,28 +148,32 @@ export default {
         "Dec"
       ];
 
-      let obj = {}
+      let obj = {};
 
-      this.currentMonth = months[new Date(this.date).getMonth()]
+      this.currentMonth = months[new Date(this.date).getMonth()];
       this.currentDate = new Date(this.date).getDate();
       this.currentYear = new Date(this.date).getFullYear();
-      this.currentFullDate = this.date
+      this.currentFullDate = this.date;
       this.date = days[new Date(this.date).getDay()];
 
-      obj['date'] = this.date
-      obj['currentMonth'] = this.currentMonth
-      obj['currentDate'] = this.currentDate
-      obj['currentYear'] = this.currentYear
-      obj['currentFullDate'] = this.currentFullDate
+      obj["date"] = this.date;
+      obj["currentMonth"] = this.currentMonth;
+      obj["currentDate"] = this.currentDate;
+      obj["currentYear"] = this.currentYear;
+      obj["currentFullDate"] = this.currentFullDate;
 
       bus.$emit("dateValue", obj);
       this.modal = false;
     },
-    restore(){
-      bus.$emit('restoreBtn')
+    restore() {
+      this.sendBus = true;
+      if (this.sendBus) {
+        this.ttModal = false;
+        bus.$emit("restoreBtn");
+      }
     },
-    deleteSub(){
-      bus.$emit('deleteBtn')
+    deleteSub() {
+      bus.$emit("deleteBtn");
     }
   },
   created() {
@@ -171,7 +188,7 @@ export default {
           { icon: "home", text: "Home", route: "/" },
           { icon: "insert_chart", text: "Statistics", route: "statistics" },
           { icon: "today", text: "Timetable", route: "timetable" },
-          { icon: "add", text: "Add Subjects", route: "add_subjects" },
+          { icon: "add", text: "Add Subjects", route: "add_subjects" }
           // { icon: "settings", text: "Settings", route: "settings" }
         ];
       } else {

@@ -91,48 +91,51 @@
 
 <script>
 import db from "../firebase/init";
+import firebase from "firebase";
 
 export default {
   data() {
     return {
+      userDB: null,
       dialog: false,
       select: ["Maths", "History"],
-      hasSubjects: null,
+      hasSubjects: null
     };
   },
   methods: {
     saveSubjects() {
       this.hasSubjects = true;
-      let obj = {}
-      
-      db.collection('attData').doc('test').get().then((res) => {
-        for(var i in this.select){
+      let obj = {};
 
-          if(res.data().data !== undefined){ 
-
-            if(res.data().data[this.select[i]] !== undefined){
-
-              if(Object.keys(res.data().data[this.select[i]]).length !== 0){
-                obj[this.select[i]] = res.data().data[this.select[i]]
-              }else if(Object.keys(res.data().data[this.select[i]]).length === 0){
-                obj[this.select[i]] = []
+      this.userDB.get().then(res => {
+        for (var i in this.select) {
+          if (res.data().data !== undefined) {
+            if (res.data().data[this.select[i]] !== undefined) {
+              if (Object.keys(res.data().data[this.select[i]]).length !== 0) {
+                obj[this.select[i]] = res.data().data[this.select[i]];
+              } else if (
+                Object.keys(res.data().data[this.select[i]]).length === 0
+              ) {
+                obj[this.select[i]] = [];
               }
-
-            }else if(res.data().data[this.select[i]] === undefined){
-              obj[this.select[i]] = []
+            } else if (res.data().data[this.select[i]] === undefined) {
+              obj[this.select[i]] = [];
             }
-          }else{
-            obj[this.select[i]] = []
+          } else {
+            obj[this.select[i]] = [];
           }
-          
-          if(this.select.indexOf(this.select[i]) === this.select.length - 1){
-            db.collection("attData").doc("test").set({
-              allSubjects: this.select,
-              data: obj
-            }, {merge: true});
-          }          
+
+          if (this.select.indexOf(this.select[i]) === this.select.length - 1) {
+            this.userDB.set(
+              {
+                allSubjects: this.select,
+                data: obj
+              },
+              { merge: true }
+            );
+          }
         }
-      })
+      });
 
       // if(this.select.indexOf(this.select[i]) === this.select.length - 1){
       //   db.collection("attData").doc("test").set({
@@ -142,21 +145,23 @@ export default {
       // }
 
       this.dialog = false;
-    },
+    }
   },
   created() {
-    db.collection("attData")
-      .doc("test")
-      .get()
-      .then(res => {
-        let sub = res.data().allSubjects;
-        if (sub) {
-          this.hasSubjects = true;
-          this.select = sub;
-        } else {
-          this.hasSubjects = false;
-        }
-      });
+    let user = firebase.auth().currentUser;
+    if (user) {
+      this.userDB = db.collection("attData").doc(user.uid);
+    }
+
+    this.userDB.get().then(res => {
+      let sub = res.data().allSubjects;
+      if (sub) {
+        this.hasSubjects = true;
+        this.select = sub;
+      } else {
+        this.hasSubjects = false;
+      }
+    });
   }
 };
 </script>
