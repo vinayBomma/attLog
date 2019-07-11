@@ -2,12 +2,17 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import firebase from 'firebase'
 
-import Home from './views/Home.vue'
-import About from './views/About.vue'
-import Statistics from './views/Statistics.vue'
-import Timetable from './views/Timetable.vue'
-import Signup from './views/Signup.vue'
-import addSubjects from './views/addSubjects.vue'
+// import Home from './views/Home.vue'
+// import Statistics from './views/Statistics.vue'
+// import Timetable from './views/Timetable.vue'
+// import Signup from './views/Signup.vue'
+// import addSubjects from './views/addSubjects.vue'
+
+const Home = () => import(/* webpackChunkName: "home" */ './views/Home.vue')
+const Statistics = () => import(/* webpackChunkName: "stats" */ './views/Statistics.vue')
+const Timetable = () => import(/* webpackChunkName: "timetable" */ './views/Timetable.vue')
+const Signup = () => import(/* webpackChunkName: "signup" */ './views/Signup.vue')
+const addSubjects = () => import(/* webpackChunkName: "addSub" */ './views/addSubjects.vue')
 
 Vue.use(Router)
 
@@ -21,11 +26,6 @@ const router = new Router({
       meta: {
         requiresAuth: true
       }
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: About
     },
     {
       path: '/statistics',

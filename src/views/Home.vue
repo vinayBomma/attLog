@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import db from "../firebase/init";
+import db from '../firebase/init'
 import firebase from "firebase";
 import { bus } from "../main";
 

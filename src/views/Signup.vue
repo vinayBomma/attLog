@@ -3,7 +3,6 @@
     <v-btn v-on:click="googleLogin">
       <img src="../../public/google.png" class="mr-2">Sign In
     </v-btn>
-    <!-- <v-btn v-on:click="googleLogout">Signout</v-btn> -->
 
   </div>
 </template>
@@ -11,6 +10,7 @@
 <script>
 import firebase from "firebase";
 import db from '../firebase/init'
+// const db = () => import("../firebase/init")
 
 export default {
   data() {
@@ -22,14 +22,6 @@ export default {
 
       firebase.auth().signInWithRedirect(provider);
     },
-    // googleLogout() {
-    //   firebase.auth().signOut().then(() => {
-    //     this.$router.push({name: 'signup'})
-    //   })
-    //     .catch(err => {
-    //       console.log(err);
-    //     });
-    // }
   },
   mounted(){
       firebase.auth().getRedirectResult()

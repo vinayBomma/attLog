@@ -13,5 +13,7 @@ reset attendance
 interactive faq
 
 statistics default override
+2x timetable
+feature discovery
 
 release without history and night mode, get basic functionality right
