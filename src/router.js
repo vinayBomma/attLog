@@ -13,6 +13,7 @@ const Statistics = () => import(/* webpackChunkName: "stats" */ './views/Statist
 const Timetable = () => import(/* webpackChunkName: "timetable" */ './views/Timetable.vue')
 const Signup = () => import(/* webpackChunkName: "signup" */ './views/Signup.vue')
 const addSubjects = () => import(/* webpackChunkName: "addSub" */ './views/addSubjects.vue')
+const privacyPolicy = () => import('./views/privacyPolicy.vue')
 
 Vue.use(Router)
 
@@ -55,6 +56,11 @@ const router = new Router({
       path: '/signup',
       name: 'signup',
       component: Signup,
+    },
+    {
+      path: '/privacypolicy',
+      name: 'privacy_policy',
+      component: privacyPolicy,
     },
   ]
 })

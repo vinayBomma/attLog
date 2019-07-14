@@ -15,5 +15,6 @@ interactive faq
 statistics default override
 2x timetable
 feature discovery
+signout modal
 
 release without history and night mode, get basic functionality right

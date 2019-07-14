@@ -2,8 +2,8 @@
     "short_name": "Attend It",
     "name": "Attend It",
     "orientation": "portrait",
-    "description": "Attend It helps you keep track of your academic attendance",
-    "theme_color": "#ffffff",
+    "description": "Attend It helps you track your academic attendance",
+    "theme_color": "#000000",
     "background_color": "#ffffff",
     "display": "standalone",
     "icons": [
