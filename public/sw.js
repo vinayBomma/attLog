@@ -1,19 +1,19 @@
-const cacheName = 'v3';
+const cName = 'v3';
 
-self.addEventListener('install', e => {
+self.addEventListener('install', () => {
   console.log('service worker installed');
   self.skipWaiting()
 });
 
-// activate event
+// activate events
 self.addEventListener('activate', e => {
   console.log('service worker activated');
 
   e.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then(cNames => {
       return Promise.all(
-        cacheNames.map(cache => {
-          if (cache !== cacheName) {
+        cNames.map(cache => {
+          if (cache !== cName) {
             console.log('Service Worker: Clearing Old Cache');
             return caches.delete(cache);
           }
@@ -30,13 +30,17 @@ self.addEventListener('fetch', e => {
     fetch(e.request)
     .then(res => {
       const resClone = res.clone()
-      caches.open(cacheName)
+      caches.open(cName)
         .then(cache => {
-          cache.put(e.request, resClone)
+          if (e.request.method !== "POST") {
+            cache.put(e.request, resClone)
+          }
+        }).catch((err) => {
+          console.log(err)
         })
       // .then(() => self.skipWaiting()) 
       return res
-    }).catch(err =>
+    }).catch(() =>
       caches.match(e.request)
       .then(res => res)
     )

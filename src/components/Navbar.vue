@@ -35,14 +35,27 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <v-icon @click="add_sub" class="mr-4">plus_one</v-icon>
         <v-icon @click="deleteSub">delete_outline</v-icon>
       </template>
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
-      <v-layout align-start justify-end row class="pa-3">
-        <v-icon v-if="isUser === true" v-on:click="googleLogout">exit_to_app</v-icon>
-      </v-layout>
+      <v-dialog v-model="signOutModal" full-width>
+        <template v-slot:activator="{ on }">
+          <v-layout align-start justify-end row class="pa-3">
+            <v-icon v-if="isUser === true" @click="signOutModal = true" v-on="on">exit_to_app</v-icon>
+          </v-layout>
+        </template>
+        <v-card>
+          <v-card-title>Are You Sure You Want To Sign Out?</v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn flat color="blue" @click="signOutModal = false">No</v-btn>
+            <v-btn flat color="blue" @click="googleLogout">Yes</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
       <v-layout column align-center v-if="userPhoto">
         <v-flex class="mt-5">
@@ -90,7 +103,7 @@
 
 <script>
 import firebase from "firebase/app";
-import '../firebase/init'
+import "../firebase/init";
 import { bus } from "../main";
 
 export default {
@@ -99,6 +112,8 @@ export default {
       date: new Date().toISOString().substr(0, 10),
       ttModal: false,
       sendBus: null,
+      signOutModal: null,
+      signOutUser: null,
       currentDate: null,
       currentMonth: null,
       currentFullDate: null,
@@ -114,15 +129,20 @@ export default {
   },
   methods: {
     googleLogout() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          this.$router.push({ name: "signup" });
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      this.signOutModal = false;
+      this.signOutUser = true
+
+      if (this.signOutUser) {
+        firebase
+          .auth()
+          .signOut()
+          .then(() => {
+            this.$router.push({ name: "signup" });
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
     },
     saveDate() {
       let days = [
@@ -175,6 +195,9 @@ export default {
     },
     deleteSub() {
       bus.$emit("deleteBtn");
+    },
+    add_sub() {
+      bus.$emit('add_sub');
     }
   },
   created() {

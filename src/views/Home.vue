@@ -27,9 +27,9 @@
         <v-flex xs12 sm6 md4 pa-1 v-else>
           <v-card>
             <v-card-text>No Timetable Added For {{this.day}}</v-card-text>
-            <v-card-actions>
-              <p>Add Timetable</p>
-            </v-card-actions>
+          </v-card>
+          <v-card class="mt-2">
+            <v-card-text>Click Here To Add Subjects</v-card-text>
           </v-card>
         </v-flex>
       </v-layout>
@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import db from '../firebase/init'
+import db from "../firebase/init";
 import firebase from "firebase";
 import { bus } from "../main";
 
@@ -66,7 +66,9 @@ export default {
       currentYear: null,
       currentFullDate: null,
       attendData: [],
-      sendReq: true
+      sendReq: true,
+      isDupe: false,
+      dupeSub: []
     };
   },
   methods: {
@@ -130,13 +132,14 @@ export default {
           this.sendReq = false;
         }
       }
-      // console.log(this.present);
-      // console.log(this.absent);
-      // console.log(this.cancelled);
+      console.log(this.present);
+      console.log(this.absent);
+      console.log(this.cancelled);
 
       let obj = {},
         userData,
         dbData;
+      let someData = {};
       let isoDate = new Date().toISOString().substr(0, 10);
 
       if (this.sendReq) {
@@ -145,8 +148,43 @@ export default {
           .then(res => {
             for (let i in this.subj) {
               let someValue = this.subj[i];
-              userData = res.data().data[someValue];
 
+              if (this.dupeSub.includes(someValue)) {
+                let dupeData = someValue;
+                someValue = someValue.slice(0, -12);
+                someData[someValue] = {
+                  weekdays: [0, 0, 0, 0, 0, 0, 0],
+                  presentDates: [],
+                  absentDates: [],
+                  cancelledDates: [],
+                  present: 0,
+                  absent: 0,
+                  cancelled: 0,
+                  total: 0
+                };
+                if (this.present.includes(dupeData)) {
+                  someData[someValue].present += 1;
+                  someData[someValue].total += 1;
+
+                  someData[someValue].presentDates.push(cDate);
+                  someData[someValue].weekdays[new Date().getDay()] += 1;
+                } else if (this.absent.includes(dupeData)) {
+                  someData[someValue].absent += 1;
+                  someData[someValue].total += 1;
+
+                  someData[someValue].absentDates.push(cDate);
+                  someData[someValue].weekdays[new Date().getDay()] -= 1;
+                } else if (this.cancelled.includes(dupeData)) {
+                  someData[someValue].cancelled += 1;
+                  someData[someValue].total += 1;
+
+                  someData[someValue].cancelledDates.push(cDate);
+                }
+                console.log(someData);
+                continue;
+              }
+
+              userData = res.data().data[someValue];
               if (Object.keys(res.data().data[someValue]).length !== 0) {
                 obj[someValue] = {
                   weekdays: userData.weekdays,
@@ -165,17 +203,119 @@ export default {
 
                   obj[someValue].presentDates.push(cDate);
                   obj[someValue].weekdays[new Date().getDay()] += 1;
+
+                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
+                    let duplicateSub = someValue + " (Duplicate)";
+                    if (this.present.includes(duplicateSub)) {
+                      // console.log("present");
+                      obj[someValue].present += someData[someValue].present;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].presentDates.push(
+                        someData[someValue].presentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] += 1;
+                      someData = {}
+                    } else if (this.absent.includes(duplicateSub)) {
+                      // console.log("absent");
+                      obj[someValue].absent += someData[someValue].absent;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].absentDates.push(
+                        someData[someValue].absentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] -= 1;
+                      someData = {}
+                    } else if (this.cancelled.includes(duplicateSub)) {
+                      // console.log("cancelled");
+                      obj[someValue].cancelled += someData[someValue].cancelled;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].cancelledDates.push(
+                        someData[someValue].cancelledDates[0]
+                      );
+                      someData = {}
+                    }
+                  }
                 } else if (this.absent.includes(someValue)) {
                   obj[someValue].absent += 1;
                   obj[someValue].total += 1;
 
                   obj[someValue].absentDates.push(cDate);
                   obj[someValue].weekdays[new Date().getDay()] -= 1;
+
+                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
+                    let duplicateSub = someValue + " (Duplicate)";
+                    if (this.present.includes(duplicateSub)) {
+                      // console.log("present");
+                      obj[someValue].present += someData[someValue].present;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].presentDates.push(
+                        someData[someValue].presentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] += 1;
+                      someData = {}
+                    } else if (this.absent.includes(duplicateSub)) {
+                      // console.log("absent");
+                      obj[someValue].absent += someData[someValue].absent;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].absentDates.push(
+                        someData[someValue].absentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] -= 1;
+                      someData = {}
+                    } else if (this.cancelled.includes(duplicateSub)) {
+                      // console.log("cancelled");
+                      obj[someValue].cancelled += someData[someValue].cancelled;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].cancelledDates.push(
+                        someData[someValue].cancelledDates[0]
+                      );
+                      someData = {}
+                    }
+                  }
                 } else if (this.cancelled.includes(someValue)) {
                   obj[someValue].cancelled += 1;
                   obj[someValue].total += 1;
 
                   obj[someValue].cancelledDates.push(cDate);
+
+                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
+                    let duplicateSub = someValue + " (Duplicate)";
+                    if (this.present.includes(duplicateSub)) {
+                      // console.log("present");
+                      obj[someValue].present += someData[someValue].present;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].presentDates.push(
+                        someData[someValue].presentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] += 1;
+                      someData = {}
+                    } else if (this.absent.includes(duplicateSub)) {
+                      // console.log("absent");
+                      obj[someValue].absent += someData[someValue].absent;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].absentDates.push(
+                        someData[someValue].absentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] -= 1;
+                      someData = {}
+                    } else if (this.cancelled.includes(duplicateSub)) {
+                      // console.log("cancelled");
+                      obj[someValue].cancelled += someData[someValue].cancelled;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].cancelledDates.push(
+                        someData[someValue].cancelledDates[0]
+                      );
+                      someData = {}
+                    }
+                  }
                 }
               } else {
                 obj[someValue] = {
@@ -204,6 +344,40 @@ export default {
                       new Date(this.currentFullDate).getDay()
                     ] += 1;
                   }
+
+                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
+                    let duplicateSub = someValue + " (Duplicate)";
+                    if (this.present.includes(duplicateSub)) {
+                      // console.log("present");
+                      obj[someValue].present += someData[someValue].present;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].presentDates.push(
+                        someData[someValue].presentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] += 1;
+                      someData = {}
+                    } else if (this.absent.includes(duplicateSub)) {
+                      // console.log("absent");
+                      obj[someValue].absent += someData[someValue].absent;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].absentDates.push(
+                        someData[someValue].absentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] -= 1;
+                      someData = {}
+                    } else if (this.cancelled.includes(duplicateSub)) {
+                      // console.log("cancelled");
+                      obj[someValue].cancelled += someData[someValue].cancelled;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].cancelledDates.push(
+                        someData[someValue].cancelledDates[0]
+                      );
+                      someData = {}
+                    }
+                  }
                 } else if (this.absent.includes(someValue)) {
                   obj[someValue].absent += 1;
                   obj[someValue].total += 1;
@@ -219,6 +393,40 @@ export default {
                       new Date(this.currentFullDate).getDay()
                     ] -= 1;
                   }
+
+                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
+                    let duplicateSub = someValue + " (Duplicate)";
+                    if (this.present.includes(duplicateSub)) {
+                      // console.log("present");
+                      obj[someValue].present += someData[someValue].present;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].presentDates.push(
+                        someData[someValue].presentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] += 1;
+                      someData = {}
+                    } else if (this.absent.includes(duplicateSub)) {
+                      // console.log("absent");
+                      obj[someValue].absent += someData[someValue].absent;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].absentDates.push(
+                        someData[someValue].absentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] -= 1;
+                      someData = {}
+                    } else if (this.cancelled.includes(duplicateSub)) {
+                      // console.log("cancelled");
+                      obj[someValue].cancelled += someData[someValue].cancelled;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].cancelledDates.push(
+                        someData[someValue].cancelledDates[0]
+                      );
+                      someData = {}
+                    }
+                  }
                 } else if (this.cancelled.includes(someValue)) {
                   obj[someValue].cancelled += 1;
                   obj[someValue].total += 1;
@@ -230,11 +438,46 @@ export default {
                       new Date(this.currentFullDate).toISOString().substr(0, 10)
                     );
                   }
+
+                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
+                    let duplicateSub = someValue + " (Duplicate)";
+                    if (this.present.includes(duplicateSub)) {
+                      // console.log("present");
+                      obj[someValue].present += someData[someValue].present;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].presentDates.push(
+                        someData[someValue].presentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] += 1;
+                      someData = {}
+                    } else if (this.absent.includes(duplicateSub)) {
+                      // console.log("absent");
+                      obj[someValue].absent += someData[someValue].absent;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].absentDates.push(
+                        someData[someValue].absentDates[0]
+                      );
+                      obj[someValue].weekdays[new Date().getDay()] -= 1;
+                      someData = {}
+                    } else if (this.cancelled.includes(duplicateSub)) {
+                      // console.log("cancelled");
+                      obj[someValue].cancelled += someData[someValue].cancelled;
+                      obj[someValue].total += someData[someValue].total;
+
+                      obj[someValue].cancelledDates.push(
+                        someData[someValue].cancelledDates[0]
+                      );
+                      someData = {}
+                    }
+                  }
                 }
               }
 
               if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
                 dbData = obj;
+                console.log(dbData);
                 this.userDB.set({ data: dbData }, { merge: true });
 
                 if (this.attendData.length === 0) {
@@ -282,6 +525,21 @@ export default {
           this.subj = dayValue;
           this.hasSubjects = true;
           console.log(`TimeTable Found for ${this.day}`);
+
+          for (let i in dayValue) {
+            if (dayValue[i].includes("Duplicate")) {
+              this.isDupe = true;
+              let someVal = dayValue[i].slice(0, -12);
+
+              if (this.dupeSub.includes(dayValue[i])) {
+                this.dupeSub.splice(this.dupeSub.indexOf(dayValue[i]), 1);
+                this.dupeSub.push(dayValue[i]);
+              } else {
+                this.dupeSub.push(dayValue[i]);
+              }
+              console.log(this.dupeSub);
+            }
+          }
         } else {
           this.hasSubjects = false;
           console.log(`No timetable for ${this.day}`);
@@ -290,14 +548,14 @@ export default {
     });
 
     this.userDB.get().then(res => {
-      if(res.data().attendance !== undefined){
+      if (res.data().attendance !== undefined) {
         let attDates = res.data().attendance;
 
         if (attDates === undefined || attDates.length === 0) {
           this.attendData = [];
-        }else if (attDates.length > 0) {
+        } else if (attDates.length > 0) {
           this.attendData = attDates;
-        }      
+        }
       }
     });
 
@@ -337,20 +595,28 @@ export default {
     // }
 
     this.userDB.get().then(res => {
-      if(res.data().timetable !== undefined){
-        if(res.data().timetable[this.day] !== undefined){
+      if (res.data().timetable !== undefined) {
+        if (res.data().timetable[this.day] !== undefined) {
           let dayValue = res.data()["timetable"][this.day];
+
           if (dayValue) {
             this.subj = dayValue;
             this.hasSubjects = true;
             console.log(`TimeTable Found for ${this.day}`);
-          }else {
+
+            for (let i in dayValue) {
+              if (dayValue[i].includes("Duplicate")) {
+                let someVal = dayValue[i].slice(0, -12);
+                this.isDupe = true;
+                this.dupeSub.push(dayValue[i]);
+              }
+            }
+          } else {
             this.hasSubjects = false;
             console.log(`No timetable for ${this.day}`);
           }
-        }  
+        }
       }
-
     });
   }
 };

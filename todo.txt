@@ -1,20 +1,20 @@
 beforeCreate
 save button
-stats subj menu
-edit and delete timetable
+
 sign in navbar functionality
 404 page
 add timetable deleting all chips page issue
 line chart along with pie chart
 loading screen after signing in
-subject twice in one day timetable
-weekdays db storage
+
+ui padding 360px
+delete subjects
+
 reset attendance
 interactive faq
+tt snackbar confirmation
 
-statistics default override
 2x timetable
 feature discovery
-signout modal
 
 release without history and night mode, get basic functionality right

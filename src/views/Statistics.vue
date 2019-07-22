@@ -1,63 +1,70 @@
 <template>
   <section>
-    <v-flex xs5 pt-2 pl-2>
-      <v-select :items="items" v-model="currentItem" v-on:change="statChange" solo></v-select>
-    </v-flex>
-    <v-container>
-      <v-layout row wrap>
-        <v-flex xs12 sm12 md4 pl-1 pr-1 pb-1>
-          <v-card>
-            <div id="doughnut" style="display: block;">
-              <canvas id="mychart1" width="400" height="300" class="pa-2"></canvas>
-            </div>
-          </v-card>
-        </v-flex>
-        <v-flex xs6 sm6 md4 pa-1>
-          <v-card>
-            <v-card-title>
-              <v-progress-circular
-                rotate="360"
-                size="100"
-                width="15"
-                color="teal"
-                :value="value"
-              >{{value}}%</v-progress-circular>
-            </v-card-title>
-            <h4 class="text-xs-center">Attendance</h4>
-          </v-card>
-        </v-flex>
+    <div v-if="showStat">
+      <v-flex xs5 pt-2 pl-2>
+        <v-select :items="items" v-model="currentItem" v-on:change="statChange" solo></v-select>
+      </v-flex>
+      <v-container>
+        <v-layout row wrap>
+          <v-flex xs12 sm12 md4 pl-1 pr-1 pb-1>
+            <v-card>
+              <div id="doughnut" style="display: block;">
+                <canvas id="mychart1" width="400" height="300" class="pa-2"></canvas>
+              </div>
+            </v-card>
+          </v-flex>
+          <v-flex xs6 sm6 md4 pa-1>
+            <v-card>
+              <v-card-title>
+                <v-progress-circular
+                  rotate="360"
+                  size="100"
+                  width="15"
+                  color="teal"
+                  :value="value"
+                >{{value}}%</v-progress-circular>
+              </v-card-title>
+              <h4 class="text-xs-center">Attendance</h4>
+            </v-card>
+          </v-flex>
 
-        <!-- <v-flex xs6 sm6 md4 pa-1>
+          <!-- <v-flex xs6 sm6 md4 pa-1>
           <v-card>
             <v-card-title>
               <v-progress-circular rotate='360' size='100' width='15' color='teal' :value='value'>{{value}}%</v-progress-circular>
             </v-card-title>
             <h4 class="text-xs-center">Attendance</h4>
           </v-card>
-        </v-flex>-->
+          </v-flex>-->
 
-        <!-- <v-flex xs12 sm6 md4 pa-1>
+          <!-- <v-flex xs12 sm6 md4 pa-1>
           <v-card>
             <v-card-title>
               <h3>History</h3>
               <v-date-picker v-model="date1" no-title readonly :events="dateEvent" :event-color="date => date[9] % 2 ? 'red' : 'yellow'" full-width></v-date-picker>
             </v-card-title>
           </v-card>
-        </v-flex>-->
-      </v-layout>
-      <!-- <v-layout v-else-if="!hasSubjects">
+          </v-flex>-->
+        </v-layout>
+        <!-- <v-layout v-else-if="!hasSubjects">
         <v-flex xs12 sm6 md4 pa-1>
           <v-card>
             <v-card-text>No Statistics Available</v-card-text>
           </v-card>
         </v-flex>
-      </v-layout>-->
-    </v-container>
+        </v-layout>-->
+      </v-container>
+    </div>
+    <div v-else-if="!showStat">
+      <v-card>
+        <v-card-text>No Statistics Available</v-card-text>
+      </v-card>
+    </div>
   </section>
 </template>
 
 <script>
-import Chart from 'chart.js'
+import Chart from "chart.js";
 import db from "../firebase/init";
 import firebase from "firebase";
 
@@ -71,7 +78,8 @@ export default {
       date1: new Date().toISOString().substr(0, 10),
       value: 75,
       items: [],
-      currentItem: null
+      currentItem: null,
+      showStat: true
     };
   },
   methods: {
@@ -102,14 +110,16 @@ export default {
 
         if (pieData[3] > 0 && pieData[2] === pieData[3]) {
           this.value = 100;
-        }else if(pieData[3] === (pieData[0] + pieData[2])){
+        } else if (pieData[3] === pieData[0] + pieData[2]) {
           this.value = 100;
-        }else {
-          this.value = Math.floor((pieData[0] * 100) / (pieData[3] - pieData[2]));
+        } else {
+          this.value = Math.floor(
+            (pieData[0] * 100) / (pieData[3] - pieData[2])
+          );
         }
 
         let obj = {
-          type: 'pie',
+          type: "pie",
           data: {
             labels: ["Present", "Absent", "Cancelled", "Total"],
             datasets: [
@@ -140,7 +150,7 @@ export default {
           options: {
             legend: {
               display: true,
-              position: 'left'
+              position: "left"
             }
             // scales: {
             //   yAxes: [
@@ -179,7 +189,7 @@ export default {
       }
 
       let obj = {
-        type: 'pie',
+        type: "pie",
         data: {
           labels: ["Present", "Absent", "Cancelled", "Total"],
           datasets: [
@@ -208,19 +218,19 @@ export default {
           ]
         },
         options: {
-            legend: {
-              display: true,
-              position: 'left'
-            }
-            // scales: {
-            //   yAxes: [
-            //     {
-            //       ticks: {
-            //         beginAtZero: true
-            //       }
-            //     }
-            //   ]
-            // }
+          legend: {
+            display: true,
+            position: "left"
+          }
+          // scales: {
+          //   yAxes: [
+          //     {
+          //       ticks: {
+          //         beginAtZero: true
+          //       }
+          //     }
+          //   ]
+          // }
         }
       };
 
@@ -232,8 +242,13 @@ export default {
     if (user) {
       this.userDB = db.collection("attData").doc(user.uid);
     }
+      this.userDB.get().then(res => {
+        if (res.data().allSubjects === undefined) {
+          this.showStat = false
+        } else {
+          this.showStat = true
+        }
+      });
   }
 };
 </script>
-
-
