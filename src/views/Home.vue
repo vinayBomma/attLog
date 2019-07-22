@@ -113,7 +113,7 @@ export default {
         this.snackbar = true;
         this.sendReq = false;
       } else {
-        this.color = undefined;
+        this.color = 'success';
         this.msg = "Attendance Logged";
         this.snackbar = true;
         this.sendReq = true;
@@ -127,7 +127,7 @@ export default {
         ) {
         } else {
           this.color = "error";
-          this.msg = "Enter Data for all subjects";
+          this.msg = "Select Attendance For All Subjects";
           this.snackbar = true;
           this.sendReq = false;
         }
@@ -180,7 +180,7 @@ export default {
 
                   someData[someValue].cancelledDates.push(cDate);
                 }
-                console.log(someData);
+                // console.log(someData);
                 continue;
               }
 
@@ -489,7 +489,7 @@ export default {
                   } else {
                     this.attendData.push(cDate);
                   }
-                }
+                } 
 
                 this.userDB.set(
                   { attendance: this.attendData },

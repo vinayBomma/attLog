@@ -38,6 +38,10 @@
         <v-icon @click="add_sub" class="mr-4">plus_one</v-icon>
         <v-icon @click="deleteSub">delete_outline</v-icon>
       </template>
+
+      <template v-if="$route.name === 'add_subjects'">
+        <v-icon @click="delSub">delete_outline</v-icon>
+      </template>
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
@@ -195,6 +199,9 @@ export default {
     },
     deleteSub() {
       bus.$emit("deleteBtn");
+    },
+    delSub() {
+      bus.$emit("delSub");
     },
     add_sub() {
       bus.$emit('add_sub');

@@ -46,6 +46,29 @@
         </v-flex>
       </template>
 
+      <template v-else-if="!hasSubjects && showDel === true">
+        <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
+          <v-card flat class="pa-3">
+            <v-checkbox v-model="checkData" :label="sub" :value="sub"></v-checkbox>
+          </v-card>
+        </v-flex>
+        <v-layout row>
+          <v-dialog v-model="delModal" full-width>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="delModal = true" v-on="on">Delete Subject</v-btn>
+            </template>
+            <v-card>
+              <v-card-title>This will delete the subject. Are You Sure?</v-card-title>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn flat color="blue" @click="delModal = false">No</v-btn>
+                <v-btn flat color="blue" @click="deleteSubj">Yes</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-layout>
+      </template>
+
       <v-card flat v-else>
         <v-card-text>No Subjects Added</v-card-text>
         <v-card-actions>
@@ -92,6 +115,7 @@
 <script>
 import db from "../firebase/init";
 import firebase from "firebase";
+import { bus } from "../main";
 
 export default {
   data() {
@@ -99,7 +123,10 @@ export default {
       userDB: null,
       dialog: false,
       select: ["Maths", "History"],
-      hasSubjects: null
+      hasSubjects: null,
+      showDel: false,
+      checkData: [],
+      delModal: false
     };
   },
   methods: {
@@ -145,9 +172,34 @@ export default {
       // }
 
       this.dialog = false;
+    },
+    deleteSubj() {
+      this.delModal = false;
+
+      this.userDB.get().then(res => {
+        this.select = res.data().allSubjects
+        for (let i in this.checkData) {
+          if(this.select.includes(this.checkData[i])){
+            this.select.splice(this.select.indexOf(this.checkData[i]), 1);
+          }
+        }
+
+        this.userDB.set({
+          allSubjects: this.select
+        }, {merge: true})
+      }); 
+
+      this.hasSubjects = !this.hasSubjects
+      this.showDel = !this.showDel
     }
   },
   created() {
+    bus.$on("delSub", () => {
+      console.log("this is awesome");
+      this.hasSubjects = !this.hasSubjects;
+      this.showDel = !this.showDel;
+    });
+
     let user = firebase.auth().currentUser;
     if (user) {
       this.userDB = db.collection("attData").doc(user.uid);

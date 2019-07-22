@@ -8,13 +8,10 @@ line chart along with pie chart
 loading screen after signing in
 
 ui padding 360px
-delete subjects
 
 reset attendance
 interactive faq
-tt snackbar confirmation
 
-2x timetable
 feature discovery
 
 release without history and night mode, get basic functionality right

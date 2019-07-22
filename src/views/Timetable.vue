@@ -25,7 +25,7 @@
               </v-flex>
             </draggable>
             <v-layout row>
-              <v-btn @click="submitTable">Submit</v-btn>
+              <v-btn @click="submitTable">Save Timetable</v-btn>
             </v-layout>
           </template>
           <template v-else-if="!hasSubjects && extraSub === false">
@@ -48,8 +48,6 @@
               <v-btn @click="addSub">Duplicate Subject</v-btn>
             </v-layout>
           </template>
-          <p>{{ checkData }}</p>
-          <p>{{ subData }}</p>
         </v-tab-item>
       </v-tabs-items>
     </div>
@@ -234,6 +232,10 @@ export default {
           });
           break;
       }
+
+      this.color = "error";
+      this.msg = `Timetable Deleted For ${this.currentItem}`;
+      this.snackbar = true;
     });
 
     bus.$on("deleteBtn", () => {
