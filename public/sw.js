@@ -1,4 +1,4 @@
-const cName = 'v3';
+const cName = 'v1';
 
 self.addEventListener('install', () => {
   console.log('service worker installed');

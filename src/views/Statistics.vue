@@ -1,65 +1,81 @@
 <template>
   <section>
-    <div v-if="showStat">
-      <v-flex xs5 pt-2 pl-2>
-        <v-select :items="items" v-model="currentItem" v-on:change="statChange" solo></v-select>
-      </v-flex>
-      <v-container>
-        <v-layout row wrap>
-          <v-flex xs12 sm12 md4 pl-1 pr-1 pb-1>
-            <v-card>
-              <div id="doughnut" style="display: block;">
-                <canvas id="mychart1" width="400" height="300" class="pa-2"></canvas>
-              </div>
-            </v-card>
-          </v-flex>
-          <v-flex xs6 sm6 md4 pa-1>
-            <v-card>
-              <v-card-title>
-                <v-progress-circular
-                  rotate="360"
-                  size="100"
-                  width="15"
-                  color="teal"
-                  :value="value"
-                >{{value}}%</v-progress-circular>
-              </v-card-title>
-              <h4 class="text-xs-center">Attendance</h4>
-            </v-card>
-          </v-flex>
+    <div :style="style">
+      <div v-if="showStat">
+        <v-flex xs5 pt-2 pl-2>
+          <v-select :items="items" v-model="currentItem" v-on:change="statChange" solo></v-select>
+        </v-flex>
+        <v-container>
+          <v-layout row wrap>
+            <v-flex xs12 sm12 md4 pl-1 pr-1 pb-1>
+              <v-card>
+                <div id="doughnut" style="display: block;">
+                  <canvas id="mychart1" width="400" height="300" class="pa-2"></canvas>
+                </div>
+              </v-card>
+            </v-flex>
+            <v-flex xs6 sm6 md4 pa-1>
+              <v-card>
+                <v-layout justify-center>
+                  <v-progress-circular
+                    rotate="360"
+                    size="100"
+                    width="15"
+                    color="teal"
+                    :value="value"
+                    class="mt-2"
+                  >{{value}}%</v-progress-circular>
+                </v-layout>
+                <v-layout justify-center>
+                  <p class="mt-2" text-align="center">Attendance</p>
+                </v-layout>
+              </v-card>
+            </v-flex>
 
-          <!-- <v-flex xs6 sm6 md4 pa-1>
+            <!-- <v-flex xs6 sm6 md4 pa-1>
           <v-card>
             <v-card-title>
               <v-progress-circular rotate='360' size='100' width='15' color='teal' :value='value'>{{value}}%</v-progress-circular>
             </v-card-title>
             <h4 class="text-xs-center">Attendance</h4>
           </v-card>
-          </v-flex>-->
+            </v-flex>-->
 
-          <!-- <v-flex xs12 sm6 md4 pa-1>
-          <v-card>
-            <v-card-title>
-              <h3>History</h3>
-              <v-date-picker v-model="date1" no-title readonly :events="dateEvent" :event-color="date => date[9] % 2 ? 'red' : 'yellow'" full-width></v-date-picker>
-            </v-card-title>
-          </v-card>
-          </v-flex>-->
+            <!-- <v-flex xs12 sm6 md4 pa-1>
+              <v-card>
+                <v-layout row>
+                  <v-card-title>History</v-card-title>
+                </v-layout>
+                <v-date-picker
+                  v-model="date1"
+                  no-title
+                  readonly
+                  :events="dateEvent"
+
+                  full-width
+                ></v-date-picker>
+              </v-card>
+            </v-flex> -->
+          </v-layout>
+        </v-container>
+      </div>
+      <div v-else-if="!showStat">
+        <v-card>
+          <v-card-text>No Statistics Available</v-card-text>
+        </v-card>
+      </div>
+    </div>
+
+    <v-dialog v-model="loading" persistent full-width>
+      <v-card color="transparent">
+        <v-layout v-model="loading" justify-center pa-3>
+          <OrbitSpinner v-show="loading === true" :size="55" color="cyan" />
         </v-layout>
-        <!-- <v-layout v-else-if="!hasSubjects">
-        <v-flex xs12 sm6 md4 pa-1>
-          <v-card>
-            <v-card-text>No Statistics Available</v-card-text>
-          </v-card>
-        </v-flex>
-        </v-layout>-->
-      </v-container>
-    </div>
-    <div v-else-if="!showStat">
-      <v-card>
-        <v-card-text>No Statistics Available</v-card-text>
+        <v-layout justify-center>
+          <p text-align="center">Loading...</p>
+        </v-layout>
       </v-card>
-    </div>
+    </v-dialog>
   </section>
 </template>
 
@@ -68,18 +84,24 @@ import Chart from "chart.js";
 import db from "../firebase/init";
 import firebase from "firebase";
 
+import "epic-spinners/dist/lib/epic-spinners.min.css";
+import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
+
 export default {
+  components: {
+    OrbitSpinner
+  },
   data() {
     return {
-      // hasSubjects: true,
       userDB: null,
-      arrayEvents: null,
       moreEvents: null,
       date1: new Date().toISOString().substr(0, 10),
       value: 75,
       items: [],
       currentItem: null,
-      showStat: true
+      showStat: true,
+      loading: false,
+      style: "opacity: 1"
     };
   },
   methods: {
@@ -93,6 +115,7 @@ export default {
     },
     dateEvent(date) {
       const [, , day] = date.split("-");
+      // console.log(let [,,date])
       if ([12, 17, 28].includes(parseInt(day, 10))) return true;
       if ([1, 19, 22].includes(parseInt(day, 10))) return ["red", "green"];
       return false;
@@ -169,7 +192,11 @@ export default {
     }
   },
   mounted() {
+    this.loading = true;
+    this.style = "opacity: 0.3";
     this.userDB.get().then(res => {
+      this.loading = false;
+      this.style = "opacity: 1";
       this.items = res.data().allSubjects;
       this.currentItem = res.data().allSubjects[0];
 
@@ -242,13 +269,18 @@ export default {
     if (user) {
       this.userDB = db.collection("attData").doc(user.uid);
     }
-      this.userDB.get().then(res => {
-        if (res.data().allSubjects === undefined) {
-          this.showStat = false
-        } else {
-          this.showStat = true
-        }
-      });
+
+    this.loading = true;
+    this.style = "opacity: 0.3";
+    this.userDB.get().then(res => {
+      this.loading = false;
+      this.style = "opacity: 1";
+      if (res.data().allSubjects === undefined) {
+        this.showStat = false;
+      } else {
+        this.showStat = true;
+      }
+    });
   }
 };
 </script>

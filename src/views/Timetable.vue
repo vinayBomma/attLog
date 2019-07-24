@@ -1,66 +1,80 @@
 <template>
   <section>
-    <div v-if="showtt">
-      <template>
-        <v-tabs
-          v-model="currentItem"
-          color="transparent"
-          fixed-tabs
-          show-arrows
-          slider-color="blue"
-          @change="tabChange"
-        >
-          <v-tab v-for="item in items" :key="item" :href="'#' + item">{{ item }}</v-tab>
-        </v-tabs>
-      </template>
-      <v-tabs-items v-model="currentItem">
-        <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
-          <template v-if="hasSubjects && extraSub === false">
-            <draggable v-model="subjects" @start="drag=true" @end="drag=false">
+    <div :style="style">
+      <div v-if="showtt">
+        <template>
+          <v-tabs
+            v-model="currentItem"
+            color="transparent"
+            fixed-tabs
+            show-arrows
+            slider-color="blue"
+            @change="tabChange"
+          >
+            <v-tab v-for="item in items" :key="item" :href="'#' + item">{{ item }}</v-tab>
+          </v-tabs>
+        </template>
+        <v-tabs-items v-model="currentItem">
+          <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
+            <template v-if="hasSubjects && extraSub === false">
+              <draggable v-model="subjects" @start="drag=true" @end="drag=false">
+                <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
+                  <v-card flat class="pa-3">
+                    <v-icon left>reorder</v-icon>
+                    <span>{{ sub }}</span>
+                  </v-card>
+                </v-flex>
+              </draggable>
+              <v-layout row>
+                <v-btn @click="submitTable">Save Timetable</v-btn>
+              </v-layout>
+            </template>
+            <template v-else-if="!hasSubjects && extraSub === false">
               <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
                 <v-card flat class="pa-3">
-                  <v-icon left>reorder</v-icon>
-                  <span>{{ sub }}</span>
+                  <v-checkbox v-model="checkData" :label="sub" :value="sub"></v-checkbox>
                 </v-card>
               </v-flex>
-            </draggable>
-            <v-layout row>
-              <v-btn @click="submitTable">Save Timetable</v-btn>
-            </v-layout>
-          </template>
-          <template v-else-if="!hasSubjects && extraSub === false">
-            <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
-              <v-card flat class="pa-3">
-                <v-checkbox v-model="checkData" :label="sub" :value="sub"></v-checkbox>
-              </v-card>
-            </v-flex>
-            <v-layout row>
-              <v-btn @click="deleteSubj">Delete</v-btn>
-            </v-layout>
-          </template>
-          <template v-if="extraSub">
-            <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
-              <v-card flat class="pa-3">
-                <v-checkbox v-model="subData" :label="sub" :value="sub"></v-checkbox>
-              </v-card>
-            </v-flex>
-            <v-layout row>
-              <v-btn @click="addSub">Duplicate Subject</v-btn>
-            </v-layout>
-          </template>
-        </v-tab-item>
-      </v-tabs-items>
-    </div>
-    <div v-else-if="!showtt">
-      <v-card>
-        <v-card-text>No Subjects Added</v-card-text>
-      </v-card>
+              <v-layout row>
+                <v-btn @click="deleteSubj">Delete</v-btn>
+              </v-layout>
+            </template>
+            <template v-if="extraSub">
+              <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
+                <v-card flat class="pa-3">
+                  <v-checkbox v-model="subData" :label="sub" :value="sub"></v-checkbox>
+                </v-card>
+              </v-flex>
+              <v-layout row>
+                <v-btn @click="addSub">Duplicate Subject</v-btn>
+              </v-layout>
+            </template>
+          </v-tab-item>
+        </v-tabs-items>
+      </div>
+      <div v-else-if="!showtt">
+        <v-card>
+          <v-card-text>No Subjects Added</v-card-text>
+        </v-card>
+      </div>
     </div>
 
     <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
       {{ msg }}
       <v-btn flat @click="snackbar === false">Close</v-btn>
     </v-snackbar>
+
+    <v-dialog v-model="loading" persistent full-width>
+      <v-card color="transparent">
+        <v-layout v-model="loading" justify-center pa-3>
+          <OrbitSpinner v-show="loading === true" :size="55" color="cyan" />
+        </v-layout>
+        <v-layout justify-center>
+          <p text-align="center">Loading...</p>
+        </v-layout>
+      </v-card>
+    </v-dialog>
+
   </section>
 </template> 
 
@@ -68,11 +82,15 @@
 import firebase from "firebase";
 import db from "../firebase/init";
 import { bus } from "../main";
+
 import draggable from "vuedraggable";
+import "epic-spinners/dist/lib/epic-spinners.min.css";
+import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
 
 export default {
   components: {
-    draggable
+    draggable,
+    OrbitSpinner
   },
   data() {
     return {
@@ -98,7 +116,9 @@ export default {
       subjects: [],
       orderedSubs: [],
       defSubs: [],
-      showtt: true
+      showtt: true,
+      loading: false,
+      style: "opacity: 1"
     };
   },
   methods: {
@@ -112,15 +132,16 @@ export default {
       this.msg = `Timetable Created For ${this.currentItem}`;
       this.snackbar = true;
 
-      this.userDB.set({timetable: obj},
-        { merge: true }
-      );
-
+      this.userDB.set({ timetable: obj }, { merge: true });
     },
     tabChange() {
+      this.loading = true;
+      this.style = "opacity: 0.3";
       this.userDB
         .get()
         .then(res => {
+          this.loading = false;
+          this.style = "opacity: 1";
           if (res.data().timetable === undefined) {
             // if(res.data().timetable[this.currentItem] === undefined){
             this.subjects = res.data().allSubjects;
@@ -158,9 +179,13 @@ export default {
     }
   },
   mounted() {
+    this.loading = true;
+    this.style = "opacity: 0.3";
     this.userDB
       .get()
       .then(res => {
+        this.loading = false;
+        this.style = "opacity: 1";
         if (res.data().timetable === undefined) {
           this.subjects = res.data().allSubjects;
           this.defSubs = this.subjects;

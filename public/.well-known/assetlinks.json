@@ -1,5 +1,5 @@
 [{
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target" : { "namespace": "android_app", "package_name": "com.chromium.twa.attendIt",
-                 "sha256_cert_fingerprints": ["CD:D0:6B:80:ED:AF:13:96:E9:2B:F6:8E:A4:80:06:CD:BE:4D:3B:96:DB:E5:74:2B:C6:EF:23:B2:BC:2E:28:4C"] }
+                 "sha256_cert_fingerprints": ["BE:3A:77:CA:45:D0:B9:51:21:C8:98:39:97:E4:50:CB:47:97:46:9E:88:2C:F8:4F:20:99:2D:4D:70:53:C5:15"] }
   }]

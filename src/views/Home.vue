@@ -1,43 +1,75 @@
 <template>
   <div>
-    <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
-    <v-container>
-      <v-layout row wrap>
-        <template v-if="hasSubjects">
-          <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
+    <div :style="style">
+      <!-- <v-dialog v-model="loading" hide-overlay persistent full-width>
+      <v-card>
+        <OrbitSpinner :size="55" :color="'#ff1d5e'" />
+      </v-card>
+      </v-dialog>-->
+      <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
+      <v-container>
+        <v-layout row wrap>
+          <template v-if="hasSubjects === true && attLogged === false">
+            <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
+              <v-card>
+                <v-card-title primary-title>{{ val }}</v-card-title>
+                <v-radio-group row id="logData">
+                  <v-radio
+                    id="devWidth"
+                    label="Present"
+                    class="ml-2"
+                    value="Present"
+                    v-on:change="getVal('present', val)"
+                  ></v-radio>
+                  <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
+                  <v-radio
+                    label="Cancelled"
+                    value="Cancelled"
+                    v-on:change="getVal('cancelled', val)"
+                  ></v-radio>
+                </v-radio-group>
+              </v-card>
+            </v-flex>
+            <v-btn color="blue" :disabled="disabled" v-on:click="submit()">Save</v-btn>
+          </template>
+
+          <v-flex xs12 sm6 md4 pa-1 v-else-if="hasSubjects === false && attLogged === true">
             <v-card>
-              <v-card-title primary-title>{{ val }}</v-card-title>
-              <v-radio-group row id="logData">
-                <v-radio
-                  id="devWidth"
-                  label="Present"
-                  class="ml-2"
-                  value="Present"
-                  v-on:change="getVal('present', val)"
-                ></v-radio>
-                <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
-                <v-radio label="Cancelled" value="Cancelled" v-on:change="getVal('cancelled', val)"></v-radio>
-              </v-radio-group>
+              <v-card-text>Attendance Has Been Logged For This Day</v-card-text>
             </v-card>
           </v-flex>
-          <v-btn color="blue" :disabled="disabled" v-on:click="submit()">Save</v-btn>
-        </template>
 
-        <!-- Make this card better -->
-        <v-flex xs12 sm6 md4 pa-1 v-else>
-          <v-card>
-            <v-card-text>No Timetable Added For {{this.day}}</v-card-text>
-          </v-card>
-          <v-card class="mt-2">
-            <v-card-text>Click Here To Add Subjects</v-card-text>
-          </v-card>
-        </v-flex>
-      </v-layout>
-    </v-container>
+          <!-- Make this card better -->
+          <v-flex xs12 sm6 md4 pa-1 v-else-if="hasSubjects === false && attLogged === false">
+            <v-card>
+              <v-card-text>No Timetable Added For {{this.day}}</v-card-text>
+            </v-card> 
+            <v-card class="mt-2">
+              <v-card-text>
+                Click
+                <router-link to="/add_subjects">Here</router-link>To Add Subjects
+              </v-card-text>
+            </v-card>
+          </v-flex>
+
+        </v-layout>
+      </v-container>
+    </div>
     <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
       {{ msg }}
       <v-btn flat @click="snackbar === false">Close</v-btn>
     </v-snackbar>
+
+    <v-dialog v-model="loading" persistent full-width>
+      <v-card color="transparent">
+        <v-layout v-model="loading" justify-center pa-3>
+          <OrbitSpinner v-show="loading === true" :size="55" color="cyan" />
+        </v-layout>
+        <v-layout justify-center>
+          <p text-align="center">Loading...</p>
+        </v-layout>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -46,7 +78,13 @@ import db from "../firebase/init";
 import firebase from "firebase";
 import { bus } from "../main";
 
+import "epic-spinners/dist/lib/epic-spinners.min.css";
+import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
+
 export default {
+  components: {
+    OrbitSpinner
+  },
   data() {
     return {
       userDB: null,
@@ -68,7 +106,10 @@ export default {
       attendData: [],
       sendReq: true,
       isDupe: false,
-      dupeSub: []
+      dupeSub: [],
+      loading: false,
+      style: "opacity: 1",
+      attLogged: null
     };
   },
   methods: {
@@ -113,7 +154,7 @@ export default {
         this.snackbar = true;
         this.sendReq = false;
       } else {
-        this.color = 'success';
+        this.color = "success";
         this.msg = "Attendance Logged";
         this.snackbar = true;
         this.sendReq = true;
@@ -215,7 +256,7 @@ export default {
                         someData[someValue].presentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.absent.includes(duplicateSub)) {
                       // console.log("absent");
                       obj[someValue].absent += someData[someValue].absent;
@@ -225,7 +266,7 @@ export default {
                         someData[someValue].absentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.cancelled.includes(duplicateSub)) {
                       // console.log("cancelled");
                       obj[someValue].cancelled += someData[someValue].cancelled;
@@ -234,7 +275,7 @@ export default {
                       obj[someValue].cancelledDates.push(
                         someData[someValue].cancelledDates[0]
                       );
-                      someData = {}
+                      someData = {};
                     }
                   }
                 } else if (this.absent.includes(someValue)) {
@@ -255,7 +296,7 @@ export default {
                         someData[someValue].presentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.absent.includes(duplicateSub)) {
                       // console.log("absent");
                       obj[someValue].absent += someData[someValue].absent;
@@ -265,7 +306,7 @@ export default {
                         someData[someValue].absentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.cancelled.includes(duplicateSub)) {
                       // console.log("cancelled");
                       obj[someValue].cancelled += someData[someValue].cancelled;
@@ -274,7 +315,7 @@ export default {
                       obj[someValue].cancelledDates.push(
                         someData[someValue].cancelledDates[0]
                       );
-                      someData = {}
+                      someData = {};
                     }
                   }
                 } else if (this.cancelled.includes(someValue)) {
@@ -294,7 +335,7 @@ export default {
                         someData[someValue].presentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.absent.includes(duplicateSub)) {
                       // console.log("absent");
                       obj[someValue].absent += someData[someValue].absent;
@@ -304,7 +345,7 @@ export default {
                         someData[someValue].absentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.cancelled.includes(duplicateSub)) {
                       // console.log("cancelled");
                       obj[someValue].cancelled += someData[someValue].cancelled;
@@ -313,7 +354,7 @@ export default {
                       obj[someValue].cancelledDates.push(
                         someData[someValue].cancelledDates[0]
                       );
-                      someData = {}
+                      someData = {};
                     }
                   }
                 }
@@ -356,7 +397,7 @@ export default {
                         someData[someValue].presentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.absent.includes(duplicateSub)) {
                       // console.log("absent");
                       obj[someValue].absent += someData[someValue].absent;
@@ -366,7 +407,7 @@ export default {
                         someData[someValue].absentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.cancelled.includes(duplicateSub)) {
                       // console.log("cancelled");
                       obj[someValue].cancelled += someData[someValue].cancelled;
@@ -375,7 +416,7 @@ export default {
                       obj[someValue].cancelledDates.push(
                         someData[someValue].cancelledDates[0]
                       );
-                      someData = {}
+                      someData = {};
                     }
                   }
                 } else if (this.absent.includes(someValue)) {
@@ -405,7 +446,7 @@ export default {
                         someData[someValue].presentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.absent.includes(duplicateSub)) {
                       // console.log("absent");
                       obj[someValue].absent += someData[someValue].absent;
@@ -415,7 +456,7 @@ export default {
                         someData[someValue].absentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.cancelled.includes(duplicateSub)) {
                       // console.log("cancelled");
                       obj[someValue].cancelled += someData[someValue].cancelled;
@@ -424,7 +465,7 @@ export default {
                       obj[someValue].cancelledDates.push(
                         someData[someValue].cancelledDates[0]
                       );
-                      someData = {}
+                      someData = {};
                     }
                   }
                 } else if (this.cancelled.includes(someValue)) {
@@ -450,7 +491,7 @@ export default {
                         someData[someValue].presentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.absent.includes(duplicateSub)) {
                       // console.log("absent");
                       obj[someValue].absent += someData[someValue].absent;
@@ -460,7 +501,7 @@ export default {
                         someData[someValue].absentDates[0]
                       );
                       obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {}
+                      someData = {};
                     } else if (this.cancelled.includes(duplicateSub)) {
                       // console.log("cancelled");
                       obj[someValue].cancelled += someData[someValue].cancelled;
@@ -469,7 +510,7 @@ export default {
                       obj[someValue].cancelledDates.push(
                         someData[someValue].cancelledDates[0]
                       );
-                      someData = {}
+                      someData = {};
                     }
                   }
                 }
@@ -489,7 +530,7 @@ export default {
                   } else {
                     this.attendData.push(cDate);
                   }
-                } 
+                }
 
                 this.userDB.set(
                   { attendance: this.attendData },
@@ -519,7 +560,18 @@ export default {
       this.currentYear = data.currentYear;
       this.currentFullDate = data.currentFullDate;
 
+      this.loading = true;
+      this.style = "opacity: 0.3";
       this.userDB.get().then(res => {
+        this.loading = false;
+        this.style = "opacity: 1";
+
+        // if (res.data().attendance.includes(new Date().toISOString().substr(0, 10)) ===true) {
+        //   this.attLogged = true;
+        // } else {
+        //   this.attLogged = false;
+        // }
+
         let dayValue = res.data()["timetable"][this.day];
         if (dayValue) {
           this.subj = dayValue;
@@ -544,10 +596,22 @@ export default {
           this.hasSubjects = false;
           console.log(`No timetable for ${this.day}`);
         }
+
+        if (res.data().attendance.includes(this.currentFullDate) ===true) {
+          this.attLogged = true;
+          this.hasSubjects = false;
+        } else {
+          this.attLogged = false;
+        }
       });
     });
 
+    this.loading = true;
+    this.style = "opacity: 0.3";
     this.userDB.get().then(res => {
+      this.loading = false;
+      this.style = "opacity: 1";
+
       if (res.data().attendance !== undefined) {
         let attDates = res.data().attendance;
 
@@ -616,6 +680,13 @@ export default {
             console.log(`No timetable for ${this.day}`);
           }
         }
+      }
+
+      if (res.data().attendance.includes(new Date().toISOString().substr(0, 10)) === true) {
+        this.attLogged = true;
+        this.hasSubjects = false
+      } else {
+        this.attLogged = false;
       }
     });
   }

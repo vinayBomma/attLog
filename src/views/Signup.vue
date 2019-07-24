@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- <OrbitSpinner v-show="loader" :size="55" :color="'#ff1d5e'" /> -->
     <v-btn v-on:click="googleLogin">
       <img src="../../public/google.png" class="mr-2" />Sign In
     </v-btn>
@@ -7,25 +8,31 @@
 </template>
 
 <script>
-import firebase from "firebase/app";
+import firebase, { functions } from "firebase/app";
 import db from "../firebase/init";
+// import "epic-spinners/dist/lib/epic-spinners.min.css";
+// import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
+import router from '../router';
 
 export default {
-  data() {
-    return {
-    };
+  data(){
+    return{
+    }
   },
   methods: {
     googleLogin() {
       const provider = new firebase.auth.GoogleAuthProvider();
 
-      firebase.auth().signInWithPopup(provider)
-        .then((res) => {
-          this.$router.push({name: 'home'})
-          this.someText = 'test'
-        }).catch((err) => {
-          console.log(err)
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(res => {
+          this.$router.push({ name: "home" });
+          this.someText = "test";
         })
+        .catch(err => {
+          console.log(err);
+        });
     }
   },
   mounted() {

@@ -12,6 +12,13 @@ ui padding 360px
 reset attendance
 interactive faq
 
+sign in reload
+addSubjects enter subject
+service worker fetch tabChange
+attendance logged for this day
+
+refactor the code
+
 feature discovery
 
 release without history and night mode, get basic functionality right
