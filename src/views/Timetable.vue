@@ -17,14 +17,14 @@
         <v-tabs-items v-model="currentItem">
           <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
             <template v-if="hasSubjects && extraSub === false">
-              <draggable v-model="subjects" @start="drag=true" @end="drag=false">
+              <!-- <draggable v-model="subjects" @start="drag=true" @end="drag=false"> -->
                 <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
                   <v-card flat class="pa-3">
                     <v-icon left>reorder</v-icon>
                     <span>{{ sub }}</span>
                   </v-card>
                 </v-flex>
-              </draggable>
+              <!-- </draggable> -->
               <v-layout row>
                 <v-btn @click="submitTable">Save Timetable</v-btn>
               </v-layout>
@@ -83,13 +83,13 @@ import firebase from "firebase";
 import db from "../firebase/init";
 import { bus } from "../main";
 
-import draggable from "vuedraggable";
+// const draggable = () => import("vuedraggable")
 import "epic-spinners/dist/lib/epic-spinners.min.css";
 import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
 
 export default {
   components: {
-    draggable,
+    // draggable,
     OrbitSpinner
   },
   data() {

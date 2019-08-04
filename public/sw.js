@@ -1,48 +1,50 @@
-const cName = 'v1';
+const staticCacheName = 'static-v1';
+const dynamicCacheName = 'dynamic-v1';
 
-self.addEventListener('install', () => {
+const assets = [
+  '/favicon.ico',
+  '/android-chrome-192x192',
+  '/webmanifest.json',
+  '/material.css'
+]
+
+self.addEventListener('install', evt => {
   console.log('service worker installed');
-  self.skipWaiting()
+  evt.waitUntil(
+    caches.open(staticCacheName).then((cache) => {
+      cache.addAll(assets)
+    })
+  )
 });
 
 // activate events
-self.addEventListener('activate', e => {
+self.addEventListener('activate', evt => {
   console.log('service worker activated');
 
-  e.waitUntil(
-    caches.keys().then(cNames => {
-      return Promise.all(
-        cNames.map(cache => {
-          if (cache !== cName) {
-            console.log('Service Worker: Clearing Old Cache');
-            return caches.delete(cache);
-          }
-        })
+  evt.waitUntil(
+    caches.keys().then(keys => {
+      return Promise.all(keys
+        .filter(key => key !== staticCacheName && key !== dynamicCacheName)
+        .map(key => caches.delete(key))
       );
     })
   );
 });
 
-self.addEventListener('fetch', e => {
-  console.log('service worker fetched')
+self.addEventListener('fetch', () => {
 
-  e.respondWith(
-    fetch(e.request)
-    .then(res => {
-      const resClone = res.clone()
-      caches.open(cName)
-        .then(cache => {
-          if (e.request.method !== "POST") {
-            cache.put(e.request, resClone)
-          }
-        }).catch((err) => {
-          console.log(err)
-        })
-      // .then(() => self.skipWaiting()) 
-      return res
-    }).catch(() =>
-      caches.match(e.request)
-      .then(res => res)
-    )
-  )
+  // if (evt.request.url.indexOf('firestore.googleapis.com') === -1) {
+  //   evt.respondWith(
+  //     caches.match(evt.request).then(cacheRes => {
+  //       return cacheRes || fetch(evt.request).then(fetchRes => {
+  //         return caches.open(dynamicCacheName).then(cache => {
+  //           cache.put(evt.request.url, fetchRes.clone());
+  //           return fetchRes;
+  //         })
+  //       })
+  //     }).catch(() => {
+  //       console.log('err')
+  //     })
+  //   )
+  // }
 })

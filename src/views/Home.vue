@@ -9,41 +9,42 @@
       <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
       <v-container>
         <v-layout row wrap>
-          <template v-if="hasSubjects === true && attLogged === false">
+          <template v-if="hasSubjects && !attLogged">
             <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
               <v-card>
                 <v-card-title primary-title>{{ val }}</v-card-title>
                 <v-radio-group row id="logData">
-                  <v-radio
-                    id="devWidth"
-                    label="Present"
-                    class="ml-2"
-                    value="Present"
-                    v-on:change="getVal('present', val)"
-                  ></v-radio>
-                  <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
-                  <v-radio
-                    label="Cancelled"
-                    value="Cancelled"
-                    v-on:change="getVal('cancelled', val)"
-                  ></v-radio>
+                  <v-layout align-center justify-center row>
+                    <v-radio
+                      id="devWidth"
+                      label="Present"
+                      value="Present"
+                      v-on:change="getVal('present', val)"
+                    ></v-radio>
+                    <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
+                    <v-radio
+                      label="No Lecture"
+                      value="Cancelled"
+                      v-on:change="getVal('cancelled', val)"
+                    ></v-radio>
+                  </v-layout>
                 </v-radio-group>
               </v-card>
             </v-flex>
             <v-btn color="blue" :disabled="disabled" v-on:click="submit()">Save</v-btn>
           </template>
 
-          <v-flex xs12 sm6 md4 pa-1 v-else-if="hasSubjects === false && attLogged === true">
+          <v-flex xs12 sm6 md4 pa-1 v-else-if="!hasSubjects&& attLogged">
             <v-card>
               <v-card-text>Attendance Has Been Logged For This Day</v-card-text>
             </v-card>
           </v-flex>
 
           <!-- Make this card better -->
-          <v-flex xs12 sm6 md4 pa-1 v-else-if="hasSubjects === false && attLogged === false">
+          <v-flex xs12 sm6 md4 pa-1 v-else-if="!hasSubjects&& !attLogged">
             <v-card>
               <v-card-text>No Timetable Added For {{this.day}}</v-card-text>
-            </v-card> 
+            </v-card>
             <v-card class="mt-2">
               <v-card-text>
                 Click
@@ -51,7 +52,6 @@
               </v-card-text>
             </v-card>
           </v-flex>
-
         </v-layout>
       </v-container>
     </div>
@@ -166,6 +166,7 @@ export default {
           this.absent.includes(this.subj[i]) ||
           this.cancelled.includes(this.subj[i])
         ) {
+          // Checks if data for every subject is selected
         } else {
           this.color = "error";
           this.msg = "Select Attendance For All Subjects";
@@ -597,7 +598,7 @@ export default {
           console.log(`No timetable for ${this.day}`);
         }
 
-        if (res.data().attendance.includes(this.currentFullDate) ===true) {
+        if (res.data().attendance.includes(this.currentFullDate) === true) {
           this.attLogged = true;
           this.hasSubjects = false;
         } else {
@@ -682,9 +683,13 @@ export default {
         }
       }
 
-      if (res.data().attendance.includes(new Date().toISOString().substr(0, 10)) === true) {
+      if (
+        res
+          .data()
+          .attendance.includes(new Date().toISOString().substr(0, 10)) === true
+      ) {
         this.attLogged = true;
-        this.hasSubjects = false
+        this.hasSubjects = false;
       } else {
         this.attLogged = false;
       }

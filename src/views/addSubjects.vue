@@ -7,7 +7,7 @@
             <v-icon left>description</v-icon>
             <span>{{sub}}</span>
             <v-card-actions v-if="index === select.length - 1">
-              <v-dialog v-model="dialog">
+              <v-dialog v-model="dialog" scrollable>
                 <template v-slot:activator="{ on }">
                   <v-btn color="blue" absolute bottom right fab v-on="on">
                     <v-icon>add</v-icon>
@@ -15,13 +15,11 @@
                 </template>
                 <v-card>
                   <v-card-title>
-                    <span class="headline">Add Subjects</span>
+                    <span class="headline">Add All Subjects</span>
                   </v-card-title>
-                  <v-card-text>
-                    <v-container grid-list-md>
-                      <v-layout>
-                        <v-flex>
-                          <v-combobox
+                  <v-container grid-list-md>
+                    <v-flex>
+                      <!-- <v-combobox
                             v-model="select"
                             label="Enter Subjects"
                             multiple
@@ -29,11 +27,44 @@
                             deletable-chips
                             hint="Press Enter Key To Add Subject"
                             persistent-hint
-                          ></v-combobox>
-                        </v-flex>
-                      </v-layout>
-                    </v-container>
-                  </v-card-text>
+                      ></v-combobox>-->
+
+                      <!-- <v-layout row>
+                            <v-text-field label="Subject"></v-text-field>
+                            <v-icon class="ml-4">check</v-icon>
+                            <v-icon class="ml-4">delete_outline</v-icon>
+                          </v-layout>
+
+                          <v-layout row>
+                            <v-text-field label="Subject"></v-text-field>
+                            <v-icon class="ml-4">check</v-icon>
+                            <v-icon class="ml-4">delete_outline</v-icon>
+                          </v-layout>
+
+                          <v-layout row>
+                            <v-text-field label="Subject"></v-text-field>
+                            <v-icon class="ml-4">check</v-icon>
+                            <v-icon class="ml-4">delete_outline</v-icon>
+                          </v-layout>
+
+                          <v-layout row>
+                            <v-text-field label="Subject"></v-text-field>
+                            <v-icon class="ml-4">check</v-icon>
+                            <v-icon class="ml-4">delete_outline</v-icon>
+                          </v-layout>
+
+                          <v-layout row>
+                            <v-text-field label="Subject"></v-text-field>
+                            <v-icon class="ml-4">check</v-icon>
+                            <v-icon class="ml-4">delete_outline</v-icon>
+                      </v-layout>-->
+
+                      <v-card-text>
+                        <v-select prefix="1" :items="items" label="Select Subject"></v-select>
+                      </v-card-text>
+                    </v-flex>
+                  </v-container>
+
                   <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" flat @click="dialog = false">Close</v-btn>
@@ -46,7 +77,7 @@
         </v-flex>
       </template>
 
-      <template v-else-if="!hasSubjects && showDel === true">
+      <!-- <template v-else-if="!hasSubjects && showDel === true">
         <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
           <v-card flat class="pa-3">
             <v-checkbox v-model="checkData" :label="sub" :value="sub"></v-checkbox>
@@ -67,9 +98,9 @@
             </v-card>
           </v-dialog>
         </v-layout>
-      </template>
+      </template>-->
 
-      <v-card flat v-else>
+      <!-- <v-card flat v-else>
         <v-card-text>No Subjects Added</v-card-text>
         <v-card-actions>
           <v-dialog v-model="dialog">
@@ -107,7 +138,7 @@
             </v-card>
           </v-dialog>
         </v-card-actions>
-      </v-card>
+      </v-card>-->
     </v-container>
   </div>
 </template>
@@ -121,12 +152,13 @@ export default {
   data() {
     return {
       userDB: null,
-      dialog: false,
+      dialog: true,
       select: ["Maths", "History"],
       hasSubjects: null,
       showDel: false,
       checkData: [],
-      delModal: false
+      delModal: false,
+      items: ['Maths', 'History', 'Vuejs', 'Python']
     };
   },
   methods: {
@@ -177,20 +209,23 @@ export default {
       this.delModal = false;
 
       this.userDB.get().then(res => {
-        this.select = res.data().allSubjects
+        this.select = res.data().allSubjects;
         for (let i in this.checkData) {
-          if(this.select.includes(this.checkData[i])){
+          if (this.select.includes(this.checkData[i])) {
             this.select.splice(this.select.indexOf(this.checkData[i]), 1);
           }
         }
 
-        this.userDB.set({
-          allSubjects: this.select
-        }, {merge: true})
-      }); 
+        this.userDB.set(
+          {
+            allSubjects: this.select
+          },
+          { merge: true }
+        );
+      });
 
-      this.hasSubjects = !this.hasSubjects
-      this.showDel = !this.showDel
+      this.hasSubjects = !this.hasSubjects;
+      this.showDel = !this.showDel;
     }
   },
   created() {

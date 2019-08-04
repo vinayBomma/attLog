@@ -14,6 +14,7 @@
                 </div>
               </v-card>
             </v-flex>
+
             <v-flex xs6 sm6 md4 pa-1>
               <v-card>
                 <v-layout justify-center>
@@ -33,13 +34,15 @@
             </v-flex>
 
             <!-- <v-flex xs6 sm6 md4 pa-1>
-          <v-card>
-            <v-card-title>
-              <v-progress-circular rotate='360' size='100' width='15' color='teal' :value='value'>{{value}}%</v-progress-circular>
-            </v-card-title>
-            <h4 class="text-xs-center">Attendance</h4>
-          </v-card>
-            </v-flex>-->
+              <v-card>
+                <v-layout justify-center>
+                  <v-card-title class="display-3">+4</v-card-title>
+                </v-layout>
+                <v-layout justify-center>
+                  <p class="text-xs-center mt-2 mb-3">Leaves Remaining</p>
+                </v-layout>
+              </v-card>
+            </v-flex> -->
 
             <!-- <v-flex xs12 sm6 md4 pa-1>
               <v-card>
@@ -51,11 +54,11 @@
                   no-title
                   readonly
                   :events="dateEvent"
-
                   full-width
                 ></v-date-picker>
               </v-card>
             </v-flex> -->
+
           </v-layout>
         </v-container>
       </div>
@@ -80,6 +83,7 @@
 </template>
 
 <script>
+// const Chart = () => import('chart.js')
 import Chart from "chart.js";
 import db from "../firebase/init";
 import firebase from "firebase";

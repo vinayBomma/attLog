@@ -8,6 +8,11 @@ module.exports = {
       new BundleAnalyzerPlugin(),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       // new VuetifyLoaderPlugin()
-    ]
-  }
+    ],
+    optimization: {
+      splitChunks: {
+        chunks: 'all'
+      }
+    },
+  },
 };

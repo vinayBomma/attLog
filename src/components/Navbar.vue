@@ -64,7 +64,7 @@
       <v-layout column align-center v-if="userPhoto">
         <v-flex class="mt-5">
           <v-avatar size="100">
-            <img :src="userPhoto" />
+            <img :src="userPhoto" alt="Profile Photo" />
           </v-avatar>
         </v-flex>
       </v-layout>

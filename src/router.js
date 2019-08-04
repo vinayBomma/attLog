@@ -72,9 +72,7 @@ router.beforeEach((to, from, next) => {
         next()
       } else {
         console.log('Fail')
-        next({  
-          name: 'signup'
-        })
+        next({name: 'signup'})
       }
     })
   } else {

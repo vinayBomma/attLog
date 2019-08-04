@@ -5,20 +5,26 @@ sign in navbar functionality
 404 page
 add timetable deleting all chips page issue
 line chart along with pie chart
-loading screen after signing in
 
 ui padding 360px
 
 reset attendance
 interactive faq
 
+history view
+on track
+import csv
+
+push notifications
+firebase persistence
+
+page accessibility
+page seo
+
 sign in reload
 addSubjects enter subject
 service worker fetch tabChange
-attendance logged for this day
 
 refactor the code
 
 feature discovery
-
-release without history and night mode, get basic functionality right

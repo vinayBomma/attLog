@@ -1,24 +1,47 @@
 <template>
   <div>
-    <!-- <OrbitSpinner v-show="loader" :size="55" :color="'#ff1d5e'" /> -->
-    <v-btn v-on:click="googleLogin">
-      <img src="../../public/google.png" class="mr-2" />Sign In
-    </v-btn>
+    <section>
+      <v-layout row align-center justify-center>
+        <h1 class="text-center headline mt-2">Attendance Tracker</h1>
+        <br />
+        <!-- <v-btn aria-label="Sign In" v-on:click="googleLogin">
+          <img src="../../public/google.png" alt="Google" class="mr-2" />Sign In
+        </v-btn>-->
+      </v-layout>
+    </section>
+
+    <section>
+      <v-layout row align-center justify-center>
+        <v-flex xs12 sm4>
+          <h1 class="text-xs-center headline mt-2">Features</h1>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap align-center>
+        <!-- <v-flex> -->
+          <v-flex xs12>
+            <v-card flat class="transparent">
+              <v-card-text class="text-center">
+                <v-icon>code</v-icon>
+              </v-card-text>
+              <v-card-title>Cross Platform</v-card-title>
+
+            </v-card>
+          </v-flex>
+        <!-- </v-container> -->
+      </v-layout>
+    </section>
+
+    <!-- <v-btn aria-label="Sign In" v-on:click="googleLogin">
+      <img src="../../public/google.png" alt="Google" class="mr-2" />Sign In
+    </v-btn>-->
   </div>
 </template>
 
 <script>
-import firebase, { functions } from "firebase/app";
+import firebase from "firebase/app";
 import db from "../firebase/init";
-// import "epic-spinners/dist/lib/epic-spinners.min.css";
-// import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
-import router from '../router';
 
 export default {
-  data(){
-    return{
-    }
-  },
   methods: {
     googleLogin() {
       const provider = new firebase.auth.GoogleAuthProvider();
@@ -26,7 +49,7 @@ export default {
       firebase
         .auth()
         .signInWithPopup(provider)
-        .then(res => {
+        .then(() => {
           this.$router.push({ name: "home" });
           this.someText = "test";
         })
