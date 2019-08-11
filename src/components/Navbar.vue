@@ -4,9 +4,10 @@
       <v-toolbar-side-icon v-on:click="drawer = !drawer"></v-toolbar-side-icon>
       <!-- <v-toolbar-title>Test</v-toolbar-title> -->
       <v-spacer></v-spacer>
-      <!-- <v-btn v-if="isUser === false">
+      
+      <v-btn v-if="isUser === false">
         <img src="../../public/google.png" class="mr-2">Sign In
-      </v-btn>-->
+      </v-btn>
 
       <template v-if="$route.name === 'home'">
         <v-dialog v-model="modal" :return-value.sync="date" lazy full-width width="290px">
