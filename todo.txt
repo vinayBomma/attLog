@@ -17,6 +17,7 @@ import csv
 
 push notifications
 firebase persistence
+ui redesign bottom nav
 
 page accessibility
 page seo

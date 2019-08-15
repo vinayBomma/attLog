@@ -5,6 +5,11 @@ node_modules
 src/assets
 src/firebase
 
+public/analysis.svg
+public/block.svg
+public/cloud.svg
+public/cross-platform.svg
+
 # local env files
 .env.local
 .env.*.local

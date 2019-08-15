@@ -8,10 +8,10 @@ import firebase from 'firebase'
 // import Signup from './views/Signup.vue'
 // import addSubjects from './views/addSubjects.vue'
 
-const Home = () => import(/* webpackChunkName: "home" */ './views/Home.vue')
+const Home = () => import(/* webpackPrefetch: true */ './views/Home.vue')
 const Statistics = () => import(/* webpackChunkName: "stats" */ './views/Statistics.vue')
 const Timetable = () => import(/* webpackChunkName: "timetable" */ './views/Timetable.vue')
-const Signup = () => import(/* webpackChunkName: "signup" */ './views/Signup.vue')
+const Signup = () => import(/* webpackPreload: true */ './views/Signup.vue')
 const addSubjects = () => import(/* webpackChunkName: "addSub" */ './views/addSubjects.vue')
 const privacyPolicy = () => import('./views/privacyPolicy.vue')
 

@@ -4,9 +4,9 @@
       <v-toolbar-side-icon v-on:click="drawer = !drawer"></v-toolbar-side-icon>
       <!-- <v-toolbar-title>Test</v-toolbar-title> -->
       <v-spacer></v-spacer>
-      
-      <v-btn v-if="isUser === false">
-        <img src="../../public/google.png" class="mr-2">Sign In
+
+      <v-btn v-if="isUser === false"  @click="googleLogin">
+        <img src="../../public/google.png" class="mr-2"/>Sign In
       </v-btn>
 
       <template v-if="$route.name === 'home'">
@@ -135,7 +135,7 @@ export default {
   methods: {
     googleLogout() {
       this.signOutModal = false;
-      this.signOutUser = true
+      this.signOutUser = true;
 
       if (this.signOutUser) {
         firebase
@@ -148,6 +148,19 @@ export default {
             console.log(err);
           });
       }
+    },
+    googleLogin() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(() => {
+          this.$router.push({ name: "home" });
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     saveDate() {
       let days = [
@@ -205,8 +218,20 @@ export default {
       bus.$emit("delSub");
     },
     add_sub() {
-      bus.$emit('add_sub');
+      bus.$emit("add_sub");
     }
+  },
+  mounter() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.$router.push({ name: "home" });
+        db.collection("attData")
+          .doc(user.uid)
+          .set({}, { merge: true });
+      } else {
+        console.log("No User Found");
+      }
+    });
   },
   created() {
     firebase.auth().onAuthStateChanged(user => {

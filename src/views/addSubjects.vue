@@ -15,11 +15,11 @@
                 </template>
                 <v-card>
                   <v-card-title>
-                    <span class="headline">Add All Subjects</span>
+                    <span class="headline">Timetable</span>
                   </v-card-title>
                   <v-container grid-list-md>
                     <v-flex>
-                      <!-- <v-combobox
+                      <v-combobox
                             v-model="select"
                             label="Enter Subjects"
                             multiple
@@ -27,41 +27,28 @@
                             deletable-chips
                             hint="Press Enter Key To Add Subject"
                             persistent-hint
-                      ></v-combobox>-->
+                      ></v-combobox>
 
-                      <!-- <v-layout row>
-                            <v-text-field label="Subject"></v-text-field>
-                            <v-icon class="ml-4">check</v-icon>
-                            <v-icon class="ml-4">delete_outline</v-icon>
-                          </v-layout>
+                      <!-- <v-card-text>
+                        <p class="subheadline">1. History
+                        <span>
+                          <v-icon color="green">check</v-icon>
+                          <v-icon color="red">clear</v-icon>
+                        </span>
+                        </p>
 
-                          <v-layout row>
-                            <v-text-field label="Subject"></v-text-field>
-                            <v-icon class="ml-4">check</v-icon>
-                            <v-icon class="ml-4">delete_outline</v-icon>
-                          </v-layout>
-
-                          <v-layout row>
-                            <v-text-field label="Subject"></v-text-field>
-                            <v-icon class="ml-4">check</v-icon>
-                            <v-icon class="ml-4">delete_outline</v-icon>
-                          </v-layout>
-
-                          <v-layout row>
-                            <v-text-field label="Subject"></v-text-field>
-                            <v-icon class="ml-4">check</v-icon>
-                            <v-icon class="ml-4">delete_outline</v-icon>
-                          </v-layout>
-
-                          <v-layout row>
-                            <v-text-field label="Subject"></v-text-field>
-                            <v-icon class="ml-4">check</v-icon>
-                            <v-icon class="ml-4">delete_outline</v-icon>
-                      </v-layout>-->
-
-                      <v-card-text>
-                        <v-select prefix="1" :items="items" label="Select Subject"></v-select>
-                      </v-card-text>
+                        <v-text-field label="Add Subject"></v-text-field>
+                        <v-select :items="items" label="Select Subject" v-model="value">
+                          <span slot="prepend" class="mt-1">1.</span>
+                          <v-icon
+                            slot="append"
+                            class="mt-1 mr-2"
+                            color="green"
+                            @click="checkBtn"
+                          >check</v-icon>
+                          <v-icon slot="append" class="mt-1" color="red">clear</v-icon>
+                        </v-select>
+                      </v-card-text> -->
                     </v-flex>
                   </v-container>
 
@@ -77,7 +64,7 @@
         </v-flex>
       </template>
 
-      <!-- <template v-else-if="!hasSubjects && showDel === true">
+      <template v-else-if="!hasSubjects && showDel === true">
         <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
           <v-card flat class="pa-3">
             <v-checkbox v-model="checkData" :label="sub" :value="sub"></v-checkbox>
@@ -98,9 +85,9 @@
             </v-card>
           </v-dialog>
         </v-layout>
-      </template>-->
+      </template>
 
-      <!-- <v-card flat v-else>
+      <v-card flat v-else>
         <v-card-text>No Subjects Added</v-card-text>
         <v-card-actions>
           <v-dialog v-model="dialog">
@@ -138,7 +125,7 @@
             </v-card>
           </v-dialog>
         </v-card-actions>
-      </v-card>-->
+      </v-card>
     </v-container>
   </div>
 </template>
@@ -152,13 +139,19 @@ export default {
   data() {
     return {
       userDB: null,
-      dialog: true,
+      dialog: false,
       select: ["Maths", "History"],
       hasSubjects: null,
       showDel: false,
       checkData: [],
       delModal: false,
-      items: ['Maths', 'History', 'Vuejs', 'Python']
+      value: '',
+      items: [
+        "Maths",
+        "History",
+        "Vuejs",
+        "Frightened Frankenstein Home Alone Bazooka Skadoodle"
+      ]
     };
   },
   methods: {
@@ -166,35 +159,35 @@ export default {
       this.hasSubjects = true;
       let obj = {};
 
-      this.userDB.get().then(res => {
-        for (var i in this.select) {
-          if (res.data().data !== undefined) {
-            if (res.data().data[this.select[i]] !== undefined) {
-              if (Object.keys(res.data().data[this.select[i]]).length !== 0) {
-                obj[this.select[i]] = res.data().data[this.select[i]];
-              } else if (
-                Object.keys(res.data().data[this.select[i]]).length === 0
-              ) {
-                obj[this.select[i]] = [];
-              }
-            } else if (res.data().data[this.select[i]] === undefined) {
-              obj[this.select[i]] = [];
-            }
-          } else {
-            obj[this.select[i]] = [];
-          }
+      // this.userDB.get().then(res => {
+      //   for (var i in this.select) {
+      //     if (res.data().data !== undefined) {
+      //       if (res.data().data[this.select[i]] !== undefined) {
+      //         if (Object.keys(res.data().data[this.select[i]]).length !== 0) {
+      //           obj[this.select[i]] = res.data().data[this.select[i]];
+      //         } else if (
+      //           Object.keys(res.data().data[this.select[i]]).length === 0
+      //         ) {
+      //           obj[this.select[i]] = [];
+      //         }
+      //       } else if (res.data().data[this.select[i]] === undefined) {
+      //         obj[this.select[i]] = [];
+      //       }
+      //     } else {
+      //       obj[this.select[i]] = [];
+      //     }
 
-          if (this.select.indexOf(this.select[i]) === this.select.length - 1) {
-            this.userDB.set(
-              {
-                allSubjects: this.select,
-                data: obj
-              },
-              { merge: true }
-            );
-          }
-        }
-      });
+      //     if (this.select.indexOf(this.select[i]) === this.select.length - 1) {
+      //       this.userDB.set(
+      //         {
+      //           allSubjects: this.select,
+      //           data: obj
+      //         },
+      //         { merge: true }
+      //       );
+      //     }
+      //   }
+      // });
 
       // if(this.select.indexOf(this.select[i]) === this.select.length - 1){
       //   db.collection("attData").doc("test").set({
@@ -226,6 +219,10 @@ export default {
 
       this.hasSubjects = !this.hasSubjects;
       this.showDel = !this.showDel;
+    },
+    checkBtn() {
+      console.log("this seems to work");
+      console.log(this.value)
     }
   },
   created() {
