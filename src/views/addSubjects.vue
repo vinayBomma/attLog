@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container>
-      <template v-if="hasSubjects">
+      <template v-if="hasSubjects === true">
         <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
           <v-card flat class="pa-3">
             <v-icon left>description</v-icon>
@@ -10,51 +10,49 @@
               <v-dialog v-model="dialog" scrollable>
                 <template v-slot:activator="{ on }">
                   <v-btn color="blue" absolute bottom right fab v-on="on">
-                    <v-icon>add</v-icon>
+                    <v-icon>edit</v-icon>
                   </v-btn>
                 </template>
                 <v-card>
                   <v-card-title>
-                    <span class="headline">Timetable</span>
+                    <span class="headline">Your Subjects</span>
                   </v-card-title>
                   <v-container grid-list-md>
                     <v-flex>
-                      <v-combobox
-                            v-model="select"
-                            label="Enter Subjects"
-                            multiple
-                            chips
-                            deletable-chips
-                            hint="Press Enter Key To Add Subject"
-                            persistent-hint
-                      ></v-combobox>
-
-                      <!-- <v-card-text>
-                        <p class="subheadline">1. History
-                        <span>
-                          <v-icon color="green">check</v-icon>
-                          <v-icon color="red">clear</v-icon>
-                        </span>
+                      <v-card-text>
+                        <p class="subheadline" v-for="(subs, i) in subjects" :key="i">
+                          {{ i+1 }}. {{ subs }}
+                          <span>
+                            <v-icon class="ml-2" color="red" @click="clearBtn(i, subs)">clear</v-icon>
+                          </span>
                         </p>
 
-                        <v-text-field label="Add Subject"></v-text-field>
-                        <v-select :items="items" label="Select Subject" v-model="value">
+                        <v-text-field label="Add Subject" v-model="value">
+                          <v-icon
+                            slot="append"
+                            class="mt-1 mr-2"
+                            color="green"
+                            @click="doneBtn"
+                          >check</v-icon>
+                          <!-- <v-icon slot="append" class="mt-1" color="red">clear</v-icon> -->
+                        </v-text-field>
+                        <!-- <v-select :items="items" label="Select Subject" v-model="value">
                           <span slot="prepend" class="mt-1">1.</span>
                           <v-icon
                             slot="append"
                             class="mt-1 mr-2"
                             color="green"
-                            @click="checkBtn"
+                            @click="doneBtn"
                           >check</v-icon>
                           <v-icon slot="append" class="mt-1" color="red">clear</v-icon>
-                        </v-select>
-                      </v-card-text> -->
+                        </v-select>-->
+                      </v-card-text>
                     </v-flex>
                   </v-container>
 
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" flat @click="dialog = false">Close</v-btn>
+                    <v-btn color="blue darken-1" flat @click="clsBtnFunc">Close</v-btn>
                     <v-btn color="blue darken-1" flat @click="saveSubjects">Save</v-btn>
                   </v-card-actions>
                 </v-card>
@@ -64,30 +62,7 @@
         </v-flex>
       </template>
 
-      <template v-else-if="!hasSubjects && showDel === true">
-        <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
-          <v-card flat class="pa-3">
-            <v-checkbox v-model="checkData" :label="sub" :value="sub"></v-checkbox>
-          </v-card>
-        </v-flex>
-        <v-layout row>
-          <v-dialog v-model="delModal" full-width>
-            <template v-slot:activator="{ on }">
-              <v-btn @click="delModal = true" v-on="on">Delete Subject</v-btn>
-            </template>
-            <v-card>
-              <v-card-title>This will delete the subject. Are You Sure?</v-card-title>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn flat color="blue" @click="delModal = false">No</v-btn>
-                <v-btn flat color="blue" @click="deleteSubj">Yes</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-layout>
-      </template>
-
-      <v-card flat v-else>
+      <v-card flat v-else-if="hasSubjects === false">
         <v-card-text>No Subjects Added</v-card-text>
         <v-card-actions>
           <v-dialog v-model="dialog">
@@ -98,28 +73,28 @@
             </template>
             <v-card>
               <v-card-title>
-                <span class="headline">Add Subjects</span>
+                <span class="headline">Your Subjects</span>
               </v-card-title>
-              <v-card-text>
-                <v-container grid-list-md>
-                  <v-layout>
-                    <v-flex>
-                      <v-combobox
-                        v-model="select"
-                        label="Enter Subjects"
-                        multiple
-                        chips
-                        deletable-chips
-                        hint="Press Enter Key To Add Subject"
-                        persistent-hint
-                      ></v-combobox>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-card-text>
+              <v-container grid-list-md>
+                <v-flex>
+                  <v-card-text>
+                    <p class="subheadline" v-for="(subs, i) in subjects" :key="i">
+                      {{ i+1 }}. {{ subs }}
+                      <span>
+                        <v-icon class="ml-2" color="red" @click="clearBtn(i, subs)">clear</v-icon>
+                      </span>
+                    </p>
+
+                    <v-text-field label="Add Subject" v-model="value">
+                      <v-icon slot="append" class="mt-1 mr-2" color="green" @click="doneBtn">check</v-icon>
+                    </v-text-field>
+                  </v-card-text>
+                </v-flex>
+              </v-container>
+
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" flat @click="dialog = false">Close</v-btn>
+                <v-btn color="blue darken-1" flat @click="clsBtnFunc">Close</v-btn>
                 <v-btn color="blue darken-1" flat @click="saveSubjects">Save</v-btn>
               </v-card-actions>
             </v-card>
@@ -127,6 +102,11 @@
         </v-card-actions>
       </v-card>
     </v-container>
+
+    <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
+      {{ msg }}
+      <v-btn flat @click="snackbar === false">Close</v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -140,98 +120,118 @@ export default {
     return {
       userDB: null,
       dialog: false,
-      select: ["Maths", "History"],
+      select: [],
+      subjects: [],
       hasSubjects: null,
-      showDel: false,
-      checkData: [],
-      delModal: false,
-      value: '',
+      value: "",
+      clsBtn: null,
+      subName: [],
       items: [
         "Maths",
         "History",
         "Vuejs",
         "Frightened Frankenstein Home Alone Bazooka Skadoodle"
-      ]
+      ],
+      snackbar: false,
+      msg: null,
+      timeout: 3000,
+      color: undefined
     };
   },
   methods: {
     saveSubjects() {
-      this.hasSubjects = true;
+      this.select = this.subjects.concat();
       let obj = {};
 
-      // this.userDB.get().then(res => {
-      //   for (var i in this.select) {
-      //     if (res.data().data !== undefined) {
-      //       if (res.data().data[this.select[i]] !== undefined) {
-      //         if (Object.keys(res.data().data[this.select[i]]).length !== 0) {
-      //           obj[this.select[i]] = res.data().data[this.select[i]];
-      //         } else if (
-      //           Object.keys(res.data().data[this.select[i]]).length === 0
-      //         ) {
-      //           obj[this.select[i]] = [];
-      //         }
-      //       } else if (res.data().data[this.select[i]] === undefined) {
-      //         obj[this.select[i]] = [];
-      //       }
-      //     } else {
-      //       obj[this.select[i]] = [];
-      //     }
+      this.userDB.get().then(res => {
+        if (this.select.length > 0) {
+          for (var i in this.select) {
+            console.log("this executes");
+            if (res.data().data !== undefined) {
+              if (res.data().data[this.select[i]] !== undefined) {
+                if (Object.keys(res.data().data[this.select[i]]).length !== 0) {
+                  obj[this.select[i]] = res.data().data[this.select[i]];
+                } else if (
+                  Object.keys(res.data().data[this.select[i]]).length === 0
+                ) {
+                  obj[this.select[i]] = [];
+                }
+              } else if (res.data().data[this.select[i]] === undefined) {
+                obj[this.select[i]] = [];
+              }
+            } else {
+              obj[this.select[i]] = [];
+            }
 
-      //     if (this.select.indexOf(this.select[i]) === this.select.length - 1) {
-      //       this.userDB.set(
-      //         {
-      //           allSubjects: this.select,
-      //           data: obj
-      //         },
-      //         { merge: true }
-      //       );
-      //     }
+            if (
+              this.select.indexOf(this.select[i]) ===
+              this.select.length - 1
+            ) {
+              this.userDB.set(
+                {
+                  allSubjects: this.select,
+                  data: obj
+                },
+                { merge: true }
+              );
+            }
+          }
+        } else {
+          this.userDB.set(
+            {
+              allSubjects: this.select,
+              data: obj
+            },
+            { merge: true }
+          );
+        }
+      });
+
+      this.$router.go();
+
+      // this.userDB.get().then(res => {
+      //   if (Object.keys(res.data().allSubjects).length === 0) {
+      //     console.log("what the heck");
+      //     this.hasSubjects = false;
+      //   } else if (Object.keys(res.data().allSubjects).length > 0) {
+      //     console.log("this is so true");
+      //     this.hasSubjects = true;
       //   }
       // });
 
-      // if(this.select.indexOf(this.select[i]) === this.select.length - 1){
-      //   db.collection("attData").doc("test").set({
-      //     allSubjects: this.select,
-      //     data: obj
-      //   }, {merge: true});
-      // }
-
       this.dialog = false;
+      this.msg = "Subjects Saved Successfully";
+      this.timeout = 3000;
+      this.snackbar = true;
+      this.color = "green";
     },
-    deleteSubj() {
-      this.delModal = false;
-
-      this.userDB.get().then(res => {
-        this.select = res.data().allSubjects;
-        for (let i in this.checkData) {
-          if (this.select.includes(this.checkData[i])) {
-            this.select.splice(this.select.indexOf(this.checkData[i]), 1);
-          }
-        }
-
-        this.userDB.set(
-          {
-            allSubjects: this.select
-          },
-          { merge: true }
-        );
-      });
-
-      this.hasSubjects = !this.hasSubjects;
-      this.showDel = !this.showDel;
+    doneBtn() {
+      if (this.value === "") {
+        this.msg = "Subject Name Cannot Be Empty";
+        this.snackbar = true;
+        this.color = "red";
+      } else if (this.select.includes(this.value)) {
+        this.msg = "Subject Already Present";
+        this.snackbar = true;
+        this.color = "red";
+      } else {
+        this.subjects.push(this.value);
+        this.value = "";
+      }
     },
-    checkBtn() {
-      console.log("this seems to work");
-      console.log(this.value)
+    clearBtn(index, subject) {
+      this.subjects.splice(this.subjects.indexOf(this.subjects[index]), 1);
+      this.clsBtn = true;
+    },
+    clsBtnFunc() {
+      this.dialog = false;
+      if (this.clsBtn) {
+        this.subjects = this.select.concat();
+        this.clsBtn = false;
+      }
     }
   },
   created() {
-    bus.$on("delSub", () => {
-      console.log("this is awesome");
-      this.hasSubjects = !this.hasSubjects;
-      this.showDel = !this.showDel;
-    });
-
     let user = firebase.auth().currentUser;
     if (user) {
       this.userDB = db.collection("attData").doc(user.uid);
@@ -239,9 +239,12 @@ export default {
 
     this.userDB.get().then(res => {
       let sub = res.data().allSubjects;
-      if (sub) {
+      if (Object.keys(sub).length > 0) {
         this.hasSubjects = true;
         this.select = sub;
+        this.subjects = this.select.concat();
+      } else if (sub.length === 0) {
+        this.hasSubjects = false;
       } else {
         this.hasSubjects = false;
       }
