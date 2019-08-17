@@ -16,20 +16,57 @@
         </template>
         <v-tabs-items v-model="currentItem">
           <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
-            <template v-if="hasSubjects && extraSub === false">
-              <!-- <draggable v-model="subjects" @start="drag=true" @end="drag=false"> -->
-                <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
-                  <v-card flat class="pa-3">
-                    <v-icon left>reorder</v-icon>
-                    <span>{{ sub }}</span>
-                  </v-card>
-                </v-flex>
-              <!-- </draggable> -->
-              <v-layout row>
-                <v-btn @click="submitTable">Save Timetable</v-btn>
-              </v-layout>
-            </template>
-            <template v-else-if="!hasSubjects && extraSub === false">
+            <!-- <template v-if="hasSubjects && extraSub === false"> -->
+            <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
+              <v-card flat class="pa-3">
+                <v-icon left>description</v-icon>
+                <span>{{ sub }}</span>
+                <v-card-actions v-if="index === subjects.length - 1">
+                  <v-dialog v-model="dialog" scrollable>
+                    <template v-slot:activator="{ on }">
+                      <v-btn color="blue" absolute bottom right fab v-on="on">
+                        <v-icon>edit</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">Timetable - {{ currentItem }}</span>
+                      </v-card-title>
+                      <v-container grid-list-md>
+                        <v-flex>
+                          <v-card-text>
+                            <p class="subheadline" v-for="(subs, i) in subjects" :key="i">
+                              {{ i+1 }}. {{ subs }}
+                              <span>
+                                <v-icon class="ml-2" color="red" @click="clearBtn(i, subs)">clear</v-icon>
+                              </span>
+                            </p>
+
+                            <v-select :items="subjects" label="Select Subject" v-model="value1">
+                              <span slot="prepend" class="mt-1">1.</span>
+                              <v-icon
+                                slot="append"
+                                class="mt-1 mr-2"
+                                color="green"
+                                @click="doneBtn"
+                              >check</v-icon>
+                            </v-select>
+                          </v-card-text>
+                        </v-flex>
+                      </v-container>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" flat @click="clsBtnFunc">Close</v-btn>
+                        <v-btn color="blue darken-1" flat @click="saveSubjects">Save</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-card-actions>
+              </v-card>
+            </v-flex>
+            <!-- </template> -->
+
+            <!-- <template v-else-if="!hasSubjects && extraSub === false">
               <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
                 <v-card flat class="pa-3">
                   <v-checkbox v-model="checkData" :label="sub" :value="sub"></v-checkbox>
@@ -48,7 +85,7 @@
               <v-layout row>
                 <v-btn @click="addSub">Duplicate Subject</v-btn>
               </v-layout>
-            </template>
+            </template>-->
           </v-tab-item>
         </v-tabs-items>
       </div>
@@ -74,7 +111,6 @@
         </v-layout>
       </v-card>
     </v-dialog>
-
   </section>
 </template> 
 
@@ -83,25 +119,22 @@ import firebase from "firebase";
 import db from "../firebase/init";
 import { bus } from "../main";
 
-// const draggable = () => import("vuedraggable")
 import "epic-spinners/dist/lib/epic-spinners.min.css";
 import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
 
 export default {
   components: {
-    // draggable,
     OrbitSpinner
   },
   data() {
     return {
+      value1: null,
       snackbar: false,
       msg: null,
       timeout: 3000,
       color: undefined,
       userDB: null,
-      dialog: false,
-      checkData: [],
-      subData: [],
+      dialog: true,
       currentItem: "Monday",
       items: [
         "Monday",
@@ -112,9 +145,7 @@ export default {
         "Saturday"
       ],
       hasSubjects: null,
-      extraSub: false,
       subjects: [],
-      orderedSubs: [],
       defSubs: [],
       showtt: true,
       loading: false,
@@ -123,16 +154,13 @@ export default {
   },
   methods: {
     submitTable() {
-      this.orderedSubs = this.subjects;
-
-      let obj = {};
-      obj[this.currentItem] = this.orderedSubs;
-
-      this.color = "success";
-      this.msg = `Timetable Created For ${this.currentItem}`;
-      this.snackbar = true;
-
-      this.userDB.set({ timetable: obj }, { merge: true });
+      // this.orderedSubs = this.subjects;
+      // let obj = {};
+      // obj[this.currentItem] = this.orderedSubs;
+      // this.color = "success";
+      // this.msg = `Timetable Created For ${this.currentItem}`;
+      // this.snackbar = true;
+      // this.userDB.set({ timetable: obj }, { merge: true });
     },
     tabChange() {
       this.loading = true;
@@ -160,22 +188,25 @@ export default {
           console.log(err);
         });
     },
-    deleteSubj() {
-      for (let i in this.checkData) {
-        if (this.subjects.includes(this.checkData[i])) {
-          this.subjects.splice(this.subjects.indexOf(this.checkData[i]), 1);
-        }
-      }
-      this.checkData = [];
-      this.hasSubjects = true;
+    doneBtn() {
+      // add verification(no sub selected, dupes etc)
+
+      console.log(this.value1);
+      this.subjects.push(this.value1);
+      this.value1 = null;
     },
-    addSub() {
-      for (let i in this.subData) {
-        let dupe = this.subData[i] + " (Duplicate)";
-        this.subjects.push(dupe);
-      }
-      this.subData = [];
-      this.extraSub = false;
+    clsBtnFunc() {
+      console.log("clear btn");
+      this.dialog = false;
+    },
+    saveSubjects() {
+      console.log("save subjects");
+    },
+    clearBtn(index, subject) {
+      // clearing subject removes subject from select also
+
+      console.log("clear btn");
+      this.subjects.splice(this.subjects.indexOf(this.subjects[index]), 1);
     }
   },
   mounted() {
@@ -216,59 +247,6 @@ export default {
       } else {
         this.showtt = true;
       }
-    });
-
-    bus.$on("restoreBtn", () => {
-      this.userDB.get().then(res => {
-        this.subjects = res.data().allSubjects;
-      });
-
-      let dbData = this.userDB;
-
-      switch (this.currentItem) {
-        case "Monday":
-          dbData.update({
-            "timetable.Monday": firebase.firestore.FieldValue.delete()
-          });
-          break;
-        case "Tuesday":
-          dbData.update({
-            "timetable.Tuesday": firebase.firestore.FieldValue.delete()
-          });
-          break;
-        case "Wednesday":
-          dbData.update({
-            "timetable.Wednesday": firebase.firestore.FieldValue.delete()
-          });
-          break;
-        case "Thursday":
-          dbData.update({
-            "timetable.Thursday": firebase.firestore.FieldValue.delete()
-          });
-          break;
-        case "Friday":
-          dbData.update({
-            "timetable.Friday": firebase.firestore.FieldValue.delete()
-          });
-          break;
-        case "Saturday":
-          dbData.update({
-            "timetable.Saturday": firebase.firestore.FieldValue.delete()
-          });
-          break;
-      }
-
-      this.color = "error";
-      this.msg = `Timetable Deleted For ${this.currentItem}`;
-      this.snackbar = true;
-    });
-
-    bus.$on("deleteBtn", () => {
-      this.hasSubjects = !this.hasSubjects;
-    });
-
-    bus.$on("add_sub", () => {
-      this.extraSub = !this.extraSub;
     });
   }
 };

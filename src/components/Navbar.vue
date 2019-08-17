@@ -22,24 +22,6 @@
         </v-dialog>
       </template>
 
-      <template v-if="$route.name === 'timetable'">
-        <v-dialog v-model="ttModal" full-width>
-          <template v-slot:activator="{ on }">
-            <v-icon class="mr-4" @click="ttModal = true" v-on="on">restore</v-icon>
-          </template>
-          <v-card>
-            <v-card-title>This will reset the timetable for this day. Are You Sure?</v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn flat color="blue" @click="ttModal = false">No</v-btn>
-              <v-btn flat color="blue" @click="restore">Yes</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <v-icon @click="add_sub" class="mr-4">plus_one</v-icon>
-        <v-icon @click="deleteSub">delete_outline</v-icon>
-      </template>
-
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
@@ -112,8 +94,6 @@ export default {
   data() {
     return {
       date: new Date().toISOString().substr(0, 10),
-      ttModal: false,
-      sendBus: null,
       signOutModal: null,
       signOutUser: null,
       currentDate: null,
@@ -125,7 +105,6 @@ export default {
       isUser: null,
       userPhoto: null,
       userName: null,
-      disIcon: null,
       links: []
     };
   },
@@ -201,19 +180,6 @@ export default {
       bus.$emit("dateValue", obj);
       this.modal = false;
     },
-    restore() {
-      this.sendBus = true;
-      if (this.sendBus) {
-        this.ttModal = false;
-        bus.$emit("restoreBtn");
-      }
-    },
-    deleteSub() {
-      bus.$emit("deleteBtn");
-    },
-    add_sub() {
-      bus.$emit("add_sub");
-    }
   },
   mounter() {
     firebase.auth().onAuthStateChanged(user => {

@@ -29,3 +29,6 @@ service worker fetch tabChange
 refactor the code
 
 feature discovery
+
+variants:
+

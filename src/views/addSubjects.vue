@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-container>
+    <v-container :style="style">
       <template v-if="hasSubjects === true">
         <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
           <v-card flat class="pa-3">
@@ -34,18 +34,7 @@
                             color="green"
                             @click="doneBtn"
                           >check</v-icon>
-                          <!-- <v-icon slot="append" class="mt-1" color="red">clear</v-icon> -->
                         </v-text-field>
-                        <!-- <v-select :items="items" label="Select Subject" v-model="value">
-                          <span slot="prepend" class="mt-1">1.</span>
-                          <v-icon
-                            slot="append"
-                            class="mt-1 mr-2"
-                            color="green"
-                            @click="doneBtn"
-                          >check</v-icon>
-                          <v-icon slot="append" class="mt-1" color="red">clear</v-icon>
-                        </v-select>-->
                       </v-card-text>
                     </v-flex>
                   </v-container>
@@ -107,6 +96,17 @@
       {{ msg }}
       <v-btn flat @click="snackbar === false">Close</v-btn>
     </v-snackbar>
+
+    <v-dialog v-model="loading" persistent full-width>
+      <v-card color="transparent">
+        <v-layout v-model="loading" justify-center pa-3>
+          <OrbitSpinner v-show="loading === true" :size="55" color="cyan" />
+        </v-layout>
+        <v-layout justify-center>
+          <p text-align="center">Loading...</p>
+        </v-layout>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -115,7 +115,13 @@ import db from "../firebase/init";
 import firebase from "firebase";
 import { bus } from "../main";
 
+import "epic-spinners/dist/lib/epic-spinners.min.css";
+import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
+
 export default {
+  components: {
+    OrbitSpinner
+  },
   data() {
     return {
       userDB: null,
@@ -135,7 +141,9 @@ export default {
       snackbar: false,
       msg: null,
       timeout: 3000,
-      color: undefined
+      color: undefined,
+      loading: false,
+      style: "opacity: 1"
     };
   },
   methods: {
@@ -146,7 +154,6 @@ export default {
       this.userDB.get().then(res => {
         if (this.select.length > 0) {
           for (var i in this.select) {
-            console.log("this executes");
             if (res.data().data !== undefined) {
               if (res.data().data[this.select[i]] !== undefined) {
                 if (Object.keys(res.data().data[this.select[i]]).length !== 0) {
@@ -167,37 +174,52 @@ export default {
               this.select.indexOf(this.select[i]) ===
               this.select.length - 1
             ) {
-              this.userDB.set(
-                {
-                  allSubjects: this.select,
-                  data: obj
-                },
-                { merge: true }
-              );
+              this.userDB
+                .set(
+                  {
+                    allSubjects: this.select,
+                    data: obj
+                  },
+                  { merge: true }
+                )
+                .then(() => {
+                  this.loading = true;
+                  this.style = "opacity: 0.3";
+                  this.userDB.get().then(res => {
+                    this.loading = false;
+                    this.style = "opacity: 1";
+                    if (Object.keys(res.data().allSubjects).length === 0) {
+                      this.hasSubjects = false;
+                    } else if (Object.keys(res.data().allSubjects).length > 0) {
+                      this.hasSubjects = true;
+                    }
+                  });
+                });
             }
           }
         } else {
-          this.userDB.set(
-            {
-              allSubjects: this.select,
-              data: obj
-            },
-            { merge: true }
-          );
+          this.userDB
+            .set(
+              {
+                allSubjects: this.select
+              },
+              { merge: true }
+            )
+            .then(() => {
+              this.loading = true;
+              this.style = "opacity: 0.3";
+              this.userDB.get().then(res => {
+                this.loading = false;
+                this.style = "opacity: 1";
+                if (Object.keys(res.data().allSubjects).length === 0) {
+                  this.hasSubjects = false;
+                } else if (Object.keys(res.data().allSubjects).length > 0) {
+                  this.hasSubjects = true;
+                }
+              });
+            });
         }
       });
-
-      this.$router.go();
-
-      // this.userDB.get().then(res => {
-      //   if (Object.keys(res.data().allSubjects).length === 0) {
-      //     console.log("what the heck");
-      //     this.hasSubjects = false;
-      //   } else if (Object.keys(res.data().allSubjects).length > 0) {
-      //     console.log("this is so true");
-      //     this.hasSubjects = true;
-      //   }
-      // });
 
       this.dialog = false;
       this.msg = "Subjects Saved Successfully";
@@ -233,11 +255,16 @@ export default {
   },
   created() {
     let user = firebase.auth().currentUser;
+
     if (user) {
       this.userDB = db.collection("attData").doc(user.uid);
     }
 
+    this.loading = true;
+    this.style = "opacity: 0.3";
     this.userDB.get().then(res => {
+      this.loading = false;
+      this.style = "opacity: 1";
       let sub = res.data().allSubjects;
       if (Object.keys(sub).length > 0) {
         this.hasSubjects = true;
