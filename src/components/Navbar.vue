@@ -6,7 +6,7 @@
       <v-toolbar-title v-if="$route.name === 'home'">Home</v-toolbar-title>
       <v-toolbar-title v-else-if="$route.name === 'statistics'">Statistics</v-toolbar-title>
       <v-toolbar-title v-else-if="$route.name === 'timetable'">Timetable</v-toolbar-title>
-      <v-toolbar-title v-else-if="$route.name === 'add_subjects'">Your Subjects</v-toolbar-title>
+      <v-toolbar-title v-else-if="$route.name === 'add_subjects'">Subjects</v-toolbar-title>
       <v-spacer></v-spacer>
 
       <v-btn v-if="isUser === false" @click="googleLogin">
@@ -85,11 +85,13 @@
         </v-list-tile>-->
       </v-list>
     </v-navigation-drawer>
+
   </nav>
 </template>
 
 <script>
 import firebase from "firebase/app";
+import db from "../firebase/init"
 import "../firebase/init";
 import { bus } from "../main";
 
@@ -184,7 +186,7 @@ export default {
       this.modal = false;
     }
   },
-  mounter() {
+  mounted() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.$router.push({ name: "home" });
@@ -192,14 +194,13 @@ export default {
           .doc(user.uid)
           .set({}, { merge: true });
       } else {
-        console.log("No User Found");
+        // console.log("No User Found");
       }
     });
   },
   created() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        console.log("User Logged In");
         this.isUser = true;
         this.userPhoto = user.photoURL;
         this.userName = user.displayName;
@@ -212,7 +213,6 @@ export default {
           // { icon: "settings", text: "Settings", route: "settings" }
         ];
       } else {
-        console.log("User not logged in");
         this.isUser = false;
         this.userPhoto = null;
         this.userName = null;

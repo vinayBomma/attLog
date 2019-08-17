@@ -5,16 +5,18 @@
         <v-carousel-item v-for="(slide, i) in slides" :key="i">
           <v-sheet height="92vh">
             <v-layout align-start justify-center>
-              <!-- <v-icon size="150" color="pink">{{ slide.icon }}</v-icon> -->
-              <!-- <img class="mt-3" src="../../public/cross-platform.svg" height="300px" width="300px"> -->
-              <v-img class="mt-3" :src="slide.image" max-height="300" max-width="300"></v-img>
+              <v-img class="mt-3" :src="slide.image" max-height="50vh" max-width="40vh"></v-img>
             </v-layout>
             <v-layout align-center justify-center>
               <v-container>
-              <h3 class="display-1 text-xs-center">{{ slide.title }}</h3>
-              <!-- <v-container> -->
-                <p class="subheading text-xs-center"
+                <h3 class="display-1 text-xs-center">{{ slide.title }}</h3>
+                <p
+                  class="subheading text-xs-center"
                 >Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat ducimus totam in vitae! Esse dolorem, adipisci ipsam atque cum deserunt vero ex architecto, aliquam doloremque commodi officia sequi repellendus quibusdam.</p>
+                <v-layout align-end justify-space-between fill-height>
+                  <!-- <v-btn>Skip</v-btn> -->
+                  <!-- <v-btn>Next</v-btn> -->
+                </v-layout>
               </v-container>
             </v-layout>
           </v-sheet>
@@ -42,11 +44,17 @@ export default {
   data() {
     return {
       slides: [
-        {title: "Cross Platform", image: require('../../public/cross-platform.svg')}, 
-        {title: "Powerful Insights", image: require('../../public/analysis.svg')},
-        {title: "Intuitive Design", image: require('../../public/block.svg')}, 
-        {title: "Seamless Updates", image: require('../../public/cloud.svg')}       
-        ],
+        {
+          title: "Cross Platform",
+          image: require("../../public/cross-platform.svg")
+        },
+        {
+          title: "Powerful Insights",
+          image: require("../../public/analysis.svg")
+        },
+        { title: "Intuitive Design", image: require("../../public/block.svg") },
+        { title: "Seamless Updates", image: require("../../public/cloud.svg") }
+      ],
       cycle: false,
       colors: [
         "green",
@@ -60,7 +68,6 @@ export default {
   methods: {
     // googleLogin() {
     //   const provider = new firebase.auth.GoogleAuthProvider();
-
     //   firebase
     //     .auth()
     //     .signInWithPopup(provider)
@@ -80,7 +87,6 @@ export default {
     //   .catch(err => {
     //     console.log("Errarta: ", err);
     //   });
-
     // firebase.auth().onAuthStateChanged(user => {
     //   if (user) {
     //     this.$router.push({ name: "home" });

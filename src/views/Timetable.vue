@@ -18,7 +18,7 @@
           <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
             <v-card flat v-if="!hastt" class="pa-3 mb-2">
               <v-icon color="red" left>error</v-icon>
-              <span class="subheadline">Timetable Not Saved For {{ currentItem }}</span>
+              <span class="subheadline">Timetable Not Created For {{ currentItem }}</span>
             </v-card>
             <v-flex xs12 sm6 md4 v-for="(sub,i) in select" :key="i" class="mb-2">
               <v-card flat class="pa-3">
@@ -69,17 +69,15 @@
         </v-tabs-items>
       </div>
       <div v-else-if="!showtt">
-        <v-container>
-          <v-card>
-            <v-card-text>
-              <p>No Subjects Added</p>
-              <p>
-                Click
-                <router-link to="/add_subjects">Here</router-link>To Add Subjects
-              </p>
-            </v-card-text>
-          </v-card>
-        </v-container>
+        <v-card>
+          <v-card-text>
+            <p>No Subjects Added</p>
+            <p>
+              Click
+              <router-link to="/add_subjects">Here</router-link>To Add Subjects
+            </p>
+          </v-card-text>
+        </v-card>
       </div>
     </div>
 
@@ -98,6 +96,15 @@
         </v-layout>
       </v-card>
     </v-dialog>
+
+    <!-- <v-card> -->
+      <!-- <v-bottom-nav app>
+      <v-btn>Home</v-btn>
+      <v-btn>Home</v-btn>
+      <v-btn>Home</v-btn>
+    </v-bottom-nav> -->
+    <!-- </v-card> -->
+
   </section>
 </template> 
 
@@ -121,7 +128,7 @@ export default {
       timeout: 3000,
       color: undefined,
       userDB: null,
-      dialog: true,
+      dialog: false,
       currentItem: "Monday",
       items: [
         "Monday",
@@ -221,7 +228,7 @@ export default {
         ) {
           this.subjects = res.data().allSubjects;
           this.select = this.subjects.concat();
-          this.hastt = false
+          this.hastt = false;
         } else {
           this.subjects = res.data().timetable[this.currentItem];
           this.select = this.subjects.concat();

@@ -1,12 +1,8 @@
 beforeCreate
-save button
 
-sign in navbar functionality
 404 page
 add timetable deleting all chips page issue
 line chart along with pie chart
-
-ui padding 360px
 
 reset attendance
 interactive faq
@@ -23,12 +19,14 @@ page accessibility
 page seo
 
 sign in reload
-addSubjects enter subject
 service worker fetch tabChange
 
 refactor the code
 
 feature discovery
 
-variants:
+production tips:
+enable sw
+remove console log statements
+change cacheName
 

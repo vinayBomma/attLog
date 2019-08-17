@@ -7,14 +7,32 @@
       </v-card>
       </v-dialog>-->
       <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
-      <v-container>
+      <v-container fluid>
         <v-layout row wrap>
           <template v-if="hasSubjects && !attLogged">
             <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
               <v-card>
-                <v-card-title primary-title>{{ val }}</v-card-title>
-                <v-radio-group row id="logData">
-                  <v-layout align-center justify-center row>
+                <v-card-title primary-title>
+                  {{val}}
+                  <v-radio-group row id="logData">
+                    <v-layout align-start row wrap>
+                      <v-radio
+                        id="devWidth"
+                        label="Present"
+                        value="Present"
+                        v-on:change="getVal('present', val)"
+                      ></v-radio>
+                      <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
+                      <v-radio
+                        label="Cancelled"
+                        value="Cancelled"
+                        v-on:change="getVal('cancelled', val)"
+                      ></v-radio>
+                    </v-layout>
+                  </v-radio-group>
+                </v-card-title>
+                <!-- <v-radio-group row id="logData">
+                  <v-layout align-start justify-center fill-height row>
                     <v-radio
                       id="devWidth"
                       label="Present"
@@ -28,7 +46,7 @@
                       v-on:change="getVal('cancelled', val)"
                     ></v-radio>
                   </v-layout>
-                </v-radio-group>
+                </v-radio-group>-->
               </v-card>
             </v-flex>
             <v-btn color="blue" :disabled="disabled" v-on:click="submit()">Save</v-btn>
@@ -87,6 +105,7 @@ export default {
   },
   data() {
     return {
+      seasons: ["Winter", "Spring", "Summer"],
       userDB: null,
       snackbar: false,
       msg: null,
@@ -113,6 +132,9 @@ export default {
     };
   },
   methods: {
+    season(val) {
+      return this.seasons[val];
+    },
     getVal: function(data, sub) {
       // Checks if sub is in another array(absent, cancelled), if yes then removes it
 
