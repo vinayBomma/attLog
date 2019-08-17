@@ -2,11 +2,15 @@
   <nav>
     <v-toolbar flat app>
       <v-toolbar-side-icon v-on:click="drawer = !drawer"></v-toolbar-side-icon>
-      <!-- <v-toolbar-title>Test</v-toolbar-title> -->
+
+      <v-toolbar-title v-if="$route.name === 'home'">Home</v-toolbar-title>
+      <v-toolbar-title v-else-if="$route.name === 'statistics'">Statistics</v-toolbar-title>
+      <v-toolbar-title v-else-if="$route.name === 'timetable'">Timetable</v-toolbar-title>
+      <v-toolbar-title v-else-if="$route.name === 'add_subjects'">Your Subjects</v-toolbar-title>
       <v-spacer></v-spacer>
 
-      <v-btn v-if="isUser === false"  @click="googleLogin">
-        <img src="../../public/google.png" class="mr-2"/>Sign In
+      <v-btn v-if="isUser === false" @click="googleLogin">
+        <img src="../../public/google.png" class="mr-2" />Sign In
       </v-btn>
 
       <template v-if="$route.name === 'home'">
@@ -21,7 +25,6 @@
           </v-date-picker>
         </v-dialog>
       </template>
-
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
@@ -179,7 +182,7 @@ export default {
 
       bus.$emit("dateValue", obj);
       this.modal = false;
-    },
+    }
   },
   mounter() {
     firebase.auth().onAuthStateChanged(user => {

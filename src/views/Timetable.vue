@@ -16,12 +16,14 @@
         </template>
         <v-tabs-items v-model="currentItem">
           <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
-            <!-- <template v-if="hasSubjects && extraSub === false"> -->
-            <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
+            <v-card flat v-if="!hastt" class="pa-3 mb-2">
+              <v-icon color="red" left>error</v-icon>
+              <span class="subheadline">Timetable Not Saved For {{ currentItem }}</span>
+            </v-card>
+            <v-flex xs12 sm6 md4 v-for="(sub,i) in select" :key="i" class="mb-2">
               <v-card flat class="pa-3">
-                <v-icon left>description</v-icon>
-                <span>{{ sub }}</span>
-                <v-card-actions v-if="index === subjects.length - 1">
+                <span>{{ i+1 }}. {{ sub }}</span>
+                <v-card-actions v-if="i === select.length - 1">
                   <v-dialog v-model="dialog" scrollable>
                     <template v-slot:activator="{ on }">
                       <v-btn color="blue" absolute bottom right fab v-on="on">
@@ -42,8 +44,7 @@
                               </span>
                             </p>
 
-                            <v-select :items="subjects" label="Select Subject" v-model="value1">
-                              <span slot="prepend" class="mt-1">1.</span>
+                            <v-select :items="defaultSubs" label="Select Subject" v-model="value1">
                               <v-icon
                                 slot="append"
                                 class="mt-1 mr-2"
@@ -64,35 +65,21 @@
                 </v-card-actions>
               </v-card>
             </v-flex>
-            <!-- </template> -->
-
-            <!-- <template v-else-if="!hasSubjects && extraSub === false">
-              <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
-                <v-card flat class="pa-3">
-                  <v-checkbox v-model="checkData" :label="sub" :value="sub"></v-checkbox>
-                </v-card>
-              </v-flex>
-              <v-layout row>
-                <v-btn @click="deleteSubj">Delete</v-btn>
-              </v-layout>
-            </template>
-            <template v-if="extraSub">
-              <v-flex xs12 sm6 md4 v-for="(sub,index) in subjects" :key="index" class="mb-2">
-                <v-card flat class="pa-3">
-                  <v-checkbox v-model="subData" :label="sub" :value="sub"></v-checkbox>
-                </v-card>
-              </v-flex>
-              <v-layout row>
-                <v-btn @click="addSub">Duplicate Subject</v-btn>
-              </v-layout>
-            </template>-->
           </v-tab-item>
         </v-tabs-items>
       </div>
       <div v-else-if="!showtt">
-        <v-card>
-          <v-card-text>No Subjects Added</v-card-text>
-        </v-card>
+        <v-container>
+          <v-card>
+            <v-card-text>
+              <p>No Subjects Added</p>
+              <p>
+                Click
+                <router-link to="/add_subjects">Here</router-link>To Add Subjects
+              </p>
+            </v-card-text>
+          </v-card>
+        </v-container>
       </div>
     </div>
 
@@ -144,24 +131,17 @@ export default {
         "Friday",
         "Saturday"
       ],
-      hasSubjects: null,
+      hastt: null,
       subjects: [],
-      defSubs: [],
+      select: [],
+      clsBtn: null,
+      defaultSubs: [],
       showtt: true,
       loading: false,
       style: "opacity: 1"
     };
   },
   methods: {
-    submitTable() {
-      // this.orderedSubs = this.subjects;
-      // let obj = {};
-      // obj[this.currentItem] = this.orderedSubs;
-      // this.color = "success";
-      // this.msg = `Timetable Created For ${this.currentItem}`;
-      // this.snackbar = true;
-      // this.userDB.set({ timetable: obj }, { merge: true });
-    },
     tabChange() {
       this.loading = true;
       this.style = "opacity: 0.3";
@@ -170,18 +150,17 @@ export default {
         .then(res => {
           this.loading = false;
           this.style = "opacity: 1";
-          if (res.data().timetable === undefined) {
-            // if(res.data().timetable[this.currentItem] === undefined){
+          if (
+            res.data().timetable === undefined ||
+            res.data().timetable[this.currentItem] === undefined
+          ) {
             this.subjects = res.data().allSubjects;
-            // }
-          } else if (res.data().timetable[this.currentItem] === undefined) {
-            this.subjects = res.data().allSubjects;
-            this.defSubs = this.subjects;
-            this.hasSubjects = true;
+            this.select = this.subjects.concat();
+            this.hastt = false;
           } else {
             this.subjects = res.data().timetable[this.currentItem];
-            this.defSubs = this.subjects;
-            this.hasSubjects = true;
+            this.select = this.subjects.concat();
+            this.hastt = true;
           }
         })
         .catch(err => {
@@ -189,24 +168,43 @@ export default {
         });
     },
     doneBtn() {
-      // add verification(no sub selected, dupes etc)
-
-      console.log(this.value1);
-      this.subjects.push(this.value1);
-      this.value1 = null;
+      if (!this.value1) {
+        this.msg = "Please Select A Subject";
+        this.snackbar = true;
+        this.color = "red";
+      } else if (this.value1) {
+        this.subjects.push(this.value1);
+        this.value1 = null;
+      }
     },
     clsBtnFunc() {
-      console.log("clear btn");
       this.dialog = false;
+      if (this.clsBtn) {
+        this.subjects = this.select.concat();
+        this.clsBtn = false;
+      }
     },
     saveSubjects() {
-      console.log("save subjects");
+      let obj = {};
+      this.select = this.subjects.concat();
+      obj[this.currentItem] = this.select;
+
+      this.userDB
+        .set(
+          {
+            timetable: obj
+          },
+          { merge: true }
+        )
+        .then(() => {
+          this.color = "success";
+          this.msg = `Timetable Created for ${this.currentItem}`;
+          this.snackbar = true;
+        });
     },
     clearBtn(index, subject) {
-      // clearing subject removes subject from select also
-
-      console.log("clear btn");
       this.subjects.splice(this.subjects.indexOf(this.subjects[index]), 1);
+      this.clsBtn = true;
     }
   },
   mounted() {
@@ -217,18 +215,17 @@ export default {
       .then(res => {
         this.loading = false;
         this.style = "opacity: 1";
-        if (res.data().timetable === undefined) {
+        if (
+          res.data().timetable === undefined ||
+          res.data().timetable[this.currentItem] === undefined
+        ) {
           this.subjects = res.data().allSubjects;
-          this.defSubs = this.subjects;
-          this.hasSubjects = true;
-        } else if (res.data().timetable[this.currentItem] === undefined) {
-          this.subjects = res.data().allSubjects;
-          this.defSubs = this.subjects;
-          this.hasSubjects = true;
+          this.select = this.subjects.concat();
+          this.hastt = false
         } else {
           this.subjects = res.data().timetable[this.currentItem];
-          this.defSubs = this.subjects;
-          this.hasSubjects = true;
+          this.select = this.subjects.concat();
+          this.hastt = true;
         }
       })
       .catch(err => {
@@ -245,6 +242,7 @@ export default {
       if (res.data().allSubjects === undefined) {
         this.showtt = false;
       } else {
+        this.defaultSubs = res.data().allSubjects;
         this.showtt = true;
       }
     });
