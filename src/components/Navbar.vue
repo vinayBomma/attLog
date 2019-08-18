@@ -61,18 +61,7 @@
       <v-divider v-if="isUser"></v-divider>
 
       <v-list>
-        <v-list-tile v-for="(link, j) in links" :key="j" router v-bind:to="link.route">
-          <v-list-tile-action>
-            <v-icon>{{ link.icon }}</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>{{ link.text }}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-
-        <!-- <v-divider v-if="isUser"></v-divider> -->
-
-        <!-- <v-list-tile>
+        <v-list-tile>
           <v-list-tile-action>
             <v-icon>brightness_3</v-icon>
           </v-list-tile-action>
@@ -80,18 +69,17 @@
             <v-list-tile-title>Night Mode</v-list-tile-title>
           </v-list-tile-content>
           <v-list-tile-action>
-            <v-switch></v-switch>
+            <v-switch @click="nightMode"></v-switch>
           </v-list-tile-action>
-        </v-list-tile>-->
+        </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-
   </nav>
 </template>
 
 <script>
 import firebase from "firebase/app";
-import db from "../firebase/init"
+import db from "../firebase/init";
 import "../firebase/init";
 import { bus } from "../main";
 
@@ -110,10 +98,15 @@ export default {
       isUser: null,
       userPhoto: null,
       userName: null,
-      links: []
+      links: [],
+      mode: false
     };
   },
   methods: {
+    nightMode() {
+      this.mode = !this.mode;
+      this.$emit("changeMode", this.mode);
+    },
     googleLogout() {
       this.signOutModal = false;
       this.signOutUser = true;
@@ -204,14 +197,6 @@ export default {
         this.isUser = true;
         this.userPhoto = user.photoURL;
         this.userName = user.displayName;
-
-        this.links = [
-          { icon: "home", text: "Home", route: "/" },
-          { icon: "insert_chart", text: "Statistics", route: "statistics" },
-          { icon: "today", text: "Timetable", route: "timetable" },
-          { icon: "add", text: "Add Subjects", route: "add_subjects" }
-          // { icon: "settings", text: "Settings", route: "settings" }
-        ];
       } else {
         this.isUser = false;
         this.userPhoto = null;

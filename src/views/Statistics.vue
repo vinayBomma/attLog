@@ -33,32 +33,25 @@
               </v-card>
             </v-flex>
 
-            <!-- <v-flex xs6 sm6 md4 pa-1>
+            <v-flex xs6 sm6 md4 pa-1>
               <v-card>
                 <v-layout justify-center>
-                  <v-card-title class="display-3">+4</v-card-title>
+                  <v-card-title class="display-3">{{sign}}{{ leaves }}</v-card-title>
                 </v-layout>
                 <v-layout justify-center>
                   <p class="text-xs-center mt-2 mb-3">Leaves Remaining</p>
                 </v-layout>
               </v-card>
-            </v-flex> -->
+            </v-flex>
 
-            <!-- <v-flex xs12 sm6 md4 pa-1>
+            <v-flex xs12 sm6 md4 pa-1>
               <v-card>
                 <v-layout row>
                   <v-card-title>History</v-card-title>
                 </v-layout>
-                <v-date-picker
-                  v-model="date1"
-                  no-title
-                  readonly
-                  :events="dateEvent"
-                  full-width
-                ></v-date-picker>
+                <v-date-picker v-model="date1" no-title readonly :events="dateEvent" full-width></v-date-picker>
               </v-card>
-            </v-flex> -->
-
+            </v-flex>
           </v-layout>
         </v-container>
       </div>
@@ -105,7 +98,10 @@ export default {
       currentItem: null,
       showStat: true,
       loading: false,
-      style: "opacity: 1"
+      style: "opacity: 1",
+      leaves: 0,
+      sign: "",
+      track: 100
     };
   },
   methods: {
@@ -179,19 +175,40 @@ export default {
               display: true,
               position: "left"
             }
-            // scales: {
-            //   yAxes: [
-            //     {
-            //       ticks: {
-            //         beginAtZero: true
-            //       }
-            //     }
-            //   ]
-            // }
           }
         };
 
         this.createChart("mychart1", obj);
+
+        if (this.value >= 75) {
+          this.track = this.value;
+          for (let i = 1; this.track >= 75; i++) {
+            this.track = Math.floor(
+              (pieData[0] * 100) / (pieData[3] + i - pieData[2])
+            );
+            console.log(this.currentItem + ": " + this.track);
+            if (this.track <= 75) {
+              this.leaves = i - 1;
+              this.sign = "+";
+            }
+          }
+        } else if (this.value <= 75) {
+          this.track = this.value;
+          for (let i = 1; this.track <= 75; i++) {
+            this.track = Math.floor(
+              ((pieData[0] + i) * 100) / (pieData[3] + i - pieData[2])
+            );
+            console.log(this.currentItem + ": " + this.track);
+            if (this.track >= 75) {
+              this.leaves = i - 1;
+              this.sign = "-";
+            }
+          }
+        }
+
+        if (this.leaves === 0) {
+          this.sign = "";
+        }
       });
     }
   },
@@ -244,7 +261,6 @@ export default {
                 "rgba(255, 159, 64, 1)"
               ],
               borderWidth: 1
-              // fill: false
             }
           ]
         },
@@ -253,19 +269,40 @@ export default {
             display: true,
             position: "left"
           }
-          // scales: {
-          //   yAxes: [
-          //     {
-          //       ticks: {
-          //         beginAtZero: true
-          //       }
-          //     }
-          //   ]
-          // }
         }
       };
 
       this.createChart("mychart1", obj);
+
+      if (this.value >= 75) {
+        this.track = this.value;
+        for (let i = 1; this.track >= 75; i++) {
+          this.track = Math.floor(
+            (pieData[0] * 100) / (pieData[3] + i - pieData[2])
+          );
+          console.log(this.currentItem + ": " + this.track);
+          if (this.track <= 75) {
+            this.leaves = i - 1;
+            this.sign = "+";
+          }
+        }
+      } else if (this.value <= 75) {
+        this.track = this.value;
+        for (let i = 1; this.track <= 75; i++) {
+          this.track = Math.floor(
+            ((pieData[0] + i) * 100) / (pieData[3] + i - pieData[2])
+          );
+          console.log(this.currentItem + ": " + this.track);
+          if (this.track >= 75) {
+            this.leaves = i - 1;
+            this.sign = "-";
+          }
+        }
+      }
+
+      if (this.leaves === 0) {
+        this.sign = "";
+      }
     });
   },
   created() {

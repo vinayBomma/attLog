@@ -97,14 +97,6 @@
       </v-card>
     </v-dialog>
 
-    <!-- <v-card> -->
-      <!-- <v-bottom-nav app>
-      <v-btn>Home</v-btn>
-      <v-btn>Home</v-btn>
-      <v-btn>Home</v-btn>
-    </v-bottom-nav> -->
-    <!-- </v-card> -->
-
   </section>
 </template> 
 

@@ -1,10 +1,10 @@
 <template>
-  <v-app :dark="dark">
-    <Navbar></Navbar>
+  <v-app v-bind:dark="nightMode">
+    <Navbar v-on:changeMode="switchMode($event)"></Navbar>
     <v-content>
       <router-view></router-view>
     </v-content>
-    <v-bottom-nav app fixed value="true">
+    <v-bottom-nav v-if="$route.name !== 'signup'" app fixed value="true">
       <div v-for="nav in bottomNav" :key="nav.name">
         <v-btn color="teal" flat router v-bind:to="nav.link">
         <span>{{ nav.name }}</span>
@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      dark: true,
+      nightMode: true,
       bottomNav: [
         {name: 'Home', icon: 'home', link: '/'},
         {name: 'Statistics', icon: 'insert_chart', link: 'statistics'},
@@ -33,6 +33,11 @@ export default {
         {name: 'Subjects', icon: 'book', link: 'add_subjects'},
       ]
     };
+  },
+  methods:{
+    switchMode(mode){
+      this.nightMode = mode;
+    }
   }
 };
 </script>

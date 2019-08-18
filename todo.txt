@@ -1,25 +1,22 @@
-beforeCreate
-
 404 page
-add timetable deleting all chips page issue
 line chart along with pie chart
 
 reset attendance
 interactive faq
 
-history view
-on track
 import csv
 
 push notifications
 firebase persistence
-ui redesign bottom nav
+history view, on track
+timetable dupe subs
+refactor home
+sign in reload
+service worker
+timetable edit btn
 
 page accessibility
 page seo
-
-sign in reload
-service worker fetch tabChange
 
 refactor the code
 
