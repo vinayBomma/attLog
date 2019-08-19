@@ -1,5 +1,15 @@
-[{
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target" : { "namespace": "android_app", "package_name": "com.chromium.twa.attendIt",
-                 "sha256_cert_fingerprints": ["CD:D0:6B:80:ED:AF:13:96:E9:2B:F6:8E:A4:80:06:CD:BE:4D:3B:96:DB:E5:74:2B:C6:EF:23:B2:BC:2E:28:4C"] }
-  }]
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.chromium.twa.attendIt",
+            "sha256_cert_fingerprints": [
+                "CD:D0:6B:80:ED:AF:13:96:E9:2B:F6:8E:A4:80:06:CD:BE:4D:3B:96:DB:E5:74:2B:C6:EF:23:B2:BC:2E:28:4C",
+                "3A:7F:9A:CC:73:4D:EB:9A:49:33:F8:CC:10:06:F2:FA:9A:67:5C:20:6A:3B:3B:20:10:1D:17:70:24:7C:2A:62"
+            ]
+        }
+    }
+]

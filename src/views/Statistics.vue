@@ -44,14 +44,14 @@
               </v-card>
             </v-flex>
 
-            <v-flex xs12 sm6 md4 pa-1>
+            <!-- <v-flex xs12 sm6 md4 pa-1>
               <v-card>
                 <v-layout row>
                   <v-card-title>History</v-card-title>
                 </v-layout>
                 <v-date-picker v-model="date1" no-title readonly :events="dateEvent" full-width></v-date-picker>
               </v-card>
-            </v-flex>
+            </v-flex> -->
           </v-layout>
         </v-container>
       </div>
@@ -101,7 +101,7 @@ export default {
       style: "opacity: 1",
       leaves: 0,
       sign: "",
-      track: 100
+      track: 100,
     };
   },
   methods: {
@@ -186,7 +186,6 @@ export default {
             this.track = Math.floor(
               (pieData[0] * 100) / (pieData[3] + i - pieData[2])
             );
-            console.log(this.currentItem + ": " + this.track);
             if (this.track <= 75) {
               this.leaves = i - 1;
               this.sign = "+";
@@ -198,7 +197,6 @@ export default {
             this.track = Math.floor(
               ((pieData[0] + i) * 100) / (pieData[3] + i - pieData[2])
             );
-            console.log(this.currentItem + ": " + this.track);
             if (this.track >= 75) {
               this.leaves = i - 1;
               this.sign = "-";
@@ -280,7 +278,6 @@ export default {
           this.track = Math.floor(
             (pieData[0] * 100) / (pieData[3] + i - pieData[2])
           );
-          console.log(this.currentItem + ": " + this.track);
           if (this.track <= 75) {
             this.leaves = i - 1;
             this.sign = "+";
@@ -292,7 +289,6 @@ export default {
           this.track = Math.floor(
             ((pieData[0] + i) * 100) / (pieData[3] + i - pieData[2])
           );
-          console.log(this.currentItem + ": " + this.track);
           if (this.track >= 75) {
             this.leaves = i - 1;
             this.sign = "-";

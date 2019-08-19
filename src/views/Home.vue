@@ -31,22 +31,6 @@
                     </v-layout>
                   </v-radio-group>
                 </v-card-title>
-                <!-- <v-radio-group row id="logData">
-                  <v-layout align-start justify-center fill-height row>
-                    <v-radio
-                      id="devWidth"
-                      label="Present"
-                      value="Present"
-                      v-on:change="getVal('present', val)"
-                    ></v-radio>
-                    <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
-                    <v-radio
-                      label="No Lecture"
-                      value="Cancelled"
-                      v-on:change="getVal('cancelled', val)"
-                    ></v-radio>
-                  </v-layout>
-                </v-radio-group>-->
               </v-card>
             </v-flex>
             <v-btn color="blue" :disabled="disabled" v-on:click="submit()">Save</v-btn>
