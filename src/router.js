@@ -9,10 +9,10 @@ import firebase from 'firebase'
 // import addSubjects from './views/addSubjects.vue'
 
 const Home = () => import(/* webpackPrefetch: true */ './views/Home.vue')
-const Statistics = () => import(/* webpackChunkName: "stats" */ './views/Statistics.vue')
-const Timetable = () => import(/* webpackChunkName: "timetable" */ './views/Timetable.vue')
+const Statistics = () => import(/* webpackPrefetch: true */'./views/Statistics.vue')
+const Timetable = () => import(/* webpackPrefetch: true */ './views/Timetable.vue')
 const Signup = () => import(/* webpackPreload: true */ './views/Signup.vue')
-const addSubjects = () => import(/* webpackChunkName: "addSub" */ './views/addSubjects.vue')
+const addSubjects = () => import(/* webpackPrefetch: true */  './views/addSubjects.vue')
 const privacyPolicy = () => import('./views/privacyPolicy.vue')
 
 Vue.use(Router)

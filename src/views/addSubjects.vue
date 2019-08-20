@@ -1,13 +1,13 @@
 <template>
   <div>
     <v-container :style="style">
-      <template v-if="hasSubjects === true">
+      <template v-if="hasSubjects">
         <v-flex xs12 sm6 md4 v-for="(sub,index) in select" :key="index" class="mb-2">
           <v-card flat class="pa-3">
             <v-icon left>description</v-icon>
             <span>{{sub}}</span>
             <v-card-actions v-if="index === select.length - 1">
-              <v-dialog v-model="dialog" scrollable>
+              <v-dialog v-model="dialog">
                 <template v-slot:activator="{ on }">
                   <v-btn color="blue" absolute bottom right fab v-on="on">
                     <v-icon>edit</v-icon>
@@ -51,7 +51,7 @@
         </v-flex>
       </template>
 
-      <v-card flat v-else-if="hasSubjects === false">
+      <v-card flat v-else-if="!hasSubjects">
         <v-card-text>No Subjects Added</v-card-text>
         <v-card-actions>
           <v-dialog v-model="dialog">
@@ -131,13 +131,6 @@ export default {
       hasSubjects: null,
       value: "",
       clsBtn: null,
-      subName: [],
-      items: [
-        "Maths",
-        "History",
-        "Vuejs",
-        "Frightened Frankenstein Home Alone Bazooka Skadoodle"
-      ],
       snackbar: false,
       msg: null,
       timeout: 3000,
@@ -270,7 +263,7 @@ export default {
         this.hasSubjects = true;
         this.select = sub;
         this.subjects = this.select.concat();
-      } else if (sub.length === 0) {
+      } else if (sub.length === 0 || sub === undefined) {
         this.hasSubjects = false;
       } else {
         this.hasSubjects = false;

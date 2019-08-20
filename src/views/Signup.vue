@@ -5,7 +5,7 @@
         <v-carousel-item v-for="(slide, i) in slides" :key="i">
           <v-sheet height="92vh">
             <v-layout align-start justify-center>
-              <v-img class="mt-3" :src="slide.image" max-height="50vh" max-width="40vh"></v-img>
+              <v-img class="mt-3" :src="slide.image" max-height="300" max-width="300"></v-img>
             </v-layout>
             <v-layout align-center justify-center>
               <v-container>
@@ -13,10 +13,7 @@
                 <p
                   class="subheading text-xs-center"
                 >Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat ducimus totam in vitae! Esse dolorem, adipisci ipsam atque cum deserunt vero ex architecto, aliquam doloremque commodi officia sequi repellendus quibusdam.</p>
-                <v-layout align-end justify-space-between fill-height>
-                  <!-- <v-btn>Skip</v-btn> -->
-                  <!-- <v-btn>Next</v-btn> -->
-                </v-layout>
+                <v-layout align-end justify-space-between fill-height></v-layout>
               </v-container>
             </v-layout>
           </v-sheet>
@@ -55,48 +52,8 @@ export default {
         { title: "Intuitive Design", image: require("../../public/block.svg") },
         { title: "Seamless Updates", image: require("../../public/cloud.svg") }
       ],
-      cycle: false,
-      colors: [
-        "green",
-        "secondary",
-        "yellow darken-4",
-        "red lighten-2",
-        "orange darken-1"
-      ]
+      cycle: false
     };
-  },
-  methods: {
-    // googleLogin() {
-    //   const provider = new firebase.auth.GoogleAuthProvider();
-    //   firebase
-    //     .auth()
-    //     .signInWithPopup(provider)
-    //     .then(() => {
-    //       this.$router.push({ name: "home" });
-    //       this.someText = "test";
-    //     })
-    //     .catch(err => {
-    //       console.log(err);
-    //     });
-    // }
-  },
-  mounted() {
-    // firebase
-    //   .auth()
-    //   .getRedirectResult()
-    //   .catch(err => {
-    //     console.log("Errarta: ", err);
-    //   });
-    // firebase.auth().onAuthStateChanged(user => {
-    //   if (user) {
-    //     this.$router.push({ name: "home" });
-    //     db.collection("attData")
-    //       .doc(user.uid)
-    //       .set({}, { merge: true });
-    //   } else {
-    //     console.log("No User Found");
-    //   }
-    // });
   }
 };
 </script>

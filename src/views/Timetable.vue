@@ -18,7 +18,7 @@
           <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
             <v-card flat v-if="!hastt" class="pa-3 mb-2">
               <v-icon color="red" left>error</v-icon>
-              <span class="subheadline">Timetable Not Created For {{ currentItem }}</span>
+              <span class="subheadline">Timetable Not Saved For {{ currentItem }}</span>
             </v-card>
             <v-flex xs12 sm6 md4 v-for="(sub,i) in select" :key="i" class="mb-2">
               <v-card flat class="pa-3">
@@ -69,15 +69,17 @@
         </v-tabs-items>
       </div>
       <div v-else-if="!showtt">
-        <v-card>
-          <v-card-text>
-            <p>No Subjects Added</p>
-            <p>
+        <v-container>
+          <v-card>
+            <v-card-text>No Subjects Added</v-card-text>
+          </v-card>
+          <v-card class="mt-2">
+            <v-card-text>
               Click
               <router-link to="/add_subjects">Here</router-link>To Add Subjects
-            </p>
-          </v-card-text>
-        </v-card>
+            </v-card-text>
+          </v-card>
+        </v-container>
       </div>
     </div>
 
@@ -96,7 +98,6 @@
         </v-layout>
       </v-card>
     </v-dialog>
-
   </section>
 </template> 
 
@@ -128,7 +129,8 @@ export default {
         "Wednesday",
         "Thursday",
         "Friday",
-        "Saturday"
+        "Saturday",
+        "Sunday"
       ],
       hastt: null,
       subjects: [],

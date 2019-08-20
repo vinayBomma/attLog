@@ -51,14 +51,16 @@
                 </v-layout>
                 <v-date-picker v-model="date1" no-title readonly :events="dateEvent" full-width></v-date-picker>
               </v-card>
-            </v-flex> -->
+            </v-flex>-->
           </v-layout>
         </v-container>
       </div>
       <div v-else-if="!showStat">
-        <v-card>
-          <v-card-text>No Statistics Available</v-card-text>
-        </v-card>
+        <v-container>
+          <v-card>
+            <v-card-text>No Statistics Available</v-card-text>
+          </v-card>
+        </v-container>
       </div>
     </div>
 
@@ -101,7 +103,7 @@ export default {
       style: "opacity: 1",
       leaves: 0,
       sign: "",
-      track: 100,
+      track: 100
     };
   },
   methods: {

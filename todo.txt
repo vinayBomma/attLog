@@ -6,11 +6,9 @@ interactive faq
 import csv
 
 push notifications - 1
-history view, on track - 3
+history view - 3
 timetable dupe subs - 2
 refactor home - 2
-sign in reload apk - 1
-service worker - 1
 timetable edit btn - 1
 reset attendance - 3
 performance - 1
