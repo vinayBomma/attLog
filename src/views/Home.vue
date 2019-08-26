@@ -658,13 +658,6 @@ export default {
     this.currentDate = new Date().getDate();
     this.day = days[new Date().getDay()];
 
-    // Code to fix the padding issue, make required changes
-
-    // if(window.screen.width > 370){
-    //   document.getElementById('devWidth').className += "ml-2"
-    //   console.log(document.getElementById('devWidth'))
-    // }
-
     this.userDB.get().then(res => {
       if (res.data().timetable !== undefined) {
         if (res.data().timetable[this.day] !== undefined) {

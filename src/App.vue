@@ -5,19 +5,22 @@
       <router-view></router-view>
     </v-content>
     <v-bottom-nav v-if="$route.name !== 'signup'" app fixed value="true">
-      <div v-for="nav in bottomNav" :key="nav.name">
-        <v-btn color="teal" flat router v-bind:to="nav.link">
+    <div v-for="nav in bottomNav" :key="nav.name">
+      <v-btn color="teal" flat router v-bind:to="nav.link">
         <span>{{ nav.name }}</span>
         <v-icon>{{ nav.icon }}</v-icon>
       </v-btn>
-      </div>
-    </v-bottom-nav>
+    </div>
+  </v-bottom-nav>
   </v-app>
 </template>
 
 <script>
-// const Navbar = () => import('./components/Navbar.vue')
-import Navbar from "./components/Navbar";
+import firebase from 'firebase'
+import db from './firebase/init'
+
+const Navbar = () => import('./components/Navbar')
+
 export default {
   name: "App",
   components: {

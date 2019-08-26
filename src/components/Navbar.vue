@@ -1,7 +1,7 @@
 <template>
   <nav>
     <v-toolbar flat app>
-      <v-toolbar-side-icon v-on:click="drawer = !drawer"></v-toolbar-side-icon>
+      <v-toolbar-side-icon v-on:click="drawer = !drawer" aria-label="Menu"></v-toolbar-side-icon>
 
       <v-toolbar-title v-if="$route.name === 'home'">Home</v-toolbar-title>
       <v-toolbar-title v-else-if="$route.name === 'statistics'">Statistics</v-toolbar-title>
@@ -9,40 +9,17 @@
       <v-toolbar-title v-else-if="$route.name === 'add_subjects'">Subjects</v-toolbar-title>
       <v-spacer></v-spacer>
 
-      <v-btn v-if="isUser === false" @click="googleLogin">
-        <img src="../../public/google.png" class="mr-2" />Sign In
+      <v-btn aria-label="Sign In" v-if="isUser === false" @click="googleLogin">
+        <img src="../../public/google.png" class="mr-2" alt="Google" />Sign In
       </v-btn>
 
-      <template v-if="$route.name === 'home'">
-        <v-dialog v-model="modal" :return-value.sync="date" lazy full-width width="290px">
-          <template v-slot:activator="{ on }">
-            <v-icon v-model="date" v-on="on">today</v-icon>
-          </template>
-          <v-date-picker v-model="date">
-            <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="modal = false">Cancel</v-btn>
-            <v-btn flat color="primary" @click="saveDate">OK</v-btn>
-          </v-date-picker>
-        </v-dialog>
-      </template>
+      <homeDate></homeDate>
+
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
-      <v-dialog v-model="signOutModal" full-width>
-        <template v-slot:activator="{ on }">
-          <v-layout align-start justify-end row class="pa-3">
-            <v-icon v-if="isUser === true" @click="signOutModal = true" v-on="on">exit_to_app</v-icon>
-          </v-layout>
-        </template>
-        <v-card>
-          <v-card-title>Are You Sure You Want To Sign Out?</v-card-title>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn flat color="blue" @click="signOutModal = false">No</v-btn>
-            <v-btn flat color="blue" @click="googleLogout">Yes</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+
+      <signOut></signOut>
 
       <v-layout column align-center v-if="userPhoto">
         <v-flex class="mt-5">
@@ -80,20 +57,19 @@
 <script>
 import firebase from "firebase/app";
 import db from "../firebase/init";
-import "../firebase/init";
-import { bus } from "../main";
+import { bus } from '../main'
+
+const homeDate = () => import('./homeDate')
+const signOut = () => import('./signOut')
 
 export default {
+  components: {
+    homeDate,
+    signOut
+  },
   data() {
     return {
       date: new Date().toISOString().substr(0, 10),
-      signOutModal: null,
-      signOutUser: null,
-      currentDate: null,
-      currentMonth: null,
-      currentFullDate: null,
-      currentYear: null,
-      modal: false,
       drawer: false,
       isUser: null,
       userPhoto: null,
@@ -107,22 +83,6 @@ export default {
       this.mode = !this.mode;
       this.$emit("changeMode", this.mode);
     },
-    googleLogout() {
-      this.signOutModal = false;
-      this.signOutUser = true;
-
-      if (this.signOutUser) {
-        firebase
-          .auth()
-          .signOut()
-          .then(() => {
-            this.$router.push({ name: "signup" });
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      }
-    },
     googleLogin() {
       const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -135,48 +95,6 @@ export default {
         .catch(err => {
           console.log(err);
         });
-    },
-    saveDate() {
-      let days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday"
-      ];
-      let months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sept",
-        "Oct",
-        "Nov",
-        "Dec"
-      ];
-
-      let obj = {};
-
-      this.currentMonth = months[new Date(this.date).getMonth()];
-      this.currentDate = new Date(this.date).getDate();
-      this.currentYear = new Date(this.date).getFullYear();
-      this.currentFullDate = this.date;
-      this.date = days[new Date(this.date).getDay()];
-
-      obj["date"] = this.date;
-      obj["currentMonth"] = this.currentMonth;
-      obj["currentDate"] = this.currentDate;
-      obj["currentYear"] = this.currentYear;
-      obj["currentFullDate"] = this.currentFullDate;
-
-      bus.$emit("dateValue", obj);
-      this.modal = false;
     }
   },
   mounted() {
@@ -206,8 +124,8 @@ export default {
           { icon: "account_circle", text: "Sign In", route: "signup" }
         ];
       }
+      bus.$emit('userSend', this.isUser);
     });
   }
 };
 </script>
-

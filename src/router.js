@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 
 // import Home from './views/Home.vue'
 // import Statistics from './views/Statistics.vue'
@@ -8,18 +8,17 @@ import firebase from 'firebase'
 // import Signup from './views/Signup.vue'
 // import addSubjects from './views/addSubjects.vue'
 
-const Home = () => import(/* webpackPrefetch: true */ './views/Home.vue')
-const Statistics = () => import(/* webpackPrefetch: true */'./views/Statistics.vue')
-const Timetable = () => import(/* webpackPrefetch: true */ './views/Timetable.vue')
-const Signup = () => import(/* webpackPreload: true */ './views/Signup.vue')
-const addSubjects = () => import(/* webpackPrefetch: true */  './views/addSubjects.vue')
+const Home = () => import('./views/Home.vue')
+const Statistics = () => import('./views/Statistics.vue')
+const Timetable = () => import('./views/Timetable.vue')
+const Signup = () => import('./views/Signup.vue' /* webpackPreload:true */)
+const addSubjects = () => import( './views/addSubjects.vue')
 const privacyPolicy = () => import('./views/privacyPolicy.vue')
 
 Vue.use(Router)
 
 const router = new Router({
   mode: 'history',
-  // base: process.env.BASE_URL,
   routes: [{
       path: '/',
       name: 'home',

@@ -12,12 +12,11 @@ refactor home - 2
 timetable edit btn - 1
 reset attendance - 3
 performance - 1
+att status on home page - 3
 use icons instead of radio buttons home - 2
 
 page accessibility
 page seo
-
-refactor the code
 
 feature discovery
 
