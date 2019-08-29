@@ -2,71 +2,58 @@
   <section>
     <div :style="style">
       <div v-if="showtt">
-        <template>
-          <v-tabs
-            v-model="currentItem"
-            color="transparent"
-            fixed-tabs
-            show-arrows
-            slider-color="blue"
-            @change="tabChange"
-          >
-            <v-tab v-for="item in items" :key="item" :href="'#' + item">{{ item }}</v-tab>
-          </v-tabs>
-        </template>
-        <v-tabs-items v-model="currentItem">
-          <v-tab-item v-for="(item, index) in items" :key="index" :value="item">
-            <v-card flat v-if="!hastt" class="pa-3 mb-2">
-              <v-icon color="red" left>error</v-icon>
-              <span class="subheadline">Timetable Not Saved For {{ currentItem }}</span>
-            </v-card>
-            <v-flex xs12 sm6 md4 v-for="(sub,i) in select" :key="i" class="mb-2">
-              <v-card flat class="pa-3">
-                <span>{{ i+1 }}. {{ sub }}</span>
-                <v-card-actions v-if="i === select.length - 1">
-                  <v-dialog v-model="dialog" scrollable>
-                    <template v-slot:activator="{ on }">
-                      <v-btn color="blue" absolute bottom right fab v-on="on">
-                        <v-icon>edit</v-icon>
-                      </v-btn>
-                    </template>
-                    <v-card>
-                      <v-card-title>
-                        <span class="headline">Timetable - {{ currentItem }}</span>
-                      </v-card-title>
-                      <v-container grid-list-md>
-                        <v-flex>
-                          <v-card-text>
-                            <p class="subheadline" v-for="(subs, i) in subjects" :key="i">
-                              {{ i+1 }}. {{ subs }}
-                              <span>
-                                <v-icon class="ml-2" color="red" @click="clearBtn(i, subs)">clear</v-icon>
-                              </span>
-                            </p>
+        <v-flex xs5 pt-2 pl-2>
+          <v-select :items="items" v-model="currentItem" @change="tabChange" solo></v-select>
+        </v-flex>
+        <v-card flat v-if="!hastt" class="pa-3 mb-2 mx-3">
+          <v-icon color="red" left>error</v-icon>
+          <span class="subheadline">Timetable Not Saved For {{ currentItem }}</span>
+        </v-card>
+        <v-flex xs12 sm6 md4 v-for="(sub,i) in select" :key="i" class="mb-2 mx-3">
+          <v-card flat class="pa-3">
+            <span>{{ i+1 }}. {{ sub }}</span>
+            <v-card-actions v-if="i === select.length - 1">
+              <v-dialog v-model="dialog" scrollable>
+                <template v-slot:activator="{ on }">
+                  <v-btn color="blue" absolute bottom right fab v-on="on">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">Timetable - {{ currentItem }}</span>
+                  </v-card-title>
+                  <v-container grid-list-md>
+                    <v-flex>
+                      <v-card-text>
+                        <p class="subheadline" v-for="(subs, i) in subjects" :key="i">
+                          {{ i+1 }}. {{ subs }}
+                          <span>
+                            <v-icon class="ml-2" color="red" @click="clearBtn(i, subs)">clear</v-icon>
+                          </span>
+                        </p>
 
-                            <v-select :items="defaultSubs" label="Select Subject" v-model="value1">
-                              <v-icon
-                                slot="append"
-                                class="mt-1 mr-2"
-                                color="green"
-                                @click="doneBtn"
-                              >check</v-icon>
-                            </v-select>
-                          </v-card-text>
-                        </v-flex>
-                      </v-container>
-                      <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="blue darken-1" flat @click="clsBtnFunc">Close</v-btn>
-                        <v-btn color="blue darken-1" flat @click="saveSubjects">Save</v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-                </v-card-actions>
-              </v-card>
-            </v-flex>
-          </v-tab-item>
-        </v-tabs-items>
+                        <v-select :items="defaultSubs" label="Select Subject" v-model="value1">
+                          <v-icon
+                            slot="append"
+                            class="mt-1 mr-2"
+                            color="green"
+                            @click="doneBtn"
+                          >check</v-icon>
+                        </v-select>
+                      </v-card-text>
+                    </v-flex>
+                  </v-container>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" flat @click="clsBtnFunc">Close</v-btn>
+                    <v-btn color="blue darken-1" flat @click="saveSubjects">Save</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
       </div>
       <div v-else-if="!showtt">
         <v-container>
@@ -153,7 +140,8 @@ export default {
           this.style = "opacity: 1";
           if (
             res.data().timetable === undefined ||
-            res.data().timetable[this.currentItem] === undefined
+            res.data().timetable[this.currentItem] === undefined ||
+            res.data().timetable[this.currentItem].length === 0
           ) {
             this.subjects = res.data().allSubjects;
             this.select = this.subjects.concat();
@@ -202,6 +190,7 @@ export default {
           this.msg = `Timetable Created for ${this.currentItem}`;
           this.snackbar = true;
         });
+      this.dialog = false;
     },
     clearBtn(index, subject) {
       this.subjects.splice(this.subjects.indexOf(this.subjects[index]), 1);
@@ -215,10 +204,11 @@ export default {
       .get()
       .then(res => {
         this.loading = false;
-        this.style = "opacity: 1";
+        this.style = "opacity: 1"
         if (
           res.data().timetable === undefined ||
-          res.data().timetable[this.currentItem] === undefined
+          res.data().timetable[this.currentItem] === undefined ||
+          res.data().timetable[this.currentItem].length === 0
         ) {
           this.subjects = res.data().allSubjects;
           this.select = this.subjects.concat();

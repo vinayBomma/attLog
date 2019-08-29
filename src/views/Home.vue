@@ -1,56 +1,40 @@
 <template>
   <div>
     <div :style="style">
-      <!-- <v-dialog v-model="loading" hide-overlay persistent full-width>
-      <v-card>
-        <OrbitSpinner :size="55" :color="'#ff1d5e'" />
-      </v-card>
-      </v-dialog>-->
       <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
       <v-container fluid>
         <v-layout row wrap>
-          <template v-if="hasSubjects && !attLogged">
+          <template v-if="!attLogged && hasSubjects">
             <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
               <v-card>
-                <v-card-title primary-title>
-                  {{val}}
-                  <v-radio-group row id="logData">
-                    <v-layout align-start row wrap>
-                      <v-radio
-                        id="devWidth"
-                        label="Present"
-                        value="Present"
-                        v-on:change="getVal('present', val)"
-                      ></v-radio>
-                      <v-radio label="Absent" value="Absent" v-on:change="getVal('absent', val)"></v-radio>
-                      <v-radio
-                        label="Cancelled"
-                        value="Cancelled"
-                        v-on:change="getVal('cancelled', val)"
-                      ></v-radio>
-                    </v-layout>
-                  </v-radio-group>
+                <v-card-title primary-title class="title">
+                  {{ val }}
+                  <v-layout justify-end>
+                    <v-icon class="mx-1" @click="presentSub(val, index, $event)" medium>done</v-icon>
+                    <v-icon class="mx-1" @click="absentSub(val, index, $event)" medium>clear</v-icon>
+                    <v-icon class="mx-1" @click="cancelSub(val, index, $event)" medium>remove</v-icon>
+                  </v-layout>
                 </v-card-title>
+                <v-card-text>Status: On Track</v-card-text>
               </v-card>
             </v-flex>
-            <v-btn color="blue" :disabled="disabled" v-on:click="submit()">Save</v-btn>
+            <v-btn color="blue" v-on:click="submit()">Save</v-btn>
           </template>
 
-          <v-flex xs12 sm6 md4 pa-1 v-else-if="!hasSubjects&& attLogged">
+          <v-flex xs12 sm6 md4 pa-1 v-else-if="attLogged">
             <v-card>
               <v-card-text>Attendance Has Been Logged For This Day</v-card-text>
             </v-card>
           </v-flex>
 
-          <!-- Make this card better -->
-          <v-flex xs12 sm6 md4 pa-1 v-else-if="!hasSubjects&& !attLogged">
+          <v-flex xs12 sm6 md4 pa-1 v-else-if="!hasSubjects">
             <v-card>
               <v-card-text>No Timetable Added For {{this.day}}</v-card-text>
             </v-card>
             <v-card class="mt-2">
               <v-card-text>
                 Click
-                <router-link to="/add_subjects">Here</router-link>To Add Subjects
+                <router-link to="/add_subjects">Here</router-link> To Add Subjects
               </v-card-text>
             </v-card>
           </v-flex>
@@ -89,18 +73,16 @@ export default {
   },
   data() {
     return {
-      seasons: ["Winter", "Spring", "Summer"],
       userDB: null,
       snackbar: false,
       msg: null,
       timeout: 3000,
       color: undefined,
-      disabled: false,
-      subj: [],
+      subj: ["Python", "Vuejs", "History", "Maths"],
       present: [],
       absent: [],
       cancelled: [],
-      hasSubjects: null,
+      hasSubjects: true,
       day: null,
       currentDate: null,
       currentMonth: null,
@@ -108,44 +90,61 @@ export default {
       currentFullDate: null,
       attendData: [],
       sendReq: true,
-      isDupe: false,
-      dupeSub: [],
       loading: false,
       style: "opacity: 1",
       attLogged: null
     };
   },
   methods: {
-    season(val) {
-      return this.seasons[val];
-    },
-    getVal: function(data, sub) {
-      // Checks if sub is in another array(absent, cancelled), if yes then removes it
+    subjVerify(event, color, color2, color3) {
+      let iconNode = event.target.parentNode.children;
 
-      if (data == "present") {
-        if (this.absent.includes(sub)) {
-          this.absent.splice(this.absent.indexOf(sub), 1);
-        } else if (this.cancelled.includes(sub)) {
-          this.cancelled.splice(this.cancelled.indexOf(sub), 1);
+      if (event.target.classList.contains(`${color}--text`)) {
+        event.target.classList.remove(`${color}--text`);
+      } else {
+        for (let i of iconNode) {
+          if (i.classList.contains(`${color2}--text`)) {
+            i.classList.remove(`${color2}--text`);
+          }
+
+          if (i.classList.contains(`${color3}--text`)) {
+            i.classList.remove(`${color3}--text`);
+          }
         }
-        this.present.push(sub);
-      } else if (data == "absent") {
-        if (this.present.includes(sub)) {
-          this.present.splice(this.present.indexOf(sub), 1);
-        } else if (this.cancelled.includes(sub)) {
-          this.cancelled.splice(this.cancelled.indexOf(sub), 1);
-        }
-        this.absent.push(sub);
-      } else if (data == "cancelled") {
-        if (this.present.includes(sub)) {
-          this.present.splice(this.present.indexOf(sub), 1);
-        } else if (this.absent.includes(sub)) {
-          this.absent.splice(this.absent.indexOf(sub), 1);
-        }
-        this.cancelled.push(sub);
+        event.target.classList.add(`${color}--text`);
       }
     },
-    submit: function() {
+    presentSub(value, index, event) {
+      if (this.absent.includes(value)) {
+        this.absent.splice(this.absent.indexOf(value), 1);
+      } else if (this.cancelled.includes(value)) {
+        this.cancelled.splice(this.cancelled.indexOf(value), 1);
+      }
+      this.present.push(value);
+
+      this.subjVerify(event, "green", "red", "grey");
+    },
+    absentSub(value, index, event) {
+      if (this.present.includes(value)) {
+        this.present.splice(this.present.indexOf(value), 1);
+      } else if (this.cancelled.includes(value)) {
+        this.cancelled.splice(this.cancelled.indexOf(value), 1);
+      }
+      this.absent.push(value);
+
+      this.subjVerify(event, "red", "green", "grey");
+    },
+    cancelSub(value, index, event) {
+      if (this.present.includes(value)) {
+        this.present.splice(this.present.indexOf(value), 1);
+      } else if (this.absent.includes(value)) {
+        this.absent.splice(this.absent.indexOf(value), 1);
+      }
+      this.cancelled.push(value);
+
+      this.subjVerify(event, "grey", "red", "green");
+    },
+    submit() {
       let cDate;
 
       if (!this.currentFullDate) {
@@ -166,29 +165,34 @@ export default {
         this.sendReq = true;
       }
 
-      for (let i in this.subj) {
-        if (
-          this.present.includes(this.subj[i]) ||
-          this.absent.includes(this.subj[i]) ||
-          this.cancelled.includes(this.subj[i])
-        ) {
-          // Checks if data for every subject is selected
-        } else {
-          this.color = "error";
-          this.msg = "Select Attendance For All Subjects";
-          this.snackbar = true;
-          this.sendReq = false;
-        }
+      if (
+        this.present.length + this.absent.length + this.cancelled.length !==
+        this.subj.length
+      ) {
+        this.color = "error";
+        this.msg = "Select Attendance For All Subjects";
+        this.snackbar = true;
+        this.sendReq = false;
       }
-      console.log(this.present);
-      console.log(this.absent);
-      console.log(this.cancelled);
 
       let obj = {},
         userData,
         dbData;
       let someData = {};
-      let isoDate = new Date().toISOString().substr(0, 10);
+
+      function verifyAtt(mode, subject, modeDate, operation) {
+        obj[subject][mode] += 1;
+        obj[subject].total += 1;
+
+        if (operation === "inc") {
+          obj[subject].weekdays[new Date(cDate).getDay()] += 1;
+        } else if (operation === "dec") {
+          obj[subject].weekdays[new Date(cDate).getDay()] -= 1;
+        } else if (operation === "eql") {
+          obj[subject].weekdays[new Date(cDate).getDay()] += 0;
+        }
+        obj[subject][modeDate].push(cDate);
+      }
 
       if (this.sendReq) {
         this.userDB
@@ -196,41 +200,6 @@ export default {
           .then(res => {
             for (let i in this.subj) {
               let someValue = this.subj[i];
-
-              if (this.dupeSub.includes(someValue)) {
-                let dupeData = someValue;
-                someValue = someValue.slice(0, -12);
-                someData[someValue] = {
-                  weekdays: [0, 0, 0, 0, 0, 0, 0],
-                  presentDates: [],
-                  absentDates: [],
-                  cancelledDates: [],
-                  present: 0,
-                  absent: 0,
-                  cancelled: 0,
-                  total: 0
-                };
-                if (this.present.includes(dupeData)) {
-                  someData[someValue].present += 1;
-                  someData[someValue].total += 1;
-
-                  someData[someValue].presentDates.push(cDate);
-                  someData[someValue].weekdays[new Date().getDay()] += 1;
-                } else if (this.absent.includes(dupeData)) {
-                  someData[someValue].absent += 1;
-                  someData[someValue].total += 1;
-
-                  someData[someValue].absentDates.push(cDate);
-                  someData[someValue].weekdays[new Date().getDay()] -= 1;
-                } else if (this.cancelled.includes(dupeData)) {
-                  someData[someValue].cancelled += 1;
-                  someData[someValue].total += 1;
-
-                  someData[someValue].cancelledDates.push(cDate);
-                }
-                // console.log(someData);
-                continue;
-              }
 
               userData = res.data().data[someValue];
               if (Object.keys(res.data().data[someValue]).length !== 0) {
@@ -246,124 +215,11 @@ export default {
                 };
 
                 if (this.present.includes(someValue)) {
-                  obj[someValue].present += 1;
-                  obj[someValue].total += 1;
-
-                  obj[someValue].presentDates.push(cDate);
-                  obj[someValue].weekdays[new Date().getDay()] += 1;
-
-                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
-                    let duplicateSub = someValue + " (Duplicate)";
-                    if (this.present.includes(duplicateSub)) {
-                      // console.log("present");
-                      obj[someValue].present += someData[someValue].present;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].presentDates.push(
-                        someData[someValue].presentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {};
-                    } else if (this.absent.includes(duplicateSub)) {
-                      // console.log("absent");
-                      obj[someValue].absent += someData[someValue].absent;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].absentDates.push(
-                        someData[someValue].absentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {};
-                    } else if (this.cancelled.includes(duplicateSub)) {
-                      // console.log("cancelled");
-                      obj[someValue].cancelled += someData[someValue].cancelled;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].cancelledDates.push(
-                        someData[someValue].cancelledDates[0]
-                      );
-                      someData = {};
-                    }
-                  }
+                  verifyAtt("present", someValue, "presentDates", "inc");
                 } else if (this.absent.includes(someValue)) {
-                  obj[someValue].absent += 1;
-                  obj[someValue].total += 1;
-
-                  obj[someValue].absentDates.push(cDate);
-                  obj[someValue].weekdays[new Date().getDay()] -= 1;
-
-                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
-                    let duplicateSub = someValue + " (Duplicate)";
-                    if (this.present.includes(duplicateSub)) {
-                      // console.log("present");
-                      obj[someValue].present += someData[someValue].present;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].presentDates.push(
-                        someData[someValue].presentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {};
-                    } else if (this.absent.includes(duplicateSub)) {
-                      // console.log("absent");
-                      obj[someValue].absent += someData[someValue].absent;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].absentDates.push(
-                        someData[someValue].absentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {};
-                    } else if (this.cancelled.includes(duplicateSub)) {
-                      // console.log("cancelled");
-                      obj[someValue].cancelled += someData[someValue].cancelled;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].cancelledDates.push(
-                        someData[someValue].cancelledDates[0]
-                      );
-                      someData = {};
-                    }
-                  }
+                  verifyAtt("absent", someValue, "absentDates", "dec");
                 } else if (this.cancelled.includes(someValue)) {
-                  obj[someValue].cancelled += 1;
-                  obj[someValue].total += 1;
-
-                  obj[someValue].cancelledDates.push(cDate);
-
-                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
-                    let duplicateSub = someValue + " (Duplicate)";
-                    if (this.present.includes(duplicateSub)) {
-                      // console.log("present");
-                      obj[someValue].present += someData[someValue].present;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].presentDates.push(
-                        someData[someValue].presentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {};
-                    } else if (this.absent.includes(duplicateSub)) {
-                      // console.log("absent");
-                      obj[someValue].absent += someData[someValue].absent;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].absentDates.push(
-                        someData[someValue].absentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {};
-                    } else if (this.cancelled.includes(duplicateSub)) {
-                      // console.log("cancelled");
-                      obj[someValue].cancelled += someData[someValue].cancelled;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].cancelledDates.push(
-                        someData[someValue].cancelledDates[0]
-                      );
-                      someData = {};
-                    }
-                  }
+                  verifyAtt("cancelled", someValue, "cancelledDates", "eql");
                 }
               } else {
                 obj[someValue] = {
@@ -378,154 +234,16 @@ export default {
                 };
 
                 if (this.present.includes(someValue)) {
-                  obj[someValue].present += 1;
-                  obj[someValue].total += 1;
-
-                  if (!this.currentFullDate) {
-                    obj[someValue].presentDates.push(isoDate);
-                    obj[someValue].weekdays[new Date().getDay()] += 1;
-                  } else {
-                    obj[someValue].presentDates.push(
-                      new Date(this.currentFullDate).toISOString().substr(0, 10)
-                    );
-                    obj[someValue].weekdays[
-                      new Date(this.currentFullDate).getDay()
-                    ] += 1;
-                  }
-
-                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
-                    let duplicateSub = someValue + " (Duplicate)";
-                    if (this.present.includes(duplicateSub)) {
-                      // console.log("present");
-                      obj[someValue].present += someData[someValue].present;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].presentDates.push(
-                        someData[someValue].presentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {};
-                    } else if (this.absent.includes(duplicateSub)) {
-                      // console.log("absent");
-                      obj[someValue].absent += someData[someValue].absent;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].absentDates.push(
-                        someData[someValue].absentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {};
-                    } else if (this.cancelled.includes(duplicateSub)) {
-                      // console.log("cancelled");
-                      obj[someValue].cancelled += someData[someValue].cancelled;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].cancelledDates.push(
-                        someData[someValue].cancelledDates[0]
-                      );
-                      someData = {};
-                    }
-                  }
+                  verifyAtt("present", someValue, "presentDates", "inc");
                 } else if (this.absent.includes(someValue)) {
-                  obj[someValue].absent += 1;
-                  obj[someValue].total += 1;
-
-                  if (!this.currentFullDate) {
-                    obj[someValue].absentDates.push(isoDate);
-                    obj[someValue].weekdays[new Date().getDay()] -= 1;
-                  } else {
-                    obj[someValue].absentDates.push(
-                      new Date(this.currentFullDate).toISOString().substr(0, 10)
-                    );
-                    obj[someValue].weekdays[
-                      new Date(this.currentFullDate).getDay()
-                    ] -= 1;
-                  }
-
-                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
-                    let duplicateSub = someValue + " (Duplicate)";
-                    if (this.present.includes(duplicateSub)) {
-                      // console.log("present");
-                      obj[someValue].present += someData[someValue].present;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].presentDates.push(
-                        someData[someValue].presentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {};
-                    } else if (this.absent.includes(duplicateSub)) {
-                      // console.log("absent");
-                      obj[someValue].absent += someData[someValue].absent;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].absentDates.push(
-                        someData[someValue].absentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {};
-                    } else if (this.cancelled.includes(duplicateSub)) {
-                      // console.log("cancelled");
-                      obj[someValue].cancelled += someData[someValue].cancelled;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].cancelledDates.push(
-                        someData[someValue].cancelledDates[0]
-                      );
-                      someData = {};
-                    }
-                  }
+                  verifyAtt("absent", someValue, "absentDates", "dec");
                 } else if (this.cancelled.includes(someValue)) {
-                  obj[someValue].cancelled += 1;
-                  obj[someValue].total += 1;
-
-                  if (!this.currentFullDate) {
-                    obj[someValue].cancelledDates.push(isoDate);
-                  } else {
-                    obj[someValue].cancelledDates.push(
-                      new Date(this.currentFullDate).toISOString().substr(0, 10)
-                    );
-                  }
-
-                  if (this.dupeSub.includes(someValue + " (Duplicate)")) {
-                    let duplicateSub = someValue + " (Duplicate)";
-                    if (this.present.includes(duplicateSub)) {
-                      // console.log("present");
-                      obj[someValue].present += someData[someValue].present;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].presentDates.push(
-                        someData[someValue].presentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] += 1;
-                      someData = {};
-                    } else if (this.absent.includes(duplicateSub)) {
-                      // console.log("absent");
-                      obj[someValue].absent += someData[someValue].absent;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].absentDates.push(
-                        someData[someValue].absentDates[0]
-                      );
-                      obj[someValue].weekdays[new Date().getDay()] -= 1;
-                      someData = {};
-                    } else if (this.cancelled.includes(duplicateSub)) {
-                      // console.log("cancelled");
-                      obj[someValue].cancelled += someData[someValue].cancelled;
-                      obj[someValue].total += someData[someValue].total;
-
-                      obj[someValue].cancelledDates.push(
-                        someData[someValue].cancelledDates[0]
-                      );
-                      someData = {};
-                    }
-                  }
+                  verifyAtt("cancelled", someValue, "cancelledDates", "eql");
                 }
               }
 
               if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
                 dbData = obj;
-                console.log(dbData);
                 this.userDB.set({ data: dbData }, { merge: true });
 
                 if (this.attendData.length === 0) {
@@ -539,10 +257,11 @@ export default {
                   }
                 }
 
-                this.userDB.set(
-                  { attendance: this.attendData },
-                  { merge: true }
-                );
+                this.userDB
+                  .set({ attendance: this.attendData }, { merge: true })
+                  .then(() => {
+                    this.$router.go({ name: "home" });
+                  });
               }
             }
           })
@@ -550,8 +269,6 @@ export default {
             console.log("Errarta: ", err);
           });
       }
-
-      this.$router.push({ name: "home" });
     }
   },
   created() {
@@ -573,61 +290,23 @@ export default {
         this.loading = false;
         this.style = "opacity: 1";
 
-        // if (res.data().attendance.includes(new Date().toISOString().substr(0, 10)) ===true) {
-        //   this.attLogged = true;
-        // } else {
-        //   this.attLogged = false;
-        // }
-
         let dayValue = res.data()["timetable"][this.day];
+
         if (dayValue) {
           this.subj = dayValue;
           this.hasSubjects = true;
-          console.log(`TimeTable Found for ${this.day}`);
-
-          for (let i in dayValue) {
-            if (dayValue[i].includes("Duplicate")) {
-              this.isDupe = true;
-              let someVal = dayValue[i].slice(0, -12);
-
-              if (this.dupeSub.includes(dayValue[i])) {
-                this.dupeSub.splice(this.dupeSub.indexOf(dayValue[i]), 1);
-                this.dupeSub.push(dayValue[i]);
-              } else {
-                this.dupeSub.push(dayValue[i]);
-              }
-              console.log(this.dupeSub);
-            }
-          }
         } else {
           this.hasSubjects = false;
-          console.log(`No timetable for ${this.day}`);
         }
 
-        if (res.data().attendance.includes(this.currentFullDate) === true) {
-          this.attLogged = true;
-          this.hasSubjects = false;
-        } else {
-          this.attLogged = false;
+        if (res.data().attendance) {
+          if (res.data().attendance.includes(this.currentFullDate)) {
+            this.attLogged = true;
+          } else {
+            this.attLogged = false;
+          }
         }
       });
-    });
-
-    this.loading = true;
-    this.style = "opacity: 0.3";
-    this.userDB.get().then(res => {
-      this.loading = false;
-      this.style = "opacity: 1";
-
-      if (res.data().attendance !== undefined) {
-        let attDates = res.data().attendance;
-
-        if (attDates === undefined || attDates.length === 0) {
-          this.attendData = [];
-        } else if (attDates.length > 0) {
-          this.attendData = attDates;
-        }
-      }
     });
 
     let days = [
@@ -654,11 +333,35 @@ export default {
       "Nov",
       "Dec"
     ];
+
     this.currentMonth = months[new Date().getMonth()];
     this.currentDate = new Date().getDate();
     this.day = days[new Date().getDay()];
 
+    this.loading = true;
+    this.style = "opacity: 0.3";
     this.userDB.get().then(res => {
+      this.loading = false;
+      this.style = "opacity: 1";
+
+      if (res.data().attendance !== undefined) {
+        let attDates = res.data().attendance;
+
+        if (attDates === undefined || attDates.length === 0) {
+          this.attendData = [];
+        } else if (attDates.length > 0) {
+          this.attendData = attDates;
+        }
+      }
+
+      if (res.data().attendance) {
+        if (res.data().attendance.includes(new Date().toISOString().substr(0, 10))) {
+          this.attLogged = true;
+        } else {
+          this.attLogged = false;
+        }
+      }
+
       if (res.data().timetable !== undefined) {
         if (res.data().timetable[this.day] !== undefined) {
           let dayValue = res.data()["timetable"][this.day];
@@ -666,31 +369,10 @@ export default {
           if (dayValue) {
             this.subj = dayValue;
             this.hasSubjects = true;
-            console.log(`TimeTable Found for ${this.day}`);
-
-            for (let i in dayValue) {
-              if (dayValue[i].includes("Duplicate")) {
-                let someVal = dayValue[i].slice(0, -12);
-                this.isDupe = true;
-                this.dupeSub.push(dayValue[i]);
-              }
-            }
           } else {
             this.hasSubjects = false;
-            console.log(`No timetable for ${this.day}`);
           }
         }
-      }
-
-      if (
-        res
-          .data()
-          .attendance.includes(new Date().toISOString().substr(0, 10)) === true
-      ) {
-        this.attLogged = true;
-        this.hasSubjects = false;
-      } else {
-        this.attLogged = false;
       }
     });
   }
