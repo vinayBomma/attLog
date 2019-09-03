@@ -1,10 +1,9 @@
-const staticCacheName = 'static-v4';
-const dynamicCacheName = 'dynamic-v4';
+const staticCacheName = 'static-v3';
+const dynamicCacheName = 'dynamic-v3';
 
 const assets = [
   '/favicon.ico',
-  '/android-chrome-192x192',
-  '/webmanifest.json',
+  '/webmanifest.json',  
 ]
 
 self.addEventListener('install', evt => {

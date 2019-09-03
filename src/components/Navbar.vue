@@ -37,7 +37,7 @@
 
       <v-divider v-if="isUser"></v-divider>
 
-      <v-list>
+      <!-- <v-list>
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>brightness_3</v-icon>
@@ -49,7 +49,7 @@
             <v-switch @click="nightMode"></v-switch>
           </v-list-tile-action>
         </v-list-tile>
-      </v-list>
+      </v-list> -->
     </v-navigation-drawer>
   </nav>
 </template>
@@ -79,10 +79,10 @@ export default {
     };
   },
   methods: {
-    nightMode() {
-      this.mode = !this.mode;
-      this.$emit("changeMode", this.mode);
-    },
+    // nightMode() {
+    //   this.mode = !this.mode;
+    //   this.$emit("changeMode", this.mode);
+    // },
     googleLogin() {
       const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -103,9 +103,12 @@ export default {
         this.$router.push({ name: "home" });
         db.collection("attData")
           .doc(user.uid)
-          .set({}, { merge: true });
-      } else {
-        // console.log("No User Found");
+          .set({
+            displayName: user.displayName,
+            phoneNum: user.phoneNumber,
+            uid: user.uid,
+            email: user.email
+          }, { merge: true });
       }
     });
   },

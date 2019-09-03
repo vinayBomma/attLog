@@ -57,7 +57,7 @@
       </div>
       <div v-else-if="!showtt">
         <v-container>
-          <v-card>
+          <v-card @click="redirect">
             <v-card-text>No Subjects Added</v-card-text>
           </v-card>
           <v-card class="mt-2">
@@ -126,10 +126,56 @@ export default {
       defaultSubs: [],
       showtt: true,
       loading: false,
-      style: "opacity: 1"
+      style: "opacity: 1",
+      vapidPublicKey:
+        "BO20mIrthZ7c2Y061L0qKpqQDSolCTkY1-zWJhrtP2GmK4-EZrgDho4INHOY_ctEbdacRZ7oEUL_QlxcMmYcRYo",
+      conVapid: null,
     };
   },
   methods: {
+    urlBase64ToUint8Array(base64String) {
+      const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+      const base64 = (base64String + padding)
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      this.conVapid = outputArray;
+    },
+    configSub() {
+      if (!("serviceWorker" in navigator)) {
+        return;
+      }
+
+      let reg;
+      navigator.serviceWorker.ready
+        .then(swreg => {
+          reg = swreg;
+          return swreg.pushManager.getSubscription();
+        })
+        .then(sub => {
+          if (sub === null) {
+            this.urlBase64ToUint8Array(this.vapidPublicKey);
+            return reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: this.conVapid
+            });
+          }
+        })
+        .then(newSub => {
+          let subJSON = JSON.stringify(newSub);
+          let subscriptions = JSON.parse(subJSON);
+          this.userDB.set({ subscriptions }, { merge: true });
+        });
+    },
+    redirect() {
+      this.$router.push("/add_subjects");
+    },
     tabChange() {
       this.loading = true;
       this.style = "opacity: 0.3";
@@ -189,6 +235,32 @@ export default {
           this.color = "success";
           this.msg = `Timetable Created for ${this.currentItem}`;
           this.snackbar = true;
+
+          this.loading = true;
+          this.style = "opacity: 0.3";
+          this.userDB.get().then(res => {
+            this.loading = false;
+            this.style = "opacity: 1";
+
+            Notification.requestPermission(res => {
+              if (res !== "granted") {
+                console.log("Permission Denied");
+              } else {
+                console.log("Permission Accepted");
+                this.configSub();
+              }
+            });
+
+            if (res.data().timetable[this.currentItem].length === 0) {
+              this.subjects = res.data().allSubjects;
+              this.select = this.subjects.concat();
+              this.hastt = false;
+            } else {
+              this.subjects = res.data().timetable[this.currentItem];
+              this.select = this.subjects.concat();
+              this.hastt = true;
+            }
+          });
         });
       this.dialog = false;
     },

@@ -15,7 +15,7 @@
                     <v-icon class="mx-1" @click="cancelSub(val, index, $event)" medium>remove</v-icon>
                   </v-layout>
                 </v-card-title>
-                <v-card-text>Status: On Track</v-card-text>
+                <!-- <v-card-text>Status: On Track</v-card-text> -->
               </v-card>
             </v-flex>
             <v-btn color="blue" v-on:click="submit()">Save</v-btn>
@@ -28,13 +28,13 @@
           </v-flex>
 
           <v-flex xs12 sm6 md4 pa-1 v-else-if="!hasSubjects">
-            <v-card>
+            <v-card @click="redirect">
               <v-card-text>No Timetable Added For {{this.day}}</v-card-text>
             </v-card>
             <v-card class="mt-2">
               <v-card-text>
                 Click
-                <router-link to="/add_subjects">Here</router-link> To Add Subjects
+                <router-link to="/add_subjects">Here</router-link>To Add Subjects
               </v-card-text>
             </v-card>
           </v-flex>
@@ -78,7 +78,7 @@ export default {
       msg: null,
       timeout: 3000,
       color: undefined,
-      subj: ["Python", "Vuejs", "History", "Maths"],
+      subj: [],
       present: [],
       absent: [],
       cancelled: [],
@@ -96,6 +96,9 @@ export default {
     };
   },
   methods: {
+    redirect() {
+      this.$router.push("/timetable");
+    },
     subjVerify(event, color, color2, color3) {
       let iconNode = event.target.parentNode.children;
 
@@ -290,11 +293,21 @@ export default {
         this.loading = false;
         this.style = "opacity: 1";
 
-        let dayValue = res.data()["timetable"][this.day];
+        if (res.data().allSubjects === undefined) {
+          this.hasSubjects = false;
+        }
 
-        if (dayValue) {
-          this.subj = dayValue;
-          this.hasSubjects = true;
+        if (res.data().timetable[this.day] !== undefined) {
+          let dayValue = res.data()["timetable"][this.day];
+
+          if (dayValue.length > 0) {
+            this.subj = dayValue;
+            this.hasSubjects = true;
+          } else if (dayValue.length === 0) {
+            this.hasSubjects = false;
+          } else {
+            this.hasSubjects = false;
+          }
         } else {
           this.hasSubjects = false;
         }
@@ -355,24 +368,32 @@ export default {
       }
 
       if (res.data().attendance) {
-        if (res.data().attendance.includes(new Date().toISOString().substr(0, 10))) {
+        if (
+          res.data().attendance.includes(new Date().toISOString().substr(0, 10))
+        ) {
           this.attLogged = true;
         } else {
           this.attLogged = false;
         }
       }
 
-      if (res.data().timetable !== undefined) {
-        if (res.data().timetable[this.day] !== undefined) {
-          let dayValue = res.data()["timetable"][this.day];
+      if (res.data().allSubjects === undefined) {
+        this.hasSubjects = false;
+      }
 
-          if (dayValue) {
-            this.subj = dayValue;
-            this.hasSubjects = true;
-          } else {
-            this.hasSubjects = false;
-          }
+      if (res.data().timetable[this.day] !== undefined) {
+        let dayValue = res.data()["timetable"][this.day];
+
+        if (dayValue.length > 0) {
+          this.subj = dayValue;
+          this.hasSubjects = true;
+        } else if (dayValue.length === 0) {
+          this.hasSubjects = false;
+        } else {
+          this.hasSubjects = false;
         }
+      } else {
+        this.hasSubjects = false;
       }
     });
   }

@@ -7,14 +7,34 @@ history view - 3
 timetable dupe subs - 2
 reset attendance - 3
 performance - 1
+firestone rules - check and verify
 att status on home page - 3
-app intro text - 1
+attDates events in homeDate - 3
+
+addSubjects modal and loading of data iphone and macos
+
+cloud functions pusManager
+play store img descript
+windows store add
+iphone usage compatibility
+
+cross platform find more new info installation instructions
+seamless updates click to get started
+modal before asking notification permisssion
+
 feature discovery
 
-tt for same day of previous week shows no timetable added
 del all subjects from timetable bug only sav button
 
 production tips:
 enable sw
 remove console log statements
 change cacheName
+
+
+feel free to bunk the next one
+dont feel like attending? then don't.
+
+low on attendance. Attend It (no pun intended)
+
+on track

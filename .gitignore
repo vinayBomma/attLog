@@ -10,6 +10,7 @@ public/block.svg
 public/cloud.svg
 public/cross-platform.svg
 
+
 # local env files
 .env.local
 .env.*.local
@@ -30,6 +31,7 @@ yarn-error.log*
 
 public/android-chrome-192x192.png
 public/android-chrome-512x512.png
+public/96x96.png
 apple-touch-icon.png
 favicon-16x16.png
 favicon-32x32.png
