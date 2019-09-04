@@ -32,8 +32,6 @@
 
 
 <script>
-import firebase from "firebase/app";
-import db from "../firebase/init";
 
 export default {
   data() {

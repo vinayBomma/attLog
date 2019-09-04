@@ -1,19 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import firebase from 'firebase/app'
+import firebase from 'firebase'
 
-// import Home from './views/Home.vue'
-// import Statistics from './views/Statistics.vue'
-// import Timetable from './views/Timetable.vue'
-// import Signup from './views/Signup.vue'
-// import addSubjects from './views/addSubjects.vue'
-
-const Home = () => import('./views/Home.vue')
-const Statistics = () => import('./views/Statistics.vue')
-const Timetable = () => import('./views/Timetable.vue')
-const Signup = () => import('./views/Signup.vue' /* webpackPreload:true */)
-const addSubjects = () => import( './views/addSubjects.vue')
-const privacyPolicy = () => import('./views/privacyPolicy.vue')
+// const Home = () => import('./views/Home.vue')
+// const Statistics = () => import('./views/Statistics.vue')
+// const Timetable = () => import('./views/Timetable.vue')
+// const Signup = () => import('./views/Signup.vue' /* webpackPreload:true */)
+// const addSubjects = () => import( './views/addSubjects.vue')
+// const privacyPolicy = () => import('./views/privacyPolicy.vue')
 
 Vue.use(Router)
 
@@ -22,7 +16,7 @@ const router = new Router({
   routes: [{
       path: '/',
       name: 'home',
-      component: Home,
+      component: () => import(/* webpackChunkName: "home" */ './views/Home.vue'),
       meta: {
         requiresAuth: true
       }
@@ -30,7 +24,7 @@ const router = new Router({
     {
       path: '/statistics',
       name: 'statistics',
-      component: Statistics,
+      component: () => import('./views/Statistics.vue'),
       meta: {
         requiresAuth: true
       }
@@ -38,7 +32,7 @@ const router = new Router({
     {
       path: '/timetable',
       name: 'timetable',
-      component: Timetable,
+      component: () => import('./views/Timetable.vue'),
       meta: {
         requiresAuth: true
       }
@@ -46,7 +40,7 @@ const router = new Router({
     {
       path: '/add_subjects',
       name: 'add_subjects',
-      component: addSubjects,
+      component: () => import( './views/addSubjects.vue'),
       meta: {
         requiresAuth: true
       }
@@ -54,12 +48,12 @@ const router = new Router({
     {
       path: '/signup',
       name: 'signup',
-      component: Signup,
+      component: () => import('./views/Signup.vue' /* webpackPreload:true */),
     },
     {
       path: '/privacypolicy',
       name: 'privacy_policy',
-      component: privacyPolicy,
+      component: () => import('./views/privacyPolicy.vue'),
     },
   ]
 })

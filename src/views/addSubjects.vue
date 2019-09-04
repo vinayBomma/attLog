@@ -111,8 +111,8 @@
 </template>
 
 <script>
-import db from "../firebase/init";
-import firebase from "firebase";
+import {db} from '../configFirebase'
+import firebase from "firebase/app";
 import { bus } from "../main";
 
 import "epic-spinners/dist/lib/epic-spinners.min.css";

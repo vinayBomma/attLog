@@ -3,6 +3,12 @@ const webpack = require('webpack')
 // const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 
 module.exports = {
+  pwa: {
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      swSrc: "src/firebase-messaging-sw.js"
+    }
+  },
   chainWebpack: config => {
     config.plugins.delete('prefetch')
   },

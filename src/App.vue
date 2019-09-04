@@ -17,8 +17,7 @@
 </template>
 
 <script>
-import firebase from "firebase";
-import db from "./firebase/init";
+import db from "./configFirebase";
 
 const Navbar = () => import("./components/Navbar");
 

@@ -18,7 +18,7 @@
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
-
+      
       <signOut></signOut>
 
       <v-layout column align-center v-if="userPhoto">
@@ -37,30 +37,38 @@
 
       <v-divider v-if="isUser"></v-divider>
 
-      <!-- <v-list>
-        <v-list-tile>
+      <v-list v-if="!isUser">
+        <v-list-tile v-for="(link, j) in links" :key="j" router v-bind:to="link.route">
           <v-list-tile-action>
-            <v-icon>brightness_3</v-icon>
+            <v-icon>{{ link.icon }}</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Night Mode</v-list-tile-title>
+            <v-list-tile-title>{{ link.text }}</v-list-tile-title>
           </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+
+      <v-list v-if="isUser">
+        <v-list-tile>
           <v-list-tile-action>
-            <v-switch @click="nightMode"></v-switch>
+            <v-btn color="orange" @click="getMessagingToken">Enable Notifications</v-btn>
           </v-list-tile-action>
         </v-list-tile>
-      </v-list> -->
+      </v-list>
     </v-navigation-drawer>
   </nav>
 </template>
 
 <script>
-import firebase from "firebase/app";
-import db from "../firebase/init";
-import { bus } from '../main'
+import { db } from "../configFirebase";
+import firebase from "firebase";
+import { bus } from "../main";
+import axios from "axios";
 
-const homeDate = () => import('./homeDate')
-const signOut = () => import('./signOut')
+import { messaging } from "../configFirebase";
+
+const homeDate = () => import("./homeDate");
+const signOut = () => import("./signOut");
 
 export default {
   components: {
@@ -74,11 +82,81 @@ export default {
       isUser: null,
       userPhoto: null,
       userName: null,
+      useruid: null,
       links: [],
       mode: false
     };
   },
   methods: {
+    getMessagingToken() {
+      messaging
+        .getToken()
+        .then(async token => {
+          if (token) {
+            const currentMessageToken = window.localStorage.getItem(
+              "messagingToken"
+            );
+            // console.log("token will be updated", currentMessageToken != token);
+
+            if (currentMessageToken != token) {
+              await this.saveToken(token);
+            }
+          } else {
+            console.log(
+              "No Instance ID token available. Request permission to generate one."
+            );
+            this.notificationsPermisionRequest();
+          }
+        })
+        .catch(function(err) {
+          console.log("An error occurred while retrieving token. ", err);
+        });
+    },
+    notificationsPermisionRequest() {
+      messaging
+        .requestPermission()
+        .then(() => {
+          this.getMessagingToken();
+        })
+        .catch(err => {
+          console.log("Unable to get permission to notify.", err);
+        });
+    },
+    listenTokenRefresh() {
+      const currentMessageToken = window.localStorage.getItem("messagingToken");
+      // console.log("currentMessageToken", currentMessageToken);
+      if (!currentMessageToken) {
+        messaging.onTokenRefresh(function() {
+          messaging
+            .getToken()
+            .then(function(token) {
+              this.saveToken(token);
+            })
+            .catch(function(err) {
+              console.log("Unable to retrieve refreshed token ", err);
+            });
+        });
+      }
+    },
+    saveToken(token) {
+      let userUid = this.useruid
+      // console.log("tokens", token);
+      axios
+        .post(
+          `https://us-central1-attendit.cloudfunctions.net/GeneralSubscription`,
+          {
+            token,
+            userUid
+          }
+        )
+        .then(response => {
+          window.localStorage.setItem("messagingToken", token);
+          console.log(response);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     // nightMode() {
     //   this.mode = !this.mode;
     //   this.$emit("changeMode", this.mode);
@@ -98,17 +176,22 @@ export default {
     }
   },
   mounted() {
+    this.listenTokenRefresh();
+
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.$router.push({ name: "home" });
         db.collection("attData")
           .doc(user.uid)
-          .set({
-            displayName: user.displayName,
-            phoneNum: user.phoneNumber,
-            uid: user.uid,
-            email: user.email
-          }, { merge: true });
+          .set(
+            {
+              displayName: user.displayName,
+              phoneNum: user.phoneNumber,
+              uid: user.uid,
+              email: user.email
+            },
+            { merge: true }
+          );
       }
     });
   },
@@ -118,6 +201,7 @@ export default {
         this.isUser = true;
         this.userPhoto = user.photoURL;
         this.userName = user.displayName;
+        this.useruid = user.uid;
       } else {
         this.isUser = false;
         this.userPhoto = null;
@@ -127,7 +211,7 @@ export default {
           { icon: "account_circle", text: "Sign In", route: "signup" }
         ];
       }
-      bus.$emit('userSend', this.isUser);
+      bus.$emit("userSend", this.isUser);
     });
   }
 };

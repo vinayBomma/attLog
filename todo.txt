@@ -7,9 +7,9 @@ history view - 3
 timetable dupe subs - 2
 reset attendance - 3
 performance - 1
-firestone rules - check and verify
-att status on home page - 3
+att status on home page - 2
 attDates events in homeDate - 3
+home attendance fix icons
 
 addSubjects modal and loading of data iphone and macos
 
@@ -19,12 +19,8 @@ windows store add
 iphone usage compatibility
 
 cross platform find more new info installation instructions
-seamless updates click to get started
-modal before asking notification permisssion
 
 feature discovery
-
-del all subjects from timetable bug only sav button
 
 production tips:
 enable sw

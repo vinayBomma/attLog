@@ -80,8 +80,8 @@
 <script>
 // const Chart = () => import('chart.js')
 import Chart from "chart.js";
-import db from "../firebase/init";
-import firebase from "firebase";
+import {db} from '../configFirebase'
+import firebase from "firebase/app";
 
 import "epic-spinners/dist/lib/epic-spinners.min.css";
 import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
