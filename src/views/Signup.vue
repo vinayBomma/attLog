@@ -49,21 +49,21 @@ export default {
           color: "yellow darken-3",
           image: require("../../public/analysis.svg"),
           info:
-            "With powerful insights, you can view and analyse your attedance in more detail. Not sure whether to bunk? We have got you covered!"
+            "With powerful insights, you can view and analyse your attendance in more detail. Not sure whether to bunk? We have got you covered!"
         },
         {
           title: "Intuitive Design",
-          color: "green",
+          color: "green darken-1",
           image: require("../../public/block.svg"),
           info:
-            "With User Experience in mind, Attend It features a simple and intuitive design. With No Ads and Offline Capability, tracking your attendance is whole lot easier."
+            "With User Experience in mind, Attend It features a simple and intuitive design. With no Ads and Offline Capability, tracking your attendance is whole lot easier."
         },
         {
           title: "Seamless Updates",
           color: "cyan darken-2",
-          image: require("../../public/cloud.svg"),
+          image: require("../../public/computing-cloud.svg"),
           info:
-            "We embrace powerful new technologies which help us simplify user experience. No need to regularly install a new update. When there is a new update available, Attend It updates just by restarting the app!\nSign In To Get Started"
+            "We embrace powerful new technologies which help us simplify user experience. No need to regularly install a new update. When there is a new update available, Attend It updates just by restarting the app!\nSign In To Get Started!"
         }
       ],
       cycle: false

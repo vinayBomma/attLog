@@ -9,16 +9,14 @@
       <v-toolbar-title v-else-if="$route.name === 'add_subjects'">Subjects</v-toolbar-title>
       <v-spacer></v-spacer>
 
-      <v-btn aria-label="Sign In" v-if="isUser === false" @click="googleLogin">
+      <v-btn class="elevation-10" aria-label="Sign In" v-if="isUser === false" @click="googleLogin">
         <img src="../../public/google.png" class="mr-2" alt="Google" />Sign In
       </v-btn>
 
       <homeDate></homeDate>
-
     </v-toolbar>
 
     <v-navigation-drawer v-model="drawer" app>
-      
       <signOut></signOut>
 
       <v-layout column align-center v-if="userPhoto">
@@ -31,7 +29,7 @@
 
       <v-layout column align-center v-if="userName">
         <v-flex class="mt-2 mb-2">
-          <p>Welcome, {{ userName }}</p>
+          <p>Welcome, {{ userName }}!</p>
         </v-flex>
       </v-layout>
 
@@ -48,11 +46,11 @@
         </v-list-tile>
       </v-list>
 
-      <v-list v-if="isUser">
+      <v-list v-if="isUser && !disabled">
         <v-list-tile>
-          <v-list-tile-action>
-            <v-btn color="orange" @click="getMessagingToken">Enable Notifications</v-btn>
-          </v-list-tile-action>
+          <!-- <v-list-tile-action> -->
+          <v-btn @click="getMessagingToken" round block>Enable Notifications</v-btn>
+          <!-- </v-list-tile-action> -->
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
@@ -84,7 +82,8 @@ export default {
       userName: null,
       useruid: null,
       links: [],
-      mode: false
+      mode: false,
+      disabled: false
     };
   },
   methods: {
@@ -119,6 +118,7 @@ export default {
           this.getMessagingToken();
         })
         .catch(err => {
+          alert("Couldn't enable push notifications. Your browser may not suppport it.")
           console.log("Unable to get permission to notify.", err);
         });
     },
@@ -136,10 +136,12 @@ export default {
               console.log("Unable to retrieve refreshed token ", err);
             });
         });
+      } else {
+        this.disabled = true;
       }
     },
     saveToken(token) {
-      let userUid = this.useruid
+      let userUid = this.useruid;
       // console.log("tokens", token);
       axios
         .post(
@@ -164,22 +166,26 @@ export default {
     googleLogin() {
       const provider = new firebase.auth.GoogleAuthProvider();
 
-      firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(() => {
-          this.$router.push({ name: "home" });
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      firebase.auth().signInWithRedirect(provider);
+
+      // firebase
+      //   .auth()
+      //   .signInWithPopup(provider)
+      //   .then(() => {
+      //     this.$router.push({ name: "home" });
+      //   })
+      //   .catch(err => {
+      //     console.log(err);
+      //   });
     }
   },
   mounted() {
+
     this.listenTokenRefresh();
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
+        console.log(user.providerData)
         this.$router.push({ name: "home" });
         db.collection("attData")
           .doc(user.uid)
@@ -188,7 +194,8 @@ export default {
               displayName: user.displayName,
               phoneNum: user.phoneNumber,
               uid: user.uid,
-              email: user.email
+              email: user.email,
+              photoURL: user.photoURL
             },
             { merge: true }
           );
@@ -196,6 +203,16 @@ export default {
     });
   },
   created() {
+    firebase
+      .auth()
+      .getRedirectResult()
+      .then(() => {
+        this.$router.push({ name: 'home'})
+      })
+      .catch(err => {
+        console.log("Errarta: ", err);
+      });
+
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.isUser = true;
@@ -208,7 +225,8 @@ export default {
         this.userName = null;
 
         this.links = [
-          { icon: "account_circle", text: "Sign In", route: "signup" }
+          { icon: "account_circle", text: "Sign In", route: "signup" },
+          // { icon: 'get_app', text: "Installation Notes", route: 'install'}
         ];
       }
       bus.$emit("userSend", this.isUser);

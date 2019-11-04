@@ -10,15 +10,21 @@
                 <v-card-title primary-title class="title">
                   {{ val }}
                   <v-layout justify-end>
-                    <v-icon class="mx-1" @click="presentSub(val, index, $event)" medium>done</v-icon>
-                    <v-icon class="mx-1" @click="absentSub(val, index, $event)" medium>clear</v-icon>
-                    <v-icon class="mx-1" @click="cancelSub(val, index, $event)" medium>remove</v-icon>
+                    <v-icon class="mx-1" @click="presentSub(val, $event)" medium>done</v-icon>
+                    <v-icon class="mx-1" @click="absentSub(val, $event)" medium>clear</v-icon>
+                    <v-icon class="mx-1" @click="cancelSub(val, $event)" medium>remove</v-icon>
                   </v-layout>
                 </v-card-title>
-                <!-- <v-card-text>Status: On Track</v-card-text> -->
+                <v-card-text>Status: Nothing to show yet!</v-card-text>
               </v-card>
             </v-flex>
-            <v-btn color="blue" v-on:click="submit()">Save</v-btn>
+            <v-btn
+              color="cyan darken-1"
+              v-on:click="submit()"
+              round
+              block
+              class="mx-5"
+            >Submit Attendance</v-btn>
           </template>
 
           <v-flex xs12 sm6 md4 pa-1 v-else-if="attLogged">
@@ -61,7 +67,7 @@
 
 <script>
 // import db from "../firebase/init";
-import {db} from '../configFirebase'
+import { db } from "../configFirebase";
 import firebase from "firebase/app";
 import { bus } from "../main";
 
@@ -100,11 +106,12 @@ export default {
     redirect() {
       this.$router.push("/timetable");
     },
-    subjVerify(event, color, color2, color3) {
+    subjVerify(event, color, color2, color3, mode, value) {
       let iconNode = event.target.parentNode.children;
 
       if (event.target.classList.contains(`${color}--text`)) {
         event.target.classList.remove(`${color}--text`);
+        mode.splice(mode.indexOf(value), 1);
       } else {
         for (let i of iconNode) {
           if (i.classList.contains(`${color2}--text`)) {
@@ -116,37 +123,38 @@ export default {
           }
         }
         event.target.classList.add(`${color}--text`);
+        mode.push(value);
       }
     },
-    presentSub(value, index, event) {
+    presentSub(value, event) {
       if (this.absent.includes(value)) {
         this.absent.splice(this.absent.indexOf(value), 1);
       } else if (this.cancelled.includes(value)) {
         this.cancelled.splice(this.cancelled.indexOf(value), 1);
       }
-      this.present.push(value);
 
-      this.subjVerify(event, "green", "red", "grey");
+      this.subjVerify(event, "green", "red", "grey", this.present, value);
+      // console.log("Present: ", this.present);
     },
-    absentSub(value, index, event) {
+    absentSub(value, event) {
       if (this.present.includes(value)) {
         this.present.splice(this.present.indexOf(value), 1);
       } else if (this.cancelled.includes(value)) {
         this.cancelled.splice(this.cancelled.indexOf(value), 1);
       }
-      this.absent.push(value);
 
-      this.subjVerify(event, "red", "green", "grey");
+      this.subjVerify(event, "red", "green", "grey", this.absent, value);
+      // console.log("Absent: ", this.absent);
     },
-    cancelSub(value, index, event) {
+    cancelSub(value, event) {
       if (this.present.includes(value)) {
         this.present.splice(this.present.indexOf(value), 1);
       } else if (this.absent.includes(value)) {
         this.absent.splice(this.absent.indexOf(value), 1);
       }
-      this.cancelled.push(value);
 
-      this.subjVerify(event, "grey", "red", "green");
+      this.subjVerify(event, "grey", "red", "green", this.cancelled, value);
+      // console.log("Cancelled: ", this.cancelled);
     },
     submit() {
       let cDate;
@@ -174,7 +182,7 @@ export default {
         this.subj.length
       ) {
         this.color = "error";
-        this.msg = "Select Attendance For All Subjects";
+        this.msg = "Mark Attendance For All Subjects";
         this.snackbar = true;
         this.sendReq = false;
       }
@@ -182,7 +190,6 @@ export default {
       let obj = {},
         userData,
         dbData;
-      let someData = {};
 
       function verifyAtt(mode, subject, modeDate, operation) {
         obj[subject][mode] += 1;
@@ -220,6 +227,7 @@ export default {
 
                 if (this.present.includes(someValue)) {
                   verifyAtt("present", someValue, "presentDates", "inc");
+                  console.log(obj)
                 } else if (this.absent.includes(someValue)) {
                   verifyAtt("absent", someValue, "absentDates", "dec");
                 } else if (this.cancelled.includes(someValue)) {
@@ -246,10 +254,9 @@ export default {
                 }
               }
 
-              if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
-                dbData = obj;
-                this.userDB.set({ data: dbData }, { merge: true });
+              console.log(obj)
 
+              if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
                 if (this.attendData.length === 0) {
                   this.attendData.push(cDate);
                 } else if (this.attendData.length > 0) {
@@ -261,11 +268,17 @@ export default {
                   }
                 }
 
-                this.userDB
-                  .set({ attendance: this.attendData }, { merge: true })
+                dbData = obj;
+                console.log(dbData)
+                this.userDB.set({ data: dbData, attendance: this.attendData }, { merge: true })
                   .then(() => {
                     this.$router.go({ name: "home" });
                   });
+                // this.userDB
+                //   .set({ attendance: this.attendData }, { merge: true })
+                  // .then(() => {
+                  //   this.$router.go({ name: "home" });
+                  // });
               }
             }
           })

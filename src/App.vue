@@ -52,4 +52,7 @@ export default {
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none;
 }
+input {
+  -webkit-user-select: text;
+}
 </style>

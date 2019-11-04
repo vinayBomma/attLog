@@ -95,7 +95,7 @@ export default {
       userDB: null,
       moreEvents: null,
       date1: new Date().toISOString().substr(0, 10),
-      value: 75,
+      value: 0,
       items: [],
       currentItem: null,
       showStat: true,

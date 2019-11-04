@@ -2,22 +2,19 @@
 
 interactive faq
 
-push notifications - 1
+push notifications 
 history view - 3
 timetable dupe subs - 2
 reset attendance - 3
 performance - 1
+color app - 2
 att status on home page - 2
 attDates events in homeDate - 3
-home attendance fix icons
 
-addSubjects modal and loading of data iphone and macos
-
-cloud functions pusManager
 play store img descript
-windows store add
-iphone usage compatibility
+app-signing
 
+windows store add
 cross platform find more new info installation instructions
 
 feature discovery

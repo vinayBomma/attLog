@@ -64,7 +64,6 @@ router.beforeEach((to, from, next) => {
       if (user) {
         next()
       } else {
-        console.log('Fail')
         next({name: 'signup'})
       }
     })
