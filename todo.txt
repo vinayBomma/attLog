@@ -2,6 +2,19 @@
 
 interactive faq
 
+
+gradient intro
+do something about login button
+navigation drawer colors
+
+
+
+
+
+
+
+
+
 push notifications 
 history view - 3
 timetable dupe subs - 2

@@ -3,14 +3,15 @@
     <section id="full-carousel">
       <v-carousel height="100%" :cycle="cycle" hide-controls>
         <v-carousel-item v-for="(slide, i) in slides" :key="i">
-          <v-sheet height="92vh" :color="slide.color">
+          <!-- <v-sheet height="92vh" :color="slide.color"> -->
+            <v-sheet height="92vh" style="background-image: radial-gradient( circle farthest-corner at -3.1% -4.3%,  rgba(57,255,186,1) 0%, rgba(21,38,82,1) 90% );">
             <v-layout align-start justify-center>
               <v-img class="mt-3" :src="slide.image" max-height="300" max-width="300"></v-img>
             </v-layout>
             <v-layout align-center justify-center>
               <v-container>
                 <h3 class="display-1 text-xs-center">{{ slide.title }}</h3>
-                <p class="subheading text-xs-center mt-2">{{ slide.info }}</p>
+                <p class="subheading text-xs-center mt-2" style="letter-spacing: 2px">{{ slide.info }}</p>
                 <v-layout align-end justify-space-between fill-height></v-layout>
               </v-container>
             </v-layout>
@@ -56,14 +57,14 @@ export default {
           color: "green darken-1",
           image: require("../../public/block.svg"),
           info:
-            "With User Experience in mind, Attend It features a simple and intuitive design. With no Ads and Offline Capability, tracking your attendance is whole lot easier."
+            "With User Experience in mind, Attend It features a simple and intuitive design. With no ads and offline capability, tracking your attendance is whole lot easier."
         },
         {
           title: "Seamless Updates",
           color: "cyan darken-2",
           image: require("../../public/computing-cloud.svg"),
           info:
-            "We embrace powerful new technologies which help us simplify user experience. No need to regularly install a new update. When there is a new update available, Attend It updates just by restarting the app!\nSign In To Get Started!"
+            "We embrace powerful new technologies which help us simplify user experience. No need to regularly install a new update. When there is a new update available, Attend It updates itself just by restarting the app!"
         }
       ],
       cycle: false

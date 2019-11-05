@@ -6,7 +6,7 @@
         <v-layout row wrap>
           <template v-if="!attLogged && hasSubjects">
             <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
-              <v-card>
+              <v-card style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );">
                 <v-card-title primary-title class="title">
                   {{ val }}
                   <v-layout justify-end>

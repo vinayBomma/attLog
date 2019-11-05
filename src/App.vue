@@ -5,7 +5,7 @@
     <v-content>
       <router-view></router-view>
     </v-content>
-    <v-bottom-nav v-if="$route.name !== 'signup'" app fixed value="true">
+    <v-bottom-nav v-if="$route.name !== 'signup' && $route.name !== 'privacy_policy'" app fixed value="true">
       <div v-for="nav in bottomNav" :key="nav.name">
         <v-btn color="teal" flat router v-bind:to="nav.link">
           <span>{{ nav.name }}</span>
