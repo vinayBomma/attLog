@@ -2,17 +2,21 @@
 
 interactive faq
 
+IN PRODUCTION: 
+CHANGE URL EMAIL LINK
 
-gradient intro
-do something about login button
+dialog - name & criteria
+compress avatar
+change avatars
+change name
+change att criteria
+store avatar image
+privacyPolicy beautify
+dialog - add subjects
+dialog - add timetable
+responsive design
 navigation drawer colors
-
-
-
-
-
-
-
+duels
 
 
 push notifications 
