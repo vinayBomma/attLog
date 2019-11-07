@@ -12,6 +12,8 @@
       <!-- <v-btn class="elevation-10" aria-label="Sign In" v-if="isUser === false" @click="googleLogin">
         <img src="../../public/google.png" class="mr-2" alt="Google" />Sign In
       </v-btn>-->
+
+      <!-- Sign In Button !-->
       <v-btn
         aria-label="Sign In"
         v-if="isUser === false"
@@ -21,11 +23,13 @@
       >
         <v-icon left>email</v-icon>Sign In
       </v-btn>
+      <!-- ==============  !-->
 
       <homeDate></homeDate>
     </v-toolbar>
 
-    <v-navigation-drawer v-model="drawer" app>
+    <!-- Sign Out !-->
+    <v-navigation-drawer v-model="drawer" app style="background-color: teal">
       <v-dialog v-model="signOutModal" full-width>
         <template v-slot:activator="{ on }">
           <v-layout align-start justify-end row class="pa-3">
@@ -41,7 +45,9 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <!-- ==============  !-->
 
+      <!-- Sign In Button !-->
       <v-layout column align-center v-if="userPhoto && isUser">
         <v-flex class="mt-5">
           <v-avatar size="100">
@@ -52,9 +58,10 @@
 
       <v-layout column align-center v-if="userName && isUser">
         <v-flex class="mt-2 mb-2">
-          <p>Welcome, {{ userName }}!</p>
+          <p class="subheading">Welcome, {{ userName }}!</p>
         </v-flex>
       </v-layout>
+      <!-- ==============  !-->
 
       <v-divider v-if="isUser"></v-divider>
 
@@ -78,6 +85,7 @@
       </v-list>
     </v-navigation-drawer>
 
+    <!-- Sign In Dialog !-->
     <v-dialog v-model="register" persistent>
       <v-card
         style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
@@ -104,7 +112,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- ==============  !-->
 
+    <!-- Sign In Email Link Dialog !-->
     <v-dialog v-model="emailLink" persistent>
       <v-card
         style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
@@ -121,7 +131,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- ==============  !-->
 
+    <!-- Choose Avatar Intro !-->
     <v-dialog v-model="appIntro" persistent>
       <v-card>
         <v-card-title
@@ -144,7 +156,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- ==============  !-->
 
+    <!-- Additional Info Intro !-->
     <v-dialog v-model="appIntro2" persistent>
       <v-card>
         <v-card-title
@@ -176,11 +190,96 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- ==============  !-->
 
+    <!-- Add Subjects Intro !-->
+    <v-dialog v-model="appIntro3" persistent>
+      <v-card>
+        <v-card-title
+          class="justify-center subheading"
+          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+        >Add Subjects</v-card-title>
+        <v-card-text>
+          <v-layout row>
+            <v-text-field v-model="subjectName" label="Add Subject"></v-text-field>
+            <v-btn @click="addSubject">Add</v-btn>
+          </v-layout>
+          <v-card v-if="hasSubject" elevation="1">
+            <v-card-text>
+              <v-layout class="pt-3" row v-for="(sub, i) in subjects" :key="i">
+                <!-- <v-layout> -->
+                <span style="letter-spacing: 2px;">{{i + 1}}. {{sub}}</span>
+                <!-- </v-layout> -->
+                <v-layout class="justify-end">
+                  <v-icon right color="red" @click="removeSubject(i)">remove_circle</v-icon>
+                </v-layout>
+              </v-layout>
+            </v-card-text>
+          </v-card>
+        </v-card-text>
+        <v-card-actions class="justify-end pa-3">
+          <v-btn flat @click="appIntro3 = false">Skip</v-btn>
+          <v-btn round @click="saveSubjects">Next</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- ============== !-->
+
+
+    <!-- Create Timetable Intro !-->
+    <v-dialog v-model="appIntro4" persistent>
+      <v-card>
+        <v-card-title
+          class="justify-center subheading"
+          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+        >Create Timetable</v-card-title>
+        <v-card-text>
+          <v-tabs
+            v-model="currentDay"
+            color="transparent"
+            fixed-tabs
+            show-arrows
+            slider-color="blue"
+            @change="tabChange"
+          >
+            <v-tab v-for="day in days" :key="day" :href="'#' + day">{{ day }}</v-tab>
+          </v-tabs>
+          <v-tabs-items v-model="currentDay">
+            <v-tab-item v-for="(day, index) in days" :key="index" :value="day">
+              <v-layout row class="mt-3">
+                <v-select v-model="currentSubject" :items="subjects" label="Choose Subject"></v-select>
+                <v-btn @click="addDaySubject">Add</v-btn>
+              </v-layout>
+              <v-card v-if="hasDaySubjects" elevation="1">
+                <v-card-text>
+                  <v-layout class="pt-3" row v-for="(sub, i) in daySubjects" :key="i">
+                    <!-- <v-layout> -->
+                    <span style="letter-spacing: 2px;">{{i + 1}}. {{sub}}</span>
+                    <!-- </v-layout> -->
+                    <v-layout class="justify-end">
+                      <v-icon right color="red" @click="removeDaySubject(i)">remove_circle</v-icon>
+                    </v-layout>
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-card-text>
+        <v-card-actions class="justify-end pa-3">
+          <v-btn flat @click="appIntro4 = false">Skip</v-btn>
+          <v-btn round @click="saveTimetable">Save</v-btn>
+          <v-btn round v-if="lastDay" @click="appIntro4 = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- ============== !-->
+
+    <!-- Snackbar !-->
     <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
       {{ msg }}
       <v-btn flat @click="snackbar === false">Close</v-btn>
     </v-snackbar>
+    <!-- ============== !-->
   </nav>
 </template>
 
@@ -199,28 +298,6 @@ export default {
   },
   data() {
     return {
-      date: new Date().toISOString().substr(0, 10),
-      drawer: false,
-      isUser: null,
-      userPhoto: [],
-      userName: null,
-      useruid: null,
-      signOutModal: null,
-      signOutUser: null,
-      links: [],
-      mode: false,
-      disabled: false,
-      register: null,
-      emailLink: null,
-      emailValue: null,
-      snackbar: false,
-      msg: null,
-      timeout: 3000,
-      color: undefined,
-      appIntro: null,
-      appIntro2: null,
-      attCriteria: 30,
-      // appIntro: true,
       avatars: [
         "../avatars/man-6.svg",
         "../avatars/man-5.svg",
@@ -254,7 +331,47 @@ export default {
         "../avatars/woman-10.svg",
         "../avatars/woman-11.svg",
         "../avatars/woman-12.svg"
-      ]
+      ],
+      date: new Date().toISOString().substr(0, 10),
+      drawer: false,
+      isUser: null,
+      userPhoto: [],
+      userName: null,
+      useruid: null,
+      signOutModal: null,
+      signOutUser: null,
+      links: [],
+      mode: false,
+      disabled: false,
+      register: null,
+      emailLink: null,
+      emailValue: null,
+      snackbar: false,
+      msg: null,
+      timeout: 3000,
+      color: undefined,
+      appIntro: null,
+      appIntro2: null,
+      attCriteria: 30,
+      appIntro3: null,
+      subjectName: null,
+      hasSubject: null,
+      subjects: [],
+      appIntro4: null,
+      currentDay: "Monday",
+      days: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      hasDaySubjects: null,
+      daySubjects: [],
+      currentSubject: null,
+      lastDay: null
     };
   },
   methods: {
@@ -267,8 +384,8 @@ export default {
         this.register = false;
 
         let actionCodeSettings = {
-          // url: "https://attendit.web.app/signup"
-          url: "http://localhost:8080/signup",
+          url: "https://attendit.firebase.app/signup",
+          // url: "http://localhost:8080/signup",
           handleCodeInApp: true
         };
 
@@ -410,11 +527,115 @@ export default {
           .set(
             {
               displayName: this.userName,
-              attCriteria: this.attCriteria,
+              attCriteria: this.attCriteria
             },
             { merge: true }
           );
         this.appIntro2 = false;
+        this.appIntro3 = true
+      }
+    },
+    addSubject() {
+      if (this.subjectName) {
+        this.hasSubject = true;
+        this.subjects.push(this.subjectName);
+        this.subjectName = null;
+      } else {
+        this.msg = "Please enter a subject!";
+        this.color = "red";
+        this.snackbar = true;
+      }
+    },
+    removeSubject(index) {
+      this.subjects.splice(index, 1);
+    },
+    saveSubjects() {
+      if (this.subjects.length > 0) {
+        db.collection("attData")
+          .doc(this.useruid)
+          .set(
+            {
+              allSubjects: this.subjects
+            },
+            { merge: true }
+          );
+        this.msg = "Subjects Added Successfully!";
+        this.color = "green";
+        this.snackbar = true;
+
+        this.appIntro3 = false;
+        this.appIntro4 = true;
+      } else {
+        this.msg = "Please enter a subject!";
+        this.color = "red";
+        this.snackbar = true;
+      }
+    },
+    addDaySubject() {
+      if (this.currentSubject) {
+        this.daySubjects.push(this.currentSubject);
+        this.hasDaySubjects = true;
+        this.currentSubject = null;
+      } else {
+        this.msg = "Please choose a subject!";
+        this.color = "red";
+        this.snackbar = true;
+      }
+    },
+    removeDaySubject(index) {
+      this.daySubjects.splice(index, 1);
+    },
+    saveTimetable() {
+      if (this.daySubjects.length > 0) {
+        let obj = {};
+        obj[this.currentDay] = this.daySubjects.concat();
+        db.collection("attData")
+          .doc(this.useruid)
+          .set(
+            {
+              timetable: obj
+            },
+            { merge: true }
+          )
+          .then(() => {
+            db.collection("attData")
+              .doc(this.useruid)
+              .get()
+              .then(res => {
+                if (res.data().timetable[this.currentDay]) {
+                  this.daySubjects = res.data().timetable[this.currentDay];
+                  this.hasDaySubjects = true;
+                } else {
+                  console.log("Value is undefined");
+                }
+              });
+          });
+        this.msg = `Timetable for ${this.currentDay} saved!`;
+        this.color = "green";
+        this.snackbar = true;
+        this.daySubjects = [];
+      } else {
+        this.msg = "Please choose atleast one subject!";
+        this.color = "red";
+        this.snackbar = true;
+      }
+    },
+    tabChange() {
+      db.collection("attData")
+        .doc(this.useruid)
+        .get()
+        .then(res => {
+          if (res.data().timetable[this.currentDay]) {
+            this.hasDaySubjects = true;
+            this.daySubjects = res.data().timetable[this.currentDay];
+          } else {
+            this.hasDaySubjects = false;
+            this.daySubjects = [];
+          }
+        });
+
+      if (this.days.indexOf(this.currentDay) === this.days.length - 1) {
+        this.lastDay = true;
       }
     },
     googleLogout() {
@@ -521,10 +742,13 @@ export default {
           .doc(this.useruid)
           .get()
           .then(res => {
-            if (res.data().photoURL !== undefined && res.data().displayName !== undefined) {
+            if (
+              res.data().photoURL !== undefined &&
+              res.data().displayName !== undefined
+            ) {
               this.userPhoto.push(res.data().photoURL);
-              this.userName = res.data().displayName
-              this.attCriteria = res.data().attCriteria
+              this.userName = res.data().displayName;
+              this.attCriteria = res.data().attCriteria;
             } else {
               console.log("Value is undefined");
             }
