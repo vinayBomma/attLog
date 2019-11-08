@@ -5,15 +5,13 @@ interactive faq
 IN PRODUCTION: 
 CHANGE URL EMAIL LINK
 
-dialog - name & criteria
+timetable tabs slide
+statistics page bottam nav
+
 compress avatar
 change avatars
 change name
 change att criteria
-store avatar image
-privacyPolicy beautify
-dialog - add subjects
-dialog - add timetable
 responsive design
 navigation drawer colors
 duels

@@ -26,6 +26,96 @@
       <!-- ==============  !-->
 
       <homeDate></homeDate>
+
+      <!-- Edit Icon Subjects !-->
+      <template v-if="$route.name === 'add_subjects'">
+        <v-dialog v-model="editSub">
+          <template v-slot:activator="{ on }">
+            <v-icon v-on="on">edit</v-icon>
+          </template>
+
+          <v-card>
+            <v-card-title
+              class="justify-center subheading"
+              style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+            >Edit Subjects</v-card-title>
+            <v-card-text>
+              <v-layout row>
+                <v-text-field v-model="subjectName" label="Add Subject"></v-text-field>
+                <v-btn @click="addSubject">Add</v-btn>
+              </v-layout>
+              <v-card v-if="hasSubject" elevation="1">
+                <v-card-text>
+                  <v-layout class="pt-3" row v-for="(sub, i) in subjects" :key="i">
+                    <!-- <v-layout> -->
+                    <span style="letter-spacing: 2px;">{{i + 1}}. {{sub}}</span>
+                    <!-- </v-layout> -->
+                    <v-layout class="justify-end">
+                      <v-icon right color="red" @click="removeSubject(i)">remove_circle</v-icon>
+                    </v-layout>
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+            </v-card-text>
+            <v-card-actions class="justify-end pa-3">
+              <v-btn flat @click="editSub = false">Close</v-btn>
+              <v-btn round @click="editSubjects">Save</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </template>
+      <!-- ============== !-->
+
+      <!-- Edit Icon Timetable !-->
+      <template v-if="$route.name === 'timetable'">
+        <v-dialog v-model="editTimetable">
+          <template v-slot:activator="{ on }">
+            <v-icon v-on="on">edit</v-icon>
+          </template>
+
+          <v-card>
+            <v-card-title
+              class="justify-center subheading"
+              style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+            >Edit Timetable</v-card-title>
+            <v-card-text>
+              <v-tabs
+                v-model="currentDay"
+                color="transparent"
+                fixed-tabs
+                show-arrows
+                slider-color="blue"
+                @change="tabChange"
+              >
+                <v-tab v-for="day in days" :key="day" :href="'#' + day">{{ day }}</v-tab>
+              </v-tabs>
+              <v-tabs-items v-model="currentDay">
+                <v-tab-item v-for="(day, index) in days" :key="index" :value="day">
+                  <v-layout row class="mt-3">
+                    <v-select v-model="currentSubject" :items="subjects" label="Choose Subject"></v-select>
+                    <v-btn @click="addDaySubject">Add</v-btn>
+                  </v-layout>
+                  <v-card v-if="hasDaySubjects" elevation="1">
+                    <v-card-text>
+                      <v-layout class="pt-3" row v-for="(sub, i) in daySubjects" :key="i">
+                        <span style="letter-spacing: 2px;">{{i + 1}}. {{sub}}</span>
+                        <v-layout class="justify-end">
+                          <v-icon right color="red" @click="removeDaySubject(i)">remove_circle</v-icon>
+                        </v-layout>
+                      </v-layout>
+                    </v-card-text>
+                  </v-card>
+                </v-tab-item>
+              </v-tabs-items>
+            </v-card-text>
+            <v-card-actions class="justify-end pa-3">
+              <v-btn flat @click="closeEditTT">Close</v-btn>
+              <v-btn round @click="saveTimetable">Save</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </template>
+      <!-- ============== !-->
     </v-toolbar>
 
     <!-- Sign Out !-->
@@ -219,15 +309,14 @@
         </v-card-text>
         <v-card-actions class="justify-end pa-3">
           <v-btn flat @click="appIntro3 = false">Skip</v-btn>
-          <v-btn round @click="saveSubjects">Next</v-btn>
+          <v-btn round @click="saveSubjects">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- ============== !-->
 
-
     <!-- Create Timetable Intro !-->
-    <v-dialog v-model="appIntro4" persistent>
+    <v-dialog v-model="appIntro4" persistent scrollable>
       <v-card>
         <v-card-title
           class="justify-center subheading"
@@ -371,7 +460,9 @@ export default {
       hasDaySubjects: null,
       daySubjects: [],
       currentSubject: null,
-      lastDay: null
+      lastDay: null,
+      editSub: null,
+      editTimetable: null
     };
   },
   methods: {
@@ -384,8 +475,8 @@ export default {
         this.register = false;
 
         let actionCodeSettings = {
-          url: "https://attendit.firebase.app/signup",
-          // url: "http://localhost:8080/signup",
+          // url: "https://attendit.firebaseapp.com/signup",
+          url: "http://localhost:8080/signup",
           handleCodeInApp: true
         };
 
@@ -532,7 +623,8 @@ export default {
             { merge: true }
           );
         this.appIntro2 = false;
-        this.appIntro3 = true
+        this.appIntro3 = true;
+        window.localStorage.removeItem("newUser");
       }
     },
     addSubject() {
@@ -550,12 +642,19 @@ export default {
       this.subjects.splice(index, 1);
     },
     saveSubjects() {
+      let obj = {}
+
       if (this.subjects.length > 0) {
+        for (var i in this.subjects) {
+          obj[this.subjects[i]] = [];
+        }
+
         db.collection("attData")
           .doc(this.useruid)
           .set(
             {
-              allSubjects: this.subjects
+              allSubjects: this.subjects,
+              data: obj,
             },
             { merge: true }
           );
@@ -637,6 +736,40 @@ export default {
       if (this.days.indexOf(this.currentDay) === this.days.length - 1) {
         this.lastDay = true;
       }
+    },
+    editSubjects() {
+      let obj = {};
+
+      if (this.subjects.length > 0) {
+        for (var i in this.subjects) {
+          obj[this.subjects[i]] = [];
+        }
+
+        db.collection("attData")
+          .doc(this.useruid)
+          .set(
+            {
+              allSubjects: this.subjects,
+              data: obj
+            },
+            { merge: true }
+          );
+
+        this.msg = "Subjects Added Successfully!";
+        this.color = "green";
+        this.snackbar = true;
+
+        this.$router.push({ path: "/" });
+        this.editSub = null;
+      } else {
+        this.msg = "Please enter a subject!";
+        this.color = "red";
+        this.snackbar = true;
+      }
+    },
+    closeEditTT(){
+      this.$router.push({path: '/'})
+      this.editTimetable = null;
     },
     googleLogout() {
       this.signOutModal = false;
@@ -749,6 +882,10 @@ export default {
               this.userPhoto.push(res.data().photoURL);
               this.userName = res.data().displayName;
               this.attCriteria = res.data().attCriteria;
+              if (res.data().allSubjects.length > 0) {
+                this.hasSubject = true;
+                this.subjects = res.data().allSubjects;
+              }
             } else {
               console.log("Value is undefined");
             }

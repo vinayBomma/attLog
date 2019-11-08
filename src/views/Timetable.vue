@@ -1,73 +1,71 @@
 <template>
   <section>
     <div :style="style">
-      <div v-if="showtt">
-        <v-flex xs5 pt-2 pl-2>
-          <v-select :items="items" v-model="currentItem" @change="tabChange" solo></v-select>
-        </v-flex>
-        <v-card flat v-if="!hastt" class="pa-3 mb-2 mx-3">
-          <v-icon color="red" left>error</v-icon>
-          <span class="subheadline">Timetable Not Saved For {{ currentItem }}</span>
-        </v-card>
-        <v-flex xs12 sm6 md4 v-for="(sub,i) in select" :key="i" class="mb-2 mx-3">
-          <v-card flat class="pa-3">
-            <span>{{ i+1 }}. {{ sub }}</span>
-            <v-card-actions v-if="i === select.length - 1">
-              <v-dialog v-model="dialog" scrollable>
-                <template v-slot:activator="{ on }">
-                  <v-btn color="blue" absolute bottom right fab v-on="on">
-                    <v-icon>edit</v-icon>
-                  </v-btn>
-                </template>
-                <v-card>
-                  <v-card-title>
-                    <span class="headline">Timetable - {{ currentItem }}</span>
-                  </v-card-title>
-                  <v-container grid-list-md>
-                    <v-flex>
-                      <v-card-text>
-                        <p class="subheadline" v-for="(subs, i) in subjects" :key="i">
-                          {{ i+1 }}. {{ subs }}
-                          <span>
-                            <v-icon class="ml-2" color="red" @click="clearBtn(i, subs)">clear</v-icon>
-                          </span>
-                        </p>
+        <template>
+          <v-tabs
+            v-model="currentDay"
+            color="transparent"
+            fixed-tabs
+            show-arrows
+            slider-color="blue"
+            @change="tabChange"
+          >
+            <v-tab v-for="day in days" :key="day" :href="'#' + day">{{ day }}</v-tab>
+          </v-tabs>
+        </template>
+        <div v-if="showtt">
+        <v-tabs-items v-model="currentDay">
+          <v-tab-item v-for="(day, index) in days" :key="index" :value="day">
+            <v-container>
 
-                        <v-select :items="defaultSubs" label="Select Subject" v-model="value1">
-                          <v-icon
-                            slot="append"
-                            class="mt-1 mr-2"
-                            color="green"
-                            @click="doneBtn"
-                          >check</v-icon>
-                        </v-select>
-                      </v-card-text>
-                    </v-flex>
-                  </v-container>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" flat @click="clsBtnFunc">Close</v-btn>
-                    <v-btn color="blue darken-1" flat @click="saveSubjects">Save</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-card-actions>
-          </v-card>
-        </v-flex>
+              <!-- No Timetable created !-->
+              <v-card
+                v-if="!hastt"
+                style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
+              >
+                <v-card-title class="justify-center">
+                  <v-icon x-large color="white">info</v-icon>
+                </v-card-title>
+                <v-card-text style="letter-spacing: 2px; text-align:center;">
+                  Timetable has not been saved! Please click the edit(pencil) icon to save your timetable.
+                </v-card-text>
+              </v-card>
+              <!-- ============== !-->
+
+              <v-card
+                class="my-2"
+                style="border-radius: 10px;background: linear-gradient(25deg,#d64c7f,#ee4758 50%);"
+                v-for="(sub, i) in daySubjects"
+                :key="i"
+              >
+                <v-card-text>
+                  <span class="letter-spacing: 2px;">{{ i + 1}}. {{ sub }}</span>
+                </v-card-text>
+              </v-card>
+            </v-container>
+          </v-tab-item>
+        </v-tabs-items>
       </div>
+
+
+      <!-- No Subjects Added !-->
       <div v-else-if="!showtt">
         <v-container>
-          <v-card @click="redirect">
-            <v-card-text>No Subjects Added</v-card-text>
-          </v-card>
-          <v-card class="mt-2">
-            <v-card-text>
-              Click
-              <router-link to="/add_subjects">Here</router-link>To Add Subjects
+          <v-card style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );">
+            <v-card-title class="justify-center">
+              <v-icon x-large color="white">error</v-icon>
+            </v-card-title>
+            <v-card-text class="subheading"
+          style="letter-spacing: 2px; text-align:center;">
+              No subjects have been added yet!
             </v-card-text>
+            <v-card-actions class="justify-end pa-3 ">
+              <v-icon large @click="$router.push({path: '/add_subjects'})">arrow_right_alt</v-icon>
+            </v-card-actions>
           </v-card>
         </v-container>
       </div>
+      <!-- ============== !-->
     </div>
 
     <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
@@ -89,7 +87,7 @@
 </template> 
 
 <script>
-import {db} from '../configFirebase'
+import { db } from "../configFirebase";
 import firebase from "firebase/app";
 import { bus } from "../main";
 
@@ -102,15 +100,8 @@ export default {
   },
   data() {
     return {
-      value1: null,
-      snackbar: false,
-      msg: null,
-      timeout: 3000,
-      color: undefined,
-      userDB: null,
-      dialog: false,
-      currentItem: "Monday",
-      items: [
+      currentDay: "Monday",
+      days: [
         "Monday",
         "Tuesday",
         "Wednesday",
@@ -119,63 +110,22 @@ export default {
         "Saturday",
         "Sunday"
       ],
+      hasDaySubjects: null,
+      daySubjects: [],
+      currentSubject: null,
+      lastDay: null,
+      snackbar: false,
+      msg: null,
+      timeout: 3000,
+      color: undefined,
+      userDB: null,
       hastt: null,
-      subjects: [],
-      select: [],
-      clsBtn: null,
-      defaultSubs: [],
       showtt: true,
       loading: false,
-      style: "opacity: 1",
-      vapidPublicKey:
-        "BO20mIrthZ7c2Y061L0qKpqQDSolCTkY1-zWJhrtP2GmK4-EZrgDho4INHOY_ctEbdacRZ7oEUL_QlxcMmYcRYo",
-      conVapid: null,
+      style: "opacity: 1"
     };
   },
   methods: {
-    urlBase64ToUint8Array(base64String) {
-      const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-      const base64 = (base64String + padding)
-        .replace(/-/g, "+")
-        .replace(/_/g, "/");
-
-      const rawData = window.atob(base64);
-      const outputArray = new Uint8Array(rawData.length);
-
-      for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-      }
-      this.conVapid = outputArray;
-    },
-    configSub() {
-      if (!("serviceWorker" in navigator)) {
-        return;
-      }
-
-      let reg;
-      navigator.serviceWorker.ready
-        .then(swreg => {
-          reg = swreg;
-          return swreg.pushManager.getSubscription();
-        })
-        .then(sub => {
-          if (sub === null) {
-            this.urlBase64ToUint8Array(this.vapidPublicKey);
-            return reg.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: this.conVapid
-            });
-          }
-        })
-        .then(newSub => {
-          let subJSON = JSON.stringify(newSub);
-          let subscriptions = JSON.parse(subJSON);
-          this.userDB.set({ subscriptions }, { merge: true });
-        });
-    },
-    redirect() {
-      this.$router.push("/add_subjects");
-    },
     tabChange() {
       this.loading = true;
       this.style = "opacity: 0.3";
@@ -186,15 +136,13 @@ export default {
           this.style = "opacity: 1";
           if (
             res.data().timetable === undefined ||
-            res.data().timetable[this.currentItem] === undefined ||
-            res.data().timetable[this.currentItem].length === 0
+            res.data().timetable[this.currentDay] === undefined ||
+            res.data().timetable[this.currentDay].length === 0
           ) {
-            this.subjects = res.data().allSubjects;
-            this.select = this.subjects.concat();
+            this.daySubjects = res.data().allSubjects;
             this.hastt = false;
           } else {
-            this.subjects = res.data().timetable[this.currentItem];
-            this.select = this.subjects.concat();
+            this.daySubjects = res.data().timetable[this.currentDay];
             this.hastt = true;
           }
         })
@@ -202,72 +150,6 @@ export default {
           console.log(err);
         });
     },
-    doneBtn() {
-      if (!this.value1) {
-        this.msg = "Please Select A Subject";
-        this.snackbar = true;
-        this.color = "red";
-      } else if (this.value1) {
-        this.subjects.push(this.value1);
-        this.value1 = null;
-      }
-    },
-    clsBtnFunc() {
-      this.dialog = false;
-      if (this.clsBtn) {
-        this.subjects = this.select.concat();
-        this.clsBtn = false;
-      }
-    },
-    saveSubjects() {
-      let obj = {};
-      this.select = this.subjects.concat();
-      obj[this.currentItem] = this.select;
-
-      this.userDB
-        .set(
-          {
-            timetable: obj
-          },
-          { merge: true }
-        )
-        .then(() => {
-          this.color = "success";
-          this.msg = `Timetable Created for ${this.currentItem}`;
-          this.snackbar = true;
-
-          this.loading = true;
-          this.style = "opacity: 0.3";
-          this.userDB.get().then(res => {
-            this.loading = false;
-            this.style = "opacity: 1";
-
-            Notification.requestPermission(res => {
-              if (res !== "granted") {
-                console.log("Permission Denied");
-              } else {
-                console.log("Permission Accepted");
-                this.configSub();
-              }
-            });
-
-            if (res.data().timetable[this.currentItem].length === 0) {
-              this.subjects = res.data().allSubjects;
-              this.select = this.subjects.concat();
-              this.hastt = false;
-            } else {
-              this.subjects = res.data().timetable[this.currentItem];
-              this.select = this.subjects.concat();
-              this.hastt = true;
-            }
-          });
-        });
-      this.dialog = false;
-    },
-    clearBtn(index, subject) {
-      this.subjects.splice(this.subjects.indexOf(this.subjects[index]), 1);
-      this.clsBtn = true;
-    }
   },
   mounted() {
     this.loading = true;
@@ -276,18 +158,16 @@ export default {
       .get()
       .then(res => {
         this.loading = false;
-        this.style = "opacity: 1"
+        this.style = "opacity: 1";
         if (
           res.data().timetable === undefined ||
-          res.data().timetable[this.currentItem] === undefined ||
-          res.data().timetable[this.currentItem].length === 0
+          res.data().timetable[this.currentDay] === undefined ||
+          res.data().timetable[this.currentDay].length === 0
         ) {
-          this.subjects = res.data().allSubjects;
-          this.select = this.subjects.concat();
+          this.daySubjects = res.data().allSubjects;
           this.hastt = false;
         } else {
-          this.subjects = res.data().timetable[this.currentItem];
-          this.select = this.subjects.concat();
+          this.daySubjects = res.data().timetable[this.currentDay];
           this.hastt = true;
         }
       })
@@ -305,7 +185,7 @@ export default {
       if (res.data().allSubjects === undefined) {
         this.showtt = false;
       } else {
-        this.defaultSubs = res.data().allSubjects;
+        this.daySubjects = res.data().allSubjects;
         this.showtt = true;
       }
     });

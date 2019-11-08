@@ -44,14 +44,14 @@
               </v-card>
             </v-flex>
 
-            <!-- <v-flex xs12 sm6 md4 pa-1>
+            <v-flex xs12 sm6 md4 pa-1>
               <v-card>
                 <v-layout row>
                   <v-card-title>History</v-card-title>
                 </v-layout>
                 <v-date-picker v-model="date1" no-title readonly :events="dateEvent" full-width></v-date-picker>
               </v-card>
-            </v-flex>-->
+            </v-flex>
           </v-layout>
         </v-container>
       </div>
