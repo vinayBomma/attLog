@@ -5,9 +5,6 @@ interactive faq
 IN PRODUCTION: 
 CHANGE URL EMAIL LINK
 
-timetable tabs slide
-statistics page bottam nav
-
 compress avatar
 change avatars
 change name
@@ -26,13 +23,13 @@ color app - 2
 att status on home page - 2
 attDates events in homeDate - 3
 
+loop through docs where the email exists, and send the notification
+
 play store img descript
 app-signing
 
 windows store add
 cross platform find more new info installation instructions
-
-feature discovery
 
 production tips:
 enable sw

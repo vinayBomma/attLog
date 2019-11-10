@@ -68,7 +68,7 @@
 
       <!-- Edit Icon Timetable !-->
       <template v-if="$route.name === 'timetable'">
-        <v-dialog v-model="editTimetable">
+        <v-dialog v-model="editTimetable" lazy>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on">edit</v-icon>
           </template>
@@ -316,7 +316,7 @@
     <!-- ============== !-->
 
     <!-- Create Timetable Intro !-->
-    <v-dialog v-model="appIntro4" persistent scrollable>
+    <v-dialog v-model="appIntro4" persistent scrollable lazy>
       <v-card>
         <v-card-title
           class="justify-center subheading"

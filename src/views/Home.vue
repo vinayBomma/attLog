@@ -3,14 +3,16 @@
     <div :style="style">
       <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
       <v-container fluid>
-        <v-layout row wrap>
-          <template v-if="!attLogged && hasSubjects">
+        <v-layout row wrap v-if="!attLogged && hasSubjects && hastt">
+          <template>
             <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
-              <v-card style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );">
+              <v-card
+                style="border-radius: 20px;background-image: linear-gradient( 110.7deg,  rgba(9,154,151,1) 6.3%, rgba(21,205,168,1) 90.6% );"
+              >
                 <v-card-title primary-title class="title">
                   {{ val }}
                   <v-layout justify-end>
-                    <v-icon class="mx-1" @click="presentSub(val, $event)" medium>done</v-icon>
+                    <v-icon class="mx-1" @click="presentSub(val, $event)" medium>check</v-icon>
                     <v-icon class="mx-1" @click="absentSub(val, $event)" medium>clear</v-icon>
                     <v-icon class="mx-1" @click="cancelSub(val, $event)" medium>remove</v-icon>
                   </v-layout>
@@ -24,34 +26,63 @@
               round
               block
               class="mx-5"
-            >Submit Attendance</v-btn>
+            >Submit</v-btn>
           </template>
-
-          <v-flex xs12 sm6 md4 pa-1 v-else-if="attLogged">
-            <v-card>
-              <v-card-text>Attendance Has Been Logged For This Day</v-card-text>
-            </v-card>
-          </v-flex>
-
-          <v-flex xs12 sm6 md4 pa-1 v-else-if="!hasSubjects">
-            <v-card @click="redirect">
-              <v-card-text>No Timetable Added For {{this.day}}</v-card-text>
-            </v-card>
-            <v-card class="mt-2">
-              <v-card-text>
-                Click
-                <router-link to="/add_subjects">Here</router-link>To Add Subjects
-              </v-card-text>
-            </v-card>
-          </v-flex>
         </v-layout>
+
+        <v-flex xs12 sm6 md4 pa-1 v-else-if="attLogged">
+          <v-card>
+            <v-card-text>Attendance Has Been Logged For This Day</v-card-text>
+          </v-card>
+        </v-flex>
+
+        <!-- No Timetable created !-->
+        <v-card
+          v-if="hasSubjects && !hastt"
+          style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
+        >
+          <v-card-title class="justify-center">
+            <v-icon x-large color="white">info</v-icon>
+          </v-card-title>
+          <v-card-text
+            class="subheading"
+            style="letter-spacing: 2px; text-align:center;"
+          >Timetable not created for {{day}}.</v-card-text>
+          <v-card-actions class="justify-end pa-3">
+            <v-icon large @click="$router.push({path: '/timetable'})">arrow_right_alt</v-icon>
+          </v-card-actions>
+        </v-card>
+        <!-- ============== !-->
+
+        <!-- No Subjects Added !-->
+        <v-card
+          flat
+          v-else-if="!hasSubjects"
+          style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
+        >
+          <v-card-title class="justify-center">
+            <v-icon x-large color="white">error</v-icon>
+          </v-card-title>
+          <v-card-text
+            class="subheading"
+            style="letter-spacing: 2px; text-align:center;"
+          >No subjects have been added yet!</v-card-text>
+          <v-card-actions class="justify-end pa-3">
+            <v-icon large @click="$router.push({path: '/add_subjects'})">arrow_right_alt</v-icon>
+          </v-card-actions>
+        </v-card>
+        <!-- ============== !-->
       </v-container>
     </div>
+
+    <!-- Snackbar !-->
     <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
       {{ msg }}
       <v-btn flat @click="snackbar === false">Close</v-btn>
     </v-snackbar>
+    <!-- ============== !-->
 
+    <!-- Loader !-->
     <v-dialog v-model="loading" persistent full-width>
       <v-card color="transparent">
         <v-layout v-model="loading" justify-center pa-3>
@@ -62,6 +93,7 @@
         </v-layout>
       </v-card>
     </v-dialog>
+    <!-- ============== !-->
   </div>
 </template>
 
@@ -99,13 +131,11 @@ export default {
       sendReq: true,
       loading: false,
       style: "opacity: 1",
-      attLogged: null
+      attLogged: null,
+      hastt: null
     };
   },
   methods: {
-    redirect() {
-      this.$router.push("/timetable");
-    },
     subjVerify(event, color, color2, color3, mode, value) {
       let iconNode = event.target.parentNode.children;
 
@@ -133,7 +163,7 @@ export default {
         this.cancelled.splice(this.cancelled.indexOf(value), 1);
       }
 
-      this.subjVerify(event, "green", "red", "grey", this.present, value);
+      this.subjVerify(event, "black", "red", "brown", this.present, value);
       // console.log("Present: ", this.present);
     },
     absentSub(value, event) {
@@ -143,7 +173,7 @@ export default {
         this.cancelled.splice(this.cancelled.indexOf(value), 1);
       }
 
-      this.subjVerify(event, "red", "green", "grey", this.absent, value);
+      this.subjVerify(event, "red", "black", "brown", this.absent, value);
       // console.log("Absent: ", this.absent);
     },
     cancelSub(value, event) {
@@ -153,7 +183,7 @@ export default {
         this.absent.splice(this.absent.indexOf(value), 1);
       }
 
-      this.subjVerify(event, "grey", "red", "green", this.cancelled, value);
+      this.subjVerify(event, "brown", "red", "black", this.cancelled, value);
       // console.log("Cancelled: ", this.cancelled);
     },
     submit() {
@@ -227,7 +257,7 @@ export default {
 
                 if (this.present.includes(someValue)) {
                   verifyAtt("present", someValue, "presentDates", "inc");
-                  console.log(obj)
+                  console.log(obj);
                 } else if (this.absent.includes(someValue)) {
                   verifyAtt("absent", someValue, "absentDates", "dec");
                 } else if (this.cancelled.includes(someValue)) {
@@ -254,7 +284,7 @@ export default {
                 }
               }
 
-              console.log(obj)
+              console.log(obj);
 
               if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
                 if (this.attendData.length === 0) {
@@ -269,16 +299,20 @@ export default {
                 }
 
                 dbData = obj;
-                console.log(dbData)
-                this.userDB.set({ data: dbData, attendance: this.attendData }, { merge: true })
+                console.log(dbData);
+                this.userDB
+                  .set(
+                    { data: dbData, attendance: this.attendData },
+                    { merge: true }
+                  )
                   .then(() => {
                     this.$router.go({ name: "home" });
                   });
                 // this.userDB
                 //   .set({ attendance: this.attendData }, { merge: true })
-                  // .then(() => {
-                  //   this.$router.go({ name: "home" });
-                  // });
+                // .then(() => {
+                //   this.$router.go({ name: "home" });
+                // });
               }
             }
           })
@@ -294,6 +328,8 @@ export default {
       this.userDB = db.collection("attData").doc(user.uid);
     }
 
+    const self = this;
+
     bus.$on("dateValue", data => {
       this.day = data.date;
       this.currentMonth = data.currentMonth;
@@ -303,37 +339,10 @@ export default {
 
       this.loading = true;
       this.style = "opacity: 0.3";
-      this.userDB.get().then(res => {
-        this.loading = false;
-        this.style = "opacity: 1";
 
-        if (res.data().allSubjects === undefined) {
-          this.hasSubjects = false;
-        }
-
-        if (res.data().timetable[this.day] !== undefined) {
-          let dayValue = res.data()["timetable"][this.day];
-
-          if (dayValue.length > 0) {
-            this.subj = dayValue;
-            this.hasSubjects = true;
-          } else if (dayValue.length === 0) {
-            this.hasSubjects = false;
-          } else {
-            this.hasSubjects = false;
-          }
-        } else {
-          this.hasSubjects = false;
-        }
-
-        if (res.data().attendance) {
-          if (res.data().attendance.includes(this.currentFullDate)) {
-            this.attLogged = true;
-          } else {
-            this.attLogged = false;
-          }
-        }
-      });
+      getTimetable();
+      this.loading = false;
+      this.style = "opacity: 1";
     });
 
     let days = [
@@ -365,51 +374,66 @@ export default {
     this.currentDate = new Date().getDate();
     this.day = days[new Date().getDay()];
 
-    this.loading = true;
-    this.style = "opacity: 0.3";
-    this.userDB.get().then(res => {
-      this.loading = false;
-      this.style = "opacity: 1";
+    function getTimetable() {
+      self.loading = true;
+      self.style = "opacity: 0.3";
+      self.userDB.get().then(res => {
+        self.loading = false;
+        self.style = "opacity: 1";
 
-      if (res.data().attendance !== undefined) {
-        let attDates = res.data().attendance;
+        if (res.data().attendance !== undefined) {
+          let attDates = res.data().attendance;
 
-        if (attDates === undefined || attDates.length === 0) {
-          this.attendData = [];
-        } else if (attDates.length > 0) {
-          this.attendData = attDates;
+          if (attDates === undefined || attDates.length === 0) {
+            self.attendData = [];
+          } else if (attDates.length > 0) {
+            self.attendData = attDates;
+          }
         }
-      }
 
-      if (res.data().attendance) {
-        if (
-          res.data().attendance.includes(new Date().toISOString().substr(0, 10))
-        ) {
-          this.attLogged = true;
+        // Attlogged
+        if (res.data().attendance) {
+          if (self.currentFullDate) {
+            if (res.data().attendance.includes(self.currentFullDate)) {
+              self.attLogged = true;
+            } else {
+              self.attLogged = false;
+            }
+          } else {
+            if (
+              res
+                .data()
+                .attendance.includes(new Date().toISOString().substr(0, 10))
+            ) {
+              self.attLogged = true;
+            } else {
+              self.attLogged = false;
+            }
+          }
+        }
+        // ==============
+
+        if (res.data().allSubjects === undefined) {
+          self.hasSubjects = false;
+        }
+
+        if (res.data().timetable[self.day] !== undefined) {
+          let dayValue = res.data()["timetable"][self.day];
+
+          if (dayValue.length > 0) {
+            self.subj = dayValue;
+            self.hasSubjects = true;
+            self.hastt = true;
+          } else {
+            self.hastt = false;
+          }
         } else {
-          this.attLogged = false;
+          self.hastt = false;
         }
-      }
+      });
+    }
 
-      if (res.data().allSubjects === undefined) {
-        this.hasSubjects = false;
-      }
-
-      if (res.data().timetable[this.day] !== undefined) {
-        let dayValue = res.data()["timetable"][this.day];
-
-        if (dayValue.length > 0) {
-          this.subj = dayValue;
-          this.hasSubjects = true;
-        } else if (dayValue.length === 0) {
-          this.hasSubjects = false;
-        } else {
-          this.hasSubjects = false;
-        }
-      } else {
-        this.hasSubjects = false;
-      }
-    });
+    getTimetable();
   }
 };
 </script>

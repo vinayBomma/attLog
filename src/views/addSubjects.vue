@@ -11,7 +11,7 @@
           :key="i"
         >
           <v-card-text>
-            <span class="letter-spacing: 2px;">{{ i + 1}}. {{ sub }}</span>
+            <span class="subheading" style="letter-spacing: 2px;">{{ i + 1}}. {{ sub }}</span>
           </v-card-text>
         </v-card>
       </template>
