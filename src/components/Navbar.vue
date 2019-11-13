@@ -25,7 +25,20 @@
       </v-btn>
       <!-- ==============  !-->
 
-      <homeDate></homeDate>
+      <!-- Home Date Picker !-->
+      <template v-if="$route.name === 'home'">
+        <v-dialog v-model="modal" :return-value.sync="date" lazy full-width width="290px">
+          <template v-slot:activator="{ on }">
+            <v-icon v-model="date" v-on="on">today</v-icon>
+          </template>
+          <v-date-picker v-model="date" :events="objectDates">
+            <v-spacer></v-spacer>
+            <v-btn aria-label="Cancel" flat color="primary" @click="modal = false">Cancel</v-btn>
+            <v-btn aria-label="Ok" flat color="primary" @click="saveDate">OK</v-btn>
+          </v-date-picker>
+        </v-dialog>
+      </template>
+      <!-- ==============  !-->
 
       <!-- Edit Icon Subjects !-->
       <template v-if="$route.name === 'add_subjects'">
@@ -376,15 +389,11 @@
 import { db } from "../configFirebase";
 import firebase from "firebase/app";
 import axios from "axios";
+import { bus } from "../main";
 
 import { messaging } from "../configFirebase";
 
-const homeDate = () => import("./homeDate");
-
 export default {
-  components: {
-    homeDate
-  },
   data() {
     return {
       avatars: [
@@ -462,7 +471,13 @@ export default {
       currentSubject: null,
       lastDay: null,
       editSub: null,
-      editTimetable: null
+      editTimetable: null,
+      modal: null,
+      currentDate: null,
+      currentMonth: null,
+      currentFullDate: null,
+      currentYear: null,
+      objectDates: {},
     };
   },
   methods: {
@@ -642,7 +657,7 @@ export default {
       this.subjects.splice(index, 1);
     },
     saveSubjects() {
-      let obj = {}
+      let obj = {};
 
       if (this.subjects.length > 0) {
         for (var i in this.subjects) {
@@ -654,7 +669,7 @@ export default {
           .set(
             {
               allSubjects: this.subjects,
-              data: obj,
+              data: obj
             },
             { merge: true }
           );
@@ -767,8 +782,8 @@ export default {
         this.snackbar = true;
       }
     },
-    closeEditTT(){
-      this.$router.push({path: '/'})
+    closeEditTT() {
+      this.$router.push({ path: "/" });
       this.editTimetable = null;
     },
     googleLogout() {
@@ -786,6 +801,48 @@ export default {
             console.log(err);
           });
       }
+    },
+    saveDate() {
+      let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ];
+      let months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sept",
+        "Oct",
+        "Nov",
+        "Dec"
+      ];
+
+      let obj = {};
+
+      this.currentMonth = months[new Date(this.date).getMonth()];
+      this.currentDate = new Date(this.date).getDate();
+      this.currentYear = new Date(this.date).getFullYear();
+      this.currentFullDate = this.date;
+      this.date = days[new Date(this.date).getDay()];
+
+      obj["date"] = this.date;
+      obj["currentMonth"] = this.currentMonth;
+      obj["currentDate"] = this.currentDate;
+      obj["currentYear"] = this.currentYear;
+      obj["currentFullDate"] = this.currentFullDate;
+
+      bus.$emit("dateValue", obj);
+      this.modal = !this.modal;
     }
 
     // nightMode() {
@@ -882,6 +939,11 @@ export default {
               this.userPhoto.push(res.data().photoURL);
               this.userName = res.data().displayName;
               this.attCriteria = res.data().attCriteria;
+              let attDates = res.data().attendance;
+              for(let i in attDates){
+                this.objectDates[attDates[i]] = ['green']
+              }
+
               if (res.data().allSubjects.length > 0) {
                 this.hasSubject = true;
                 this.subjects = res.data().allSubjects;
