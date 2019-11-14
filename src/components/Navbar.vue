@@ -21,7 +21,7 @@
         style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
         @click="register = true"
       >
-        <v-icon left>email</v-icon>Sign In
+        <v-icon left>email</v-icon>Sign Up
       </v-btn>
       <!-- ==============  !-->
 
@@ -132,7 +132,7 @@
     </v-toolbar>
 
     <!-- Sign Out !-->
-    <v-navigation-drawer v-model="drawer" app style="background-color: teal">
+    <v-navigation-drawer v-model="drawer" app>
       <v-dialog v-model="signOutModal" full-width>
         <template v-slot:activator="{ on }">
           <v-layout align-start justify-end row class="pa-3">
@@ -140,10 +140,11 @@
           </v-layout>
         </template>
         <v-card>
-          <v-card-title>Are You Sure You Want To Sign Out?</v-card-title>
+          <v-card-title class="subheading justify-center" style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );">Sign Out</v-card-title>
+          <v-card-text class="subheading" style="text-align: center; word-spacing: 2px; letter-spacing: 2px">Are you sure you want to sign out?</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn aria-label="No" flat color="blue" @click="signOutModal = false">No</v-btn>
+            <v-btn aria-label="No" flat color="blue" @click="signOutModal = false">Cancel</v-btn>
             <v-btn aria-label="Yes" flat color="blue" @click="googleLogout">Yes</v-btn>
           </v-card-actions>
         </v-card>
@@ -193,7 +194,7 @@
       <v-card
         style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
       >
-        <v-card-title class="headline justify-center">Login</v-card-title>
+        <v-card-title class="headline justify-center">Sign Up</v-card-title>
         <v-card-text>
           <v-layout row>
             <v-flex xs-3 md-4>
@@ -368,7 +369,7 @@
           </v-tabs-items>
         </v-card-text>
         <v-card-actions class="justify-end pa-3">
-          <v-btn flat @click="appIntro4 = false">Skip</v-btn>
+          <v-btn flat @click="ttIntro">Skip</v-btn>
           <v-btn round @click="saveTimetable">Save</v-btn>
           <v-btn round v-if="lastDay" @click="appIntro4 = false">Close</v-btn>
         </v-card-actions>
@@ -490,8 +491,8 @@ export default {
         this.register = false;
 
         let actionCodeSettings = {
-          // url: "https://attendit.firebaseapp.com/signup",
-          url: "http://localhost:8080/signup",
+          url: "https://attendit.firebaseapp.com/signup",
+          // url: "http://localhost:8080/signup",
           handleCodeInApp: true
         };
 
@@ -733,6 +734,10 @@ export default {
         this.color = "red";
         this.snackbar = true;
       }
+    },
+    ttIntro(){
+      this.appIntro4 = false;
+      this.$router.go({path: '/'})
     },
     tabChange() {
       db.collection("attData")

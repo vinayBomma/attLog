@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :style="style">
+    <div :style="style">  
       <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
       <v-container fluid>
         <v-layout row wrap v-if="!attLogged && hasSubjects && hastt">
@@ -20,21 +20,26 @@
                 <v-card-text>Status: Nothing to show yet!</v-card-text>
               </v-card>
             </v-flex>
-            <v-btn
-              color="cyan darken-1"
-              v-on:click="submit()"
-              round
-              block
-              class="mx-5"
-            >Submit</v-btn>
+            <v-btn color="cyan darken-1" v-on:click="submit()" round block class="mx-5">Submit</v-btn>
           </template>
         </v-layout>
+        
 
-        <v-flex xs12 sm6 md4 pa-1 v-else-if="attLogged">
-          <v-card>
-            <v-card-text>Attendance Has Been Logged For This Day</v-card-text>
-          </v-card>
-        </v-flex>
+        <!-- Attendance Logged !-->
+        <v-card
+          flat
+          v-else-if="attLogged"
+          style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
+        >
+          <v-card-title class="justify-center">
+            <v-icon x-large color="white">check_circle</v-icon>
+          </v-card-title>
+          <v-card-text
+            class="subheading"
+            style="letter-spacing: 2px; text-align:center;"
+          >Attendance has been logged for this day!</v-card-text>
+        </v-card>
+        <!-- ============== !-->
 
         <!-- No Timetable created !-->
         <v-card
@@ -164,7 +169,6 @@ export default {
       }
 
       this.subjVerify(event, "black", "red", "brown", this.present, value);
-      // console.log("Present: ", this.present);
     },
     absentSub(value, event) {
       if (this.present.includes(value)) {
@@ -174,7 +178,6 @@ export default {
       }
 
       this.subjVerify(event, "red", "black", "brown", this.absent, value);
-      // console.log("Absent: ", this.absent);
     },
     cancelSub(value, event) {
       if (this.present.includes(value)) {
@@ -184,7 +187,6 @@ export default {
       }
 
       this.subjVerify(event, "brown", "red", "black", this.cancelled, value);
-      // console.log("Cancelled: ", this.cancelled);
     },
     submit() {
       let cDate;
@@ -197,12 +199,12 @@ export default {
 
       if (this.attendData.includes(cDate)) {
         this.color = "error";
-        this.msg = "Attendance Cannot Be Relogged";
+        this.msg = "Attendance Cannot Be Relogged!";
         this.snackbar = true;
         this.sendReq = false;
       } else {
         this.color = "success";
-        this.msg = "Attendance Logged";
+        this.msg = "Attendance has been logged!";
         this.snackbar = true;
         this.sendReq = true;
       }
@@ -257,7 +259,7 @@ export default {
 
                 if (this.present.includes(someValue)) {
                   verifyAtt("present", someValue, "presentDates", "inc");
-                  console.log(obj);
+                  // console.log(obj);
                 } else if (this.absent.includes(someValue)) {
                   verifyAtt("absent", someValue, "absentDates", "dec");
                 } else if (this.cancelled.includes(someValue)) {
@@ -284,7 +286,7 @@ export default {
                 }
               }
 
-              console.log(obj);
+              // console.log(obj);
 
               if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
                 if (this.attendData.length === 0) {
@@ -299,7 +301,7 @@ export default {
                 }
 
                 dbData = obj;
-                console.log(dbData);
+                // console.log(dbData);
                 this.userDB
                   .set(
                     { data: dbData, attendance: this.attendData },
@@ -341,6 +343,7 @@ export default {
       this.style = "opacity: 0.3";
 
       getTimetable();
+      
       this.loading = false;
       this.style = "opacity: 1";
     });

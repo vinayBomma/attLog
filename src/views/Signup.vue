@@ -3,7 +3,6 @@
     <section id="full-carousel">
       <v-carousel height="100%" :cycle="cycle" hide-controls>
         <v-carousel-item v-for="(slide, i) in slides" :key="i">
-          <!-- <v-sheet height="92vh" :color="slide.color"> -->
             <v-sheet height="92vh" :style="slide.color">
             <v-layout align-start justify-center>
               <v-img class="mt-3" :src="slide.image" max-height="300" max-width="300"></v-img>
@@ -64,7 +63,7 @@ export default {
           color: "background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(51,102,153,1) 0%, rgba(68,116,163,1) 90% );",
           image: require("../../public/computing-cloud.svg"),
           info:
-            "We embrace powerful new technologies which help us simplify user experience. No need to regularly install a new update. When there is a new update available, Attend It updates itself just by restarting the app!"
+            "We embrace powerful new technologies which help us simplify user experience. When there is a new update available, Attend It updates without any interruptions!"
         }
       ],
       cycle: false
