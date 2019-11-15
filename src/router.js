@@ -45,6 +45,14 @@ const router = new Router({
         requiresAuth: true
       }
     },
+    // {
+    //   path: '/duels',
+    //   name: 'duels',
+    //   component: () => import( './views/Duels.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   }
+    // },
     {
       path: '/signup',
       name: 'signup',

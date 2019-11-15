@@ -5,6 +5,8 @@ interactive faq
 IN PRODUCTION: 
 CHANGE URL EMAIL LINK
 
+status
+
 compress avatar
 change avatars
 change name

@@ -25,6 +25,30 @@
       </v-btn>
       <!-- ==============  !-->
 
+
+      <!-- Home Reset Attendance !-->
+      <template v-if="$route.name === 'home' && attDates.includes(currentFullDate)">
+        <v-dialog v-model="restoreModal">
+          <template v-slot:activator="{ on }">
+            <v-icon v-on="on" @click="restoreModal = true" class="mr-4">restore</v-icon>
+          </template>
+          <v-card>
+            <v-card-title
+              class="justify-center subheading"
+              style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+            >Reset Attendance</v-card-title>
+            <v-card-text class="subheading" style="text-align: center; word-spacing: 2px; letter-spacing: 2px">Are you sure you want to reset your attendance for this day?</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn aria-label="No" flat color="blue" @click="restoreModal = false">Cancel</v-btn>
+            <v-btn aria-label="Yes" flat color="blue" @click="restoreAtt">Yes</v-btn>
+          </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </template>
+      <!-- ==============  !-->
+
+
       <!-- Home Date Picker !-->
       <template v-if="$route.name === 'home'">
         <v-dialog v-model="modal" :return-value.sync="date" lazy full-width width="290px">
@@ -39,6 +63,7 @@
         </v-dialog>
       </template>
       <!-- ==============  !-->
+
 
       <!-- Edit Icon Subjects !-->
       <template v-if="$route.name === 'add_subjects'">
@@ -479,6 +504,8 @@ export default {
       currentFullDate: null,
       currentYear: null,
       objectDates: {},
+      attDates: [],
+      restoreModal: null,
     };
   },
   methods: {
@@ -848,6 +875,10 @@ export default {
 
       bus.$emit("dateValue", obj);
       this.modal = !this.modal;
+    },
+    restoreAtt(){
+      bus.$emit('currentDate', this.currentFullDate);
+      this.restoreModal = !this.restoreModal
     }
 
     // nightMode() {
@@ -944,9 +975,9 @@ export default {
               this.userPhoto.push(res.data().photoURL);
               this.userName = res.data().displayName;
               this.attCriteria = res.data().attCriteria;
-              let attDates = res.data().attendance;
-              for(let i in attDates){
-                this.objectDates[attDates[i]] = ['green']
+              this.attDates = res.data().attendance;
+              for(let i in this.attDates){
+                this.objectDates[this.attDates[i]] = ['green']
               }
 
               if (res.data().allSubjects.length > 0) {

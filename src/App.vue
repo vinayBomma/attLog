@@ -32,6 +32,7 @@ export default {
       bottomNav: [
         { name: "Home", icon: "home", link: "/" },
         { name: "Statistics", icon: "insert_chart", link: "statistics" },
+        // { name: "Duels", icon: "../public/duel.png", link: "duels" },
         { name: "Timetable", icon: "today", link: "timetable" },
         { name: "Subjects", icon: "book", link: "add_subjects" }
       ]

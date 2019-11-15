@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :style="style">  
+    <div :style="style">
       <v-subheader>{{ currentDate }} {{ currentMonth }}, {{ day }}</v-subheader>
       <v-container fluid>
         <v-layout row wrap v-if="!attLogged && hasSubjects && hastt">
@@ -12,9 +12,17 @@
                 <v-card-title primary-title class="title">
                   {{ val }}
                   <v-layout justify-end>
-                    <v-icon class="mx-1" @click="presentSub(val, $event)" medium>check</v-icon>
-                    <v-icon class="mx-1" @click="absentSub(val, $event)" medium>clear</v-icon>
-                    <v-icon class="mx-1" @click="cancelSub(val, $event)" medium>remove</v-icon>
+                    <v-icon
+                      class="mx-1"
+                      @click="presentSub(val, $event)"
+                      medium
+                    >check_circle_outline</v-icon>
+                    <v-icon class="mx-1" @click="absentSub(val, $event)" medium>highlight_off</v-icon>
+                    <v-icon
+                      class="mx-1"
+                      @click="cancelSub(val, $event)"
+                      medium
+                    >remove_circle_outline</v-icon>
                   </v-layout>
                 </v-card-title>
                 <v-card-text>Status: Nothing to show yet!</v-card-text>
@@ -23,7 +31,6 @@
             <v-btn color="cyan darken-1" v-on:click="submit()" round block class="mx-5">Submit</v-btn>
           </template>
         </v-layout>
-        
 
         <!-- Attendance Logged !-->
         <v-card
@@ -123,6 +130,9 @@ export default {
       timeout: 3000,
       color: undefined,
       subj: [],
+      dupeSubj: [],
+      dupeTimetable: [],
+      isDupe: null,
       present: [],
       absent: [],
       cancelled: [],
@@ -209,6 +219,19 @@ export default {
         this.sendReq = true;
       }
 
+      for (let i in this.subj) {
+        let count = 0;
+        for (let j = 0; j <= this.subj.length; j++) {
+          if (this.subj[i] === this.subj[j]) {
+            count++;
+            if (count > 1) {
+              this.dupeSubj.push(this.subj[j]);
+              this.subj.splice(this.subj.indexOf(this.subj[j]), 1);
+            }
+          }
+        }
+      }
+
       if (
         this.present.length + this.absent.length + this.cancelled.length !==
         this.subj.length
@@ -259,7 +282,6 @@ export default {
 
                 if (this.present.includes(someValue)) {
                   verifyAtt("present", someValue, "presentDates", "inc");
-                  // console.log(obj);
                 } else if (this.absent.includes(someValue)) {
                   verifyAtt("absent", someValue, "absentDates", "dec");
                 } else if (this.cancelled.includes(someValue)) {
@@ -285,7 +307,6 @@ export default {
                   verifyAtt("cancelled", someValue, "cancelledDates", "eql");
                 }
               }
-
               // console.log(obj);
 
               if (this.subj.indexOf(this.subj[i]) === this.subj.length - 1) {
@@ -301,7 +322,7 @@ export default {
                 }
 
                 dbData = obj;
-                // console.log(dbData);
+                console.log(dbData);
                 this.userDB
                   .set(
                     { data: dbData, attendance: this.attendData },
@@ -310,11 +331,6 @@ export default {
                   .then(() => {
                     this.$router.go({ name: "home" });
                   });
-                // this.userDB
-                //   .set({ attendance: this.attendData }, { merge: true })
-                // .then(() => {
-                //   this.$router.go({ name: "home" });
-                // });
               }
             }
           })
@@ -343,9 +359,68 @@ export default {
       this.style = "opacity: 0.3";
 
       getTimetable();
-      
+
       this.loading = false;
       this.style = "opacity: 1";
+    });
+
+    bus.$on("currentDate", data => {
+      let currDate = data;
+      let currDay = new Date(currDate).getDay();
+      this.userDB.get().then(res => {
+        let attendance = res.data().attendance;
+        let subjects = res.data();
+
+        attendance.splice(attendance.indexOf(currDate), 1);
+
+        Object.keys(subjects.data).forEach((key, index) => {
+          if (
+            subjects.data[key].presentDates ||
+            subjects.data[key].absentDates ||
+            subjects.data[key].cancelledDates
+          ) {
+            if (subjects.data[key].presentDates.includes(currDate)) {
+              subjects.data[key].present -= 1;
+              subjects.data[key].total -= 1;
+              subjects.data[key].presentDates.splice(
+                subjects.data[key].presentDates.indexOf(currDate),
+                1
+              );
+              subjects.data[key].weekdays[currDay] -= 1;
+            } else if (subjects.data[key].absentDates.includes(currDate)) {
+              subjects.data[key].absent -= 1;
+              subjects.data[key].total -= 1;
+              subjects.data[key].absentDates.splice(
+                subjects.data[key].absentDates.indexOf(currDate),
+                1
+              );
+              subjects.data[key].weekdays[currDay] += 1;
+            } else if (subjects.data[key].cancelledDates.includes(currDate)) {
+              subjects.data[key].cancelled -= 1;
+              subjects.data[key].total -= 1;
+              subjects.data[key].cancelledDates.splice(
+                subjects.data[key].cancelledDates.indexOf(currDate),
+                1
+              );
+            }
+          }
+          this.userDB.set(
+            { data: subjects.data, attendance: attendance },
+            { merge: true }
+          ).then(() => {
+            this.$router.go({path: '/'})
+          })
+        });
+
+        // for (let i in subjects) {
+        //   let obj = subjects[i];
+        //   console.log(obj);
+        //   // this.useDB.set(
+        //   //   { data: obj, attendance: attendance },
+        //   //   { merge: true }
+        //   // );
+        // }
+      });
     });
 
     let days = [
@@ -387,7 +462,7 @@ export default {
         if (res.data().attendance !== undefined) {
           let attDates = res.data().attendance;
 
-          if (attDates === undefined || attDates.length === 0) {
+          if (attDates.length === 0) {
             self.attendData = [];
           } else if (attDates.length > 0) {
             self.attendData = attDates;
@@ -425,6 +500,31 @@ export default {
 
           if (dayValue.length > 0) {
             self.subj = dayValue;
+
+            // for(let i = 0; i < dayValue.length; i++){
+            //   let count = 0;
+            //   for(let j in dayValue){
+            //     if(dayValue[i] === dayValue[j]){
+            //       count++
+            //       if(count > 1){
+            //         console.log(self.dupeTimetable)
+            //         self.isDupe = true;
+            //         self.dupeSubj.push(dayValue[j])
+            //         self.dupeTimetable = self.subj.concat()
+            //         self.dupeTimetable.splice(dayValue.indexOf(dayValue[j]), 1)
+            //         for(let k in self.dupeSubj){
+            //           console.log(self.dupeSubj)
+            //           self.dupeTimetable.push(self.dupeSubj[k])
+            //           self.dupeSubj.splice(self.dupeSubj.indexOf(self.dupeSubj[k]), 1)
+            //         }
+            //         console.log(self.dupeTimetable)
+            //         console.log(self.dupeSubj)
+            //         break;
+            //       }
+            //     }
+            //   }
+            // }
+
             self.hasSubjects = true;
             self.hastt = true;
           } else {
