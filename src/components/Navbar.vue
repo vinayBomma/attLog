@@ -176,7 +176,7 @@
       </v-dialog>
       <!-- ==============  !-->
 
-      <!-- Sign In Button !-->
+      <!-- Profile Photo !-->
       <v-layout column align-center v-if="userPhoto && isUser">
         <v-flex class="mt-5">
           <v-avatar size="100">
@@ -969,7 +969,7 @@ export default {
           .get()
           .then(res => {
             if (
-              res.data().photoURL !== undefined &&
+              res.data().photoURL !== undefined &&  
               res.data().displayName !== undefined
             ) {
               this.userPhoto.push(res.data().photoURL);
