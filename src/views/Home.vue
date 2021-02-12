@@ -5,90 +5,105 @@
       <v-container fluid>
         <v-layout row wrap v-if="!attLogged && hasSubjects && hastt">
           <template>
-            <v-flex xs12 sm6 md4 pa-1 v-for="(val, index) in subj" :key="index">
+            <v-flex xs12 sm6 md6 pa-1 v-for="(val, index) in subj" :key="index">
               <v-card
                 style="border-radius: 20px;background-image: linear-gradient( 110.7deg,  rgba(9,154,151,1) 6.3%, rgba(21,205,168,1) 90.6% );"
               >
                 <v-card-title primary-title class="title">
                   {{ val }}
                   <v-layout justify-end>
-                    <v-icon
-                      class="mx-1"
-                      @click="presentSub(val, $event)"
-                      medium
-                    >check_circle_outline</v-icon>
-                    <v-icon class="mx-1" @click="absentSub(val, $event)" medium>highlight_off</v-icon>
-                    <v-icon
-                      class="mx-1"
-                      @click="cancelSub(val, $event)"
-                      medium
-                    >remove_circle_outline</v-icon>
+                    <v-icon class="mx-1" @click="presentSub(val, $event)" medium
+                      >check_circle_outline</v-icon
+                    >
+                    <v-icon class="mx-1" @click="absentSub(val, $event)" medium
+                      >highlight_off</v-icon
+                    >
+                    <v-icon class="mx-1" @click="cancelSub(val, $event)" medium
+                      >remove_circle_outline</v-icon
+                    >
                   </v-layout>
                 </v-card-title>
                 <v-card-text>Status: Nothing to show yet!</v-card-text>
               </v-card>
             </v-flex>
-            <v-btn color="cyan darken-1" v-on:click="submit()" round block class="mx-5">Submit</v-btn>
+            <v-layout class="align-center">
+              <v-btn
+                color="cyan darken-1"
+                v-on:click="submit()"
+                round
+                block
+                class="mx-5"
+                >Submit</v-btn
+              >
+              </v-layout>
           </template>
         </v-layout>
 
         <!-- Attendance Logged !-->
-        <v-card
-          flat
-          v-else-if="attLogged"
-          style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
-        >
-          <v-card-title class="justify-center">
-            <v-icon x-large color="white">check_circle</v-icon>
-          </v-card-title>
-          <v-card-text
-            class="subheading"
-            style="letter-spacing: 2px; text-align:center;"
-          >Attendance has been logged for this day!</v-card-text>
-        </v-card>
+        <v-flex xs12 sm12 md8 offset-md2 pa-1 v-else-if="attLogged">
+          <v-card
+            flat
+            style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
+          >
+            <v-card-title class="justify-center">
+              <v-icon x-large color="white">check_circle</v-icon>
+            </v-card-title>
+            <v-card-text
+              class="subheading"
+              style="letter-spacing: 2px; text-align:center;"
+              >Attendance has been logged for this day!</v-card-text
+            >
+          </v-card>
+        </v-flex>
         <!-- ============== !-->
 
         <!-- No Timetable created !-->
-        <v-card
-          v-if="hasSubjects && !hastt"
-          style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
-        >
-          <v-card-title class="justify-center">
-            <v-icon x-large color="white">info</v-icon>
-          </v-card-title>
-          <v-card-text
-            class="subheading"
-            style="letter-spacing: 2px; text-align:center;"
-          >Timetable not created for {{day}}.</v-card-text>
-          <v-card-actions class="justify-end pa-3">
-            <v-icon large @click="$router.push({path: '/timetable'})">arrow_right_alt</v-icon>
-          </v-card-actions>
-        </v-card>
+        <v-flex xs12 sm12 md8 offset-md2 pa-1 v-if="hasSubjects && !hastt">
+          <v-card
+            @click="$router.push({ path: '/timetable' })"
+            style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
+          >
+            <v-card-title class="justify-center">
+              <v-icon x-large color="white">info</v-icon>
+            </v-card-title>
+            <v-card-text
+              class="subheading"
+              style="letter-spacing: 2px; text-align:center;"
+              >Timetable not created for {{ day }}</v-card-text
+            >
+          </v-card>
+        </v-flex>
         <!-- ============== !-->
 
         <!-- No Subjects Added !-->
-        <v-card
-          flat
-          v-else-if="!hasSubjects"
-          style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
-        >
-          <v-card-title class="justify-center">
-            <v-icon x-large color="white">error</v-icon>
-          </v-card-title>
-          <v-card-text
-            class="subheading"
-            style="letter-spacing: 2px; text-align:center;"
-          >No subjects have been added yet!</v-card-text>
-          <v-card-actions class="justify-end pa-3">
-            <v-icon large @click="$router.push({path: '/add_subjects'})">arrow_right_alt</v-icon>
-          </v-card-actions>
-        </v-card>
+        <v-flex xs12 sm12 md8 offset-md2 pa-1 v-else-if="!hasSubjects">
+          <v-card
+            @click="$router.push({ path: '/add_subjects' })"
+            flat
+            style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
+          >
+            <v-card-title class="justify-center">
+              <v-icon x-large color="white">error</v-icon>
+            </v-card-title>
+            <v-card-text
+              class="subheading"
+              style="letter-spacing: 2px; text-align:center;"
+              >No subjects have been added yet!</v-card-text
+            >
+          </v-card>
+        </v-flex>
         <!-- ============== !-->
       </v-container>
     </div>
 
     <!-- Snackbar !-->
-    <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      multi-line
+      bottom
+      :color="color"
+    >
       {{ msg }}
       <v-btn flat @click="snackbar === false">Close</v-btn>
     </v-snackbar>
@@ -120,7 +135,7 @@ import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
 
 export default {
   components: {
-    OrbitSpinner
+    OrbitSpinner,
   },
   data() {
     return {
@@ -147,7 +162,7 @@ export default {
       loading: false,
       style: "opacity: 1",
       attLogged: null,
-      hastt: null
+      hastt: null,
     };
   },
   methods: {
@@ -263,7 +278,7 @@ export default {
       if (this.sendReq) {
         this.userDB
           .get()
-          .then(res => {
+          .then((res) => {
             for (let i in this.subj) {
               let someValue = this.subj[i];
 
@@ -277,7 +292,7 @@ export default {
                   present: userData.present,
                   absent: userData.absent,
                   cancelled: userData.cancelled,
-                  total: userData.total
+                  total: userData.total,
                 };
 
                 if (this.present.includes(someValue)) {
@@ -296,7 +311,7 @@ export default {
                   present: 0,
                   absent: 0,
                   cancelled: 0,
-                  total: 0
+                  total: 0,
                 };
 
                 if (this.present.includes(someValue)) {
@@ -334,11 +349,11 @@ export default {
               }
             }
           })
-          .catch(err => {
+          .catch((err) => {
             console.log("Errarta: ", err);
           });
       }
-    }
+    },
   },
   created() {
     let user = firebase.auth().currentUser;
@@ -348,7 +363,7 @@ export default {
 
     const self = this;
 
-    bus.$on("dateValue", data => {
+    bus.$on("dateValue", (data) => {
       this.day = data.date;
       this.currentMonth = data.currentMonth;
       this.currentDate = data.currentDate;
@@ -364,16 +379,16 @@ export default {
       this.style = "opacity: 1";
     });
 
-    bus.$on("currentDate", data => {
+    bus.$on("currentDate", (data) => {
       let currDate = data;
       let currDay = new Date(currDate).getDay();
-      this.userDB.get().then(res => {
+      this.userDB.get().then((res) => {
         let attendance = res.data().attendance;
         let subjects = res.data();
 
         attendance.splice(attendance.indexOf(currDate), 1);
 
-        Object.keys(subjects.data).forEach((key, index) => {
+        Object.keys(subjects.data).forEach((key) => {
           if (
             subjects.data[key].presentDates ||
             subjects.data[key].absentDates ||
@@ -404,12 +419,14 @@ export default {
               );
             }
           }
-          this.userDB.set(
-            { data: subjects.data, attendance: attendance },
-            { merge: true }
-          ).then(() => {
-            this.$router.go({path: '/'})
-          })
+          this.userDB
+            .set(
+              { data: subjects.data, attendance: attendance },
+              { merge: true }
+            )
+            .then(() => {
+              this.$router.go({ path: "/" });
+            });
         });
 
         // for (let i in subjects) {
@@ -430,7 +447,7 @@ export default {
       "Wednesday",
       "Thursday",
       "Friday",
-      "Saturday"
+      "Saturday",
     ];
 
     let months = [
@@ -445,7 +462,7 @@ export default {
       "Sept",
       "Oct",
       "Nov",
-      "Dec"
+      "Dec",
     ];
 
     this.currentMonth = months[new Date().getMonth()];
@@ -455,7 +472,7 @@ export default {
     function getTimetable() {
       self.loading = true;
       self.style = "opacity: 0.3";
-      self.userDB.get().then(res => {
+      self.userDB.get().then((res) => {
         self.loading = false;
         self.style = "opacity: 1";
 
@@ -537,6 +554,6 @@ export default {
     }
 
     getTimetable();
-  }
+  },
 };
 </script>

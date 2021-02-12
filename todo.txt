@@ -1,47 +1,30 @@
-404 page
+notification drawer:
+install notes
+About
+contact us
+privacy policy
+changelog
+settings
+feedback
+report bug
+share app
 
-interactive faq
-
-IN PRODUCTION: 
-CHANGE URL EMAIL LINK
-
-status
-
-compress avatar
-change avatars
-change name
+in settings:
 change att criteria
-responsive design
-navigation drawer colors
-duels
+reset attendance
+delete all subjects
+feedback
+report bug
+share app
 
+push notifications
 
-push notifications 
-history view - 3
-timetable dupe subs - 2
-reset attendance - 3
-performance - 1
-color app - 2
-att status on home page - 2
-attDates events in homeDate - 3
-
-loop through docs where the email exists, and send the notification
-
-play store img descript
-app-signing
-
-windows store add
+att status on home page - 2 (You have %d leaves remaininng)
 cross platform find more new info installation instructions
+remove firebase messaging as well
+
 
 production tips:
 enable sw
 remove console log statements
 change cacheName
-
-
-feel free to bunk the next one
-dont feel like attending? then don't.
-
-low on attendance. Attend It (no pun intended)
-
-on track

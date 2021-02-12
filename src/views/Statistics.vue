@@ -2,8 +2,13 @@
   <section>
     <div :style="style">
       <div v-if="showStat">
-        <v-flex xs5 pt-2 pl-2>
-          <v-select :items="items" v-model="currentItem" v-on:change="statChange" solo></v-select>
+        <v-flex xs8 sm6 md3 pt-2 pl-2>
+          <v-select
+            :items="items"
+            v-model="currentItem"
+            v-on:change="statChange"
+            solo
+          ></v-select>
         </v-flex>
         <v-container v-if="!subjectStat">
           <v-card
@@ -16,7 +21,8 @@
             <v-card-text
               class="subheading"
               style="letter-spacing: 2px; text-align:center;"
-            >Statistics not available for this subject!</v-card-text>
+              >Statistics not available for this subject!</v-card-text
+            >
           </v-card>
         </v-container>
         <v-container v-else-if="subjectStat">
@@ -25,7 +31,12 @@
             <v-flex xs12 sm12 md4 pl-1 pr-1 pb-1>
               <v-card>
                 <div id="doughnut" style="display: block;">
-                  <canvas id="mychart1" width="400" height="300" class="pa-2"></canvas>
+                  <canvas
+                    id="mychart1"
+                    width="400"
+                    height="300"
+                    class="pa-2"
+                  ></canvas>
                 </div>
               </v-card>
             </v-flex>
@@ -42,10 +53,13 @@
                     color="teal"
                     :value="value"
                     class="mt-2"
-                  >{{value}}%</v-progress-circular>
+                    >{{ value }}%</v-progress-circular
+                  >
                 </v-layout>
                 <v-layout justify-center>
-                  <v-card-text style="letter-spacing:1px; text-align:center">Attendance</v-card-text>
+                  <v-card-text style="letter-spacing:1px; text-align:center"
+                    >Attendance</v-card-text
+                  >
                 </v-layout>
               </v-card>
             </v-flex>
@@ -55,23 +69,35 @@
             <v-flex xs6 sm6 md4 pa-1>
               <v-card>
                 <v-layout justify-center>
-                  <v-card-title class="display-3">{{sign}}{{ leaves }}</v-card-title>
+                  <v-card-title class="display-3"
+                    >{{ sign }}{{ leaves }}</v-card-title
+                  >
                 </v-layout>
                 <v-layout justify-center>
-                  <v-card-text style="letter-spacing:1px; text-align:center">Leaves Remaining</v-card-text>
+                  <v-card-text style="letter-spacing:1px; text-align:center"
+                    >Leaves Remaining</v-card-text
+                  >
                 </v-layout>
               </v-card>
             </v-flex>
             <!-- ============== !-->
 
             <!-- History View !-->
-            <v-flex xs12 sm6 md4 pa-1>
+            <v-flex xs12 sm6 md8 offset-md2 pa-1>
               <v-card>
                 <v-card-title
                   class="subheading"
                   style="letter-spacing: 2px; background-image: linear-gradient( 110.7deg,  rgba(9,154,151,1) 6.3%, rgba(21,205,168,1) 90.6% );"
-                >History</v-card-title>
-                <v-date-picker v-model="date1" no-title readonly :events="objectDates" full-width></v-date-picker>
+                  >History</v-card-title
+                >
+                <v-date-picker
+                  v-model="date1"
+                  no-title
+                  readonly
+                  :events="objectDates"
+                  full-width
+                  color="yellow darken-1"
+                ></v-date-picker>
               </v-card>
             </v-flex>
             <!-- ============== !-->
@@ -93,7 +119,8 @@
         <v-card-text
           class="subheading"
           style="letter-spacing: 2px; text-align:center;"
-        >No statistics available!</v-card-text>
+          >No statistics available!</v-card-text
+        >
       </v-card>
     </v-container>
     <!-- ============== !-->
@@ -125,7 +152,7 @@ import OrbitSpinner from "epic-spinners/src/components/lib/OrbitSpinner";
 
 export default {
   components: {
-    OrbitSpinner
+    OrbitSpinner,
   },
   data() {
     return {
@@ -147,7 +174,7 @@ export default {
       cancelledDates: [],
       objectDates: null,
       subjectStat: true,
-      attCriteria: 75
+      attCriteria: 75,
     };
   },
   methods: {
@@ -156,7 +183,7 @@ export default {
       new Chart(ctx, {
         type: chartData.type,
         data: chartData.data,
-        options: chartData.options
+        options: chartData.options,
       });
     },
     pieChart() {
@@ -174,7 +201,7 @@ export default {
                 "rgba(255, 206, 86, 0.2)",
                 "rgba(75, 192, 192, 0.2)",
                 "rgba(153, 102, 255, 0.2)",
-                "rgba(255, 159, 64, 0.2)"
+                "rgba(255, 159, 64, 0.2)",
               ],
               borderColor: [
                 "rgba(255, 99, 132, 1)",
@@ -182,19 +209,19 @@ export default {
                 "rgba(255, 206, 86, 1)",
                 "rgba(75, 192, 192, 1)",
                 "rgba(153, 102, 255, 1)",
-                "rgba(255, 159, 64, 1)"
+                "rgba(255, 159, 64, 1)",
               ],
-              borderWidth: 1
+              borderWidth: 1,
               // fill: false
-            }
-          ]
+            },
+          ],
         },
         options: {
           legend: {
             display: true,
-            position: "left"
-          }
-        }
+            position: "left",
+          },
+        },
       };
 
       if (this.pieData[3] > 0 && this.pieData[2] === this.pieData[3]) {
@@ -238,11 +265,11 @@ export default {
     },
     statChange() {
       if (this.showStat) {
-        this.userDB.get().then(res => {
+        this.userDB.get().then((res) => {
           let statData = res.data().data[this.currentItem];
 
           if (Object.keys(statData).length > 0) {
-            this.subjectStat = true
+            this.subjectStat = true;
             this.objectDates = {};
             if (statData.presentDates !== undefined) {
               if (statData.presentDates.length > 0) {
@@ -275,7 +302,7 @@ export default {
               statData.present,
               statData.absent,
               statData.cancelled,
-              statData.total
+              statData.total,
             ];
 
             this.pieChart();
@@ -286,13 +313,13 @@ export default {
           }
         });
       }
-    }
+    },
   },
   mounted() {
     if (this.showStat) {
       this.loading = true;
       this.style = "opacity: 0.3";
-      this.userDB.get().then(res => {
+      this.userDB.get().then((res) => {
         this.loading = false;
         this.style = "opacity: 1";
         this.items = res.data().allSubjects;
@@ -335,7 +362,7 @@ export default {
             statData.present,
             statData.absent,
             statData.cancelled,
-            statData.total
+            statData.total,
           ];
 
           this.pieChart();
@@ -355,7 +382,7 @@ export default {
 
     this.loading = true;
     this.style = "opacity: 0.3";
-    this.userDB.get().then(res => {
+    this.userDB.get().then((res) => {
       this.loading = false;
       this.style = "opacity: 1";
       if (
@@ -367,6 +394,6 @@ export default {
         this.showStat = true;
       }
     });
-  }
+  },
 };
 </script>

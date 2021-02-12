@@ -33,8 +33,8 @@
       </div>
 
       <!-- No Timetable created !-->
+      <v-flex xs12 sm12 md8 offset-md2 pa-1 v-if="showtt && !hastt">
       <v-card class="my-2"
-        v-if="showtt && !hastt"
         style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
       >
         <v-card-title class="justify-center">
@@ -45,12 +45,13 @@
           style="letter-spacing: 2px; text-align:center;"
         >Timetable for this day has not been created! Please click the edit(pencil) icon to create your timetable.</v-card-text>
       </v-card>
+      </v-flex>
       <!-- ============== !-->
 
       <!-- No Subjects Added !-->
       <div v-else-if="!showtt">
         <v-container>
-          <v-card
+          <v-card @click="$router.push({path: '/add_subjects'})"
             style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
           >
             <v-card-title class="justify-center">
@@ -60,9 +61,6 @@
               class="subheading"
               style="letter-spacing: 2px; text-align:center;"
             >No subjects have been added yet!</v-card-text>
-            <v-card-actions class="justify-end pa-3">
-              <v-icon large @click="$router.push({path: '/add_subjects'})">arrow_right_alt</v-icon>
-            </v-card-actions>
           </v-card>
         </v-container>
       </div>

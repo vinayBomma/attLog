@@ -1,73 +1,101 @@
 <template>
   <nav>
     <v-toolbar flat app>
-      <v-toolbar-side-icon v-on:click="drawer = !drawer" aria-label="Menu"></v-toolbar-side-icon>
+      <v-toolbar-side-icon
+        v-on:click="drawer = !drawer"
+        aria-label="Menu"
+      ></v-toolbar-side-icon>
 
       <v-toolbar-title v-if="$route.name === 'home'">Home</v-toolbar-title>
-      <v-toolbar-title v-else-if="$route.name === 'statistics'">Statistics</v-toolbar-title>
-      <v-toolbar-title v-else-if="$route.name === 'timetable'">Timetable</v-toolbar-title>
-      <v-toolbar-title v-else-if="$route.name === 'add_subjects'">Subjects</v-toolbar-title>
+      <v-toolbar-title v-else-if="$route.name === 'statistics'"
+        >Statistics</v-toolbar-title
+      >
+      <v-toolbar-title v-else-if="$route.name === 'timetable'"
+        >Timetable</v-toolbar-title
+      >
+      <v-toolbar-title v-else-if="$route.name === 'add_subjects'"
+        >Subjects</v-toolbar-title
+      >
       <v-spacer></v-spacer>
 
-      <!-- <v-btn class="elevation-10" aria-label="Sign In" v-if="isUser === false" @click="googleLogin">
-        <img src="../../public/google.png" class="mr-2" alt="Google" />Sign In
-      </v-btn>-->
-
-      <!-- Sign In Button !-->
       <v-btn
+        class="elevation-10"
         aria-label="Sign In"
         v-if="isUser === false"
-        round
-        style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
-        @click="register = true"
-      >
-        <v-icon left>email</v-icon>Sign Up
+        @click="googleLogin"
+        >Continue with
+        <img src="../../public/google.png" class="ml-2" alt="Google" />
       </v-btn>
-      <!-- ==============  !-->
-
 
       <!-- Home Reset Attendance !-->
-      <template v-if="$route.name === 'home' && attDates.includes(currentFullDate)">
-        <v-dialog v-model="restoreModal">
+      <template
+        v-if="$route.name === 'home' && attDates.includes(currentFullDate)"
+      >
+        <v-dialog v-model="restoreModal" max-width="800">
           <template v-slot:activator="{ on }">
-            <v-icon v-on="on" @click="restoreModal = true" class="mr-4">restore</v-icon>
+            <v-icon v-on="on" @click="restoreModal = true" class="mr-4"
+              >restore</v-icon
+            >
           </template>
           <v-card>
             <v-card-title
               class="justify-center subheading"
               style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-            >Reset Attendance</v-card-title>
-            <v-card-text class="subheading" style="text-align: center; word-spacing: 2px; letter-spacing: 2px">Are you sure you want to reset your attendance for this day?</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn aria-label="No" flat color="blue" @click="restoreModal = false">Cancel</v-btn>
-            <v-btn aria-label="Yes" flat color="blue" @click="restoreAtt">Yes</v-btn>
-          </v-card-actions>
+              >Reset Attendance</v-card-title
+            >
+            <v-card-text
+              class="subheading"
+              style="text-align: center; word-spacing: 2px; letter-spacing: 2px"
+              >Are you sure you want to reset your attendance for this
+              day?</v-card-text
+            >
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn aria-label="No" flat @click="restoreModal = false"
+                >Cancel</v-btn
+              >
+              <v-btn aria-label="Yes" round color="cyan" @click="restoreAtt"
+                >Yes</v-btn
+              >
+            </v-card-actions>
           </v-card>
         </v-dialog>
       </template>
       <!-- ==============  !-->
 
-
       <!-- Home Date Picker !-->
       <template v-if="$route.name === 'home'">
-        <v-dialog v-model="modal" :return-value.sync="date" lazy full-width width="290px">
+        <v-dialog
+          v-model="modal"
+          :return-value.sync="date"
+          lazy
+          full-width
+          width="290px"
+        >
           <template v-slot:activator="{ on }">
             <v-icon v-model="date" v-on="on">today</v-icon>
           </template>
-          <v-date-picker v-model="date" :events="objectDates">
+          <v-date-picker
+            v-model="date"
+            :events="objectDates"
+            header-color="cyan"
+            color="yellow darken-1"
+          >
             <v-spacer></v-spacer>
-            <v-btn aria-label="Cancel" flat color="primary" @click="modal = false">Cancel</v-btn>
-            <v-btn aria-label="Ok" flat color="primary" @click="saveDate">OK</v-btn>
+            <v-btn aria-label="Cancel" flat @click="modal = false"
+              >Cancel</v-btn
+            >
+            <v-btn aria-label="Ok" round color="cyan" @click="saveDate"
+              >OK</v-btn
+            >
           </v-date-picker>
         </v-dialog>
       </template>
       <!-- ==============  !-->
 
-
       <!-- Edit Icon Subjects !-->
       <template v-if="$route.name === 'add_subjects'">
-        <v-dialog v-model="editSub">
+        <v-dialog v-model="editSub" max-width="800">
           <template v-slot:activator="{ on }">
             <v-icon v-on="on">edit</v-icon>
           </template>
@@ -76,20 +104,36 @@
             <v-card-title
               class="justify-center subheading"
               style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-            >Edit Subjects</v-card-title>
+              >Edit Subjects</v-card-title
+            >
             <v-card-text>
               <v-layout row>
-                <v-text-field v-model="subjectName" label="Add Subject"></v-text-field>
-                <v-btn @click="addSubject">Add</v-btn>
+                <v-text-field v-model="subjectName" label="Subject Name">
+                  <template v-slot:append-outer>
+                    <v-icon @click="addSubject" color="green lighten-1"
+                      >add_circle</v-icon
+                    >
+                  </template></v-text-field
+                >
+                <!-- <v-btn @click="addSubject">Add</v-btn> -->
               </v-layout>
               <v-card v-if="hasSubject" elevation="1">
                 <v-card-text>
-                  <v-layout class="pt-3" row v-for="(sub, i) in subjects" :key="i">
+                  <v-layout
+                    class="pt-3"
+                    row
+                    v-for="(sub, i) in subjects"
+                    :key="i"
+                  >
                     <!-- <v-layout> -->
-                    <span style="letter-spacing: 2px;">{{i + 1}}. {{sub}}</span>
+                    <span style="letter-spacing: 2px;"
+                      >{{ i + 1 }}. {{ sub }}</span
+                    >
                     <!-- </v-layout> -->
                     <v-layout class="justify-end">
-                      <v-icon right color="red" @click="removeSubject(i)">remove_circle</v-icon>
+                      <v-icon right color="red" @click="removeSubject(i)"
+                        >remove_circle</v-icon
+                      >
                     </v-layout>
                   </v-layout>
                 </v-card-text>
@@ -97,7 +141,7 @@
             </v-card-text>
             <v-card-actions class="justify-end pa-3">
               <v-btn flat @click="editSub = false">Close</v-btn>
-              <v-btn round @click="editSubjects">Save</v-btn>
+              <v-btn round color="cyan" @click="editSubjects">Save</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -106,7 +150,7 @@
 
       <!-- Edit Icon Timetable !-->
       <template v-if="$route.name === 'timetable'">
-        <v-dialog v-model="editTimetable" lazy>
+        <v-dialog v-model="editTimetable" lazy max-width="1200">
           <template v-slot:activator="{ on }">
             <v-icon v-on="on">edit</v-icon>
           </template>
@@ -115,7 +159,8 @@
             <v-card-title
               class="justify-center subheading"
               style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-            >Edit Timetable</v-card-title>
+              >Edit Timetable</v-card-title
+            >
             <v-card-text>
               <v-tabs
                 v-model="currentDay"
@@ -125,20 +170,44 @@
                 slider-color="blue"
                 @change="tabChange"
               >
-                <v-tab v-for="day in days" :key="day" :href="'#' + day">{{ day }}</v-tab>
+                <v-tab v-for="day in days" :key="day" :href="'#' + day">{{
+                  day
+                }}</v-tab>
               </v-tabs>
               <v-tabs-items v-model="currentDay">
-                <v-tab-item v-for="(day, index) in days" :key="index" :value="day">
+                <v-tab-item
+                  v-for="(day, index) in days"
+                  :key="index"
+                  :value="day"
+                >
                   <v-layout row class="mt-3">
-                    <v-select v-model="currentSubject" :items="subjects" label="Choose Subject"></v-select>
-                    <v-btn @click="addDaySubject">Add</v-btn>
+                    <v-select
+                      v-model="currentSubject"
+                      :items="subjects"
+                      label="Choose Subject"
+                    >
+                      <template v-slot:append-outer>
+                        <v-icon @click="addDaySubject" color="green lighten-1"
+                          >add_circle</v-icon
+                        >
+                      </template>
+                    </v-select>
                   </v-layout>
                   <v-card v-if="hasDaySubjects" elevation="1">
                     <v-card-text>
-                      <v-layout class="pt-3" row v-for="(sub, i) in daySubjects" :key="i">
-                        <span style="letter-spacing: 2px;">{{i + 1}}. {{sub}}</span>
+                      <v-layout
+                        class="pt-3"
+                        row
+                        v-for="(sub, i) in daySubjects"
+                        :key="i"
+                      >
+                        <span style="letter-spacing: 2px;"
+                          >{{ i + 1 }}. {{ sub }}</span
+                        >
                         <v-layout class="justify-end">
-                          <v-icon right color="red" @click="removeDaySubject(i)">remove_circle</v-icon>
+                          <v-icon right color="red" @click="removeDaySubject(i)"
+                            >remove_circle</v-icon
+                          >
                         </v-layout>
                       </v-layout>
                     </v-card-text>
@@ -148,7 +217,7 @@
             </v-card-text>
             <v-card-actions class="justify-end pa-3">
               <v-btn flat @click="closeEditTT">Close</v-btn>
-              <v-btn round @click="saveTimetable">Save</v-btn>
+              <v-btn round @click="saveTimetable" color="cyan">Save</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -158,19 +227,36 @@
 
     <!-- Sign Out !-->
     <v-navigation-drawer v-model="drawer" app>
-      <v-dialog v-model="signOutModal" full-width>
+      <v-dialog v-model="signOutModal" max-width="600">
         <template v-slot:activator="{ on }">
           <v-layout align-start justify-end row class="pa-3">
-            <v-icon v-if="isUser === true" @click="signOutModal = true" v-on="on">exit_to_app</v-icon>
+            <v-icon
+              v-if="isUser === true"
+              @click="signOutModal = true"
+              v-on="on"
+              >logout</v-icon
+            >
           </v-layout>
         </template>
         <v-card>
-          <v-card-title class="subheading justify-center" style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );">Sign Out</v-card-title>
-          <v-card-text class="subheading" style="text-align: center; word-spacing: 2px; letter-spacing: 2px">Are you sure you want to sign out?</v-card-text>
+          <v-card-title
+            class="subheading justify-center"
+            style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+            >Sign Out</v-card-title
+          >
+          <v-card-text
+            class="subheading"
+            style="text-align: center; word-spacing: 2px; letter-spacing: 2px"
+            >Are you sure you want to sign out?</v-card-text
+          >
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn aria-label="No" flat color="blue" @click="signOutModal = false">Cancel</v-btn>
-            <v-btn aria-label="Yes" flat color="blue" @click="googleLogout">Yes</v-btn>
+            <v-btn aria-label="No" flat @click="signOutModal = false"
+              >Cancel</v-btn
+            >
+            <v-btn aria-label="Yes" round color="cyan" @click="googleLogout"
+              >Yes</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -178,9 +264,9 @@
 
       <!-- Profile Photo !-->
       <v-layout column align-center v-if="userPhoto && isUser">
-        <v-flex class="mt-5">
+        <v-flex>
           <v-avatar size="100">
-            <img :src="userPhoto[0]" alt="Profile Photo" />
+            <img :src="userPhoto" alt="Profile Photo" />
           </v-avatar>
         </v-flex>
       </v-layout>
@@ -194,8 +280,13 @@
 
       <v-divider v-if="isUser"></v-divider>
 
-      <v-list v-if="!isUser">
-        <v-list-tile v-for="(link, j) in links" :key="j" router v-bind:to="link.route">
+      <v-list>
+        <v-list-tile
+          v-for="(link, j) in links"
+          :key="j"
+          router
+          v-bind:to="link.route"
+        >
           <v-list-tile-action>
             <v-icon>{{ link.icon }}</v-icon>
           </v-list-tile-action>
@@ -208,14 +299,16 @@
       <v-list v-if="isUser && !disabled">
         <v-list-tile>
           <!-- <v-list-tile-action> -->
-          <v-btn @click="getMessagingToken" round block>Enable Notifications</v-btn>
+          <v-btn @click="getMessagingToken" round block
+            >Enable Notifications</v-btn
+          >
           <!-- </v-list-tile-action> -->
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
 
     <!-- Sign In Dialog !-->
-    <v-dialog v-model="register" persistent>
+    <!-- <v-dialog v-model="register" persistent>
       <v-card
         style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
       >
@@ -240,11 +333,11 @@
           <v-btn @click="sendEmailLink" round>Next</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <!-- ==============  !-->
 
     <!-- Sign In Email Link Dialog !-->
-    <v-dialog v-model="emailLink" persistent>
+    <!-- <v-dialog v-model="emailLink" persistent>
       <v-card
         style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
       >
@@ -259,11 +352,11 @@
           <v-btn @click="emailLink = null" round>Okay</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <!-- ==============  !-->
 
     <!-- Choose Avatar Intro !-->
-    <v-dialog v-model="appIntro" persistent>
+    <!-- <v-dialog v-model="appIntro" persistent>
       <v-card>
         <v-card-title
           class="justify-center subheading"
@@ -272,11 +365,9 @@
         <v-card-text>
           <v-layout row wrap>
             <v-flex xs-4 md-3 v-for="(avt, j) in avatars" :key="avt">
-              <!-- <v-hover v-slot:default="{hover}"> -->
               <v-card flat hover @click="avatarSelect($event)">
                 <img :src="avatars[j]" width="75" height="75" />
               </v-card>
-              <!-- </v-hover> -->
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -284,11 +375,11 @@
           <v-btn round @click="avatarNext">Next</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <!-- ==============  !-->
 
     <!-- Additional Info Intro !-->
-    <v-dialog v-model="appIntro2" persistent>
+    <!-- <v-dialog v-model="appIntro2" persistent>
       <v-card>
         <v-card-title
           class="justify-center subheading"
@@ -318,7 +409,7 @@
           <v-btn round @click="additionalInfo">Next</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <!-- ==============  !-->
 
     <!-- Add Subjects Intro !-->
@@ -327,20 +418,26 @@
         <v-card-title
           class="justify-center subheading"
           style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-        >Add Subjects</v-card-title>
+          >Add Subjects</v-card-title
+        >
         <v-card-text>
           <v-layout row>
-            <v-text-field v-model="subjectName" label="Add Subject"></v-text-field>
+            <v-text-field
+              v-model="subjectName"
+              label="Add Subject"
+            ></v-text-field>
             <v-btn @click="addSubject">Add</v-btn>
           </v-layout>
           <v-card v-if="hasSubject" elevation="1">
             <v-card-text>
               <v-layout class="pt-3" row v-for="(sub, i) in subjects" :key="i">
                 <!-- <v-layout> -->
-                <span style="letter-spacing: 2px;">{{i + 1}}. {{sub}}</span>
+                <span style="letter-spacing: 2px;">{{ i + 1 }}. {{ sub }}</span>
                 <!-- </v-layout> -->
                 <v-layout class="justify-end">
-                  <v-icon right color="red" @click="removeSubject(i)">remove_circle</v-icon>
+                  <v-icon right color="red" @click="removeSubject(i)"
+                    >remove_circle</v-icon
+                  >
                 </v-layout>
               </v-layout>
             </v-card-text>
@@ -360,7 +457,8 @@
         <v-card-title
           class="justify-center subheading"
           style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-        >Create Timetable</v-card-title>
+          >Create Timetable</v-card-title
+        >
         <v-card-text>
           <v-tabs
             v-model="currentDay"
@@ -370,22 +468,37 @@
             slider-color="blue"
             @change="tabChange"
           >
-            <v-tab v-for="day in days" :key="day" :href="'#' + day">{{ day }}</v-tab>
+            <v-tab v-for="day in days" :key="day" :href="'#' + day">{{
+              day
+            }}</v-tab>
           </v-tabs>
           <v-tabs-items v-model="currentDay">
             <v-tab-item v-for="(day, index) in days" :key="index" :value="day">
               <v-layout row class="mt-3">
-                <v-select v-model="currentSubject" :items="subjects" label="Choose Subject"></v-select>
+                <v-select
+                  v-model="currentSubject"
+                  :items="subjects"
+                  label="Choose Subject"
+                ></v-select>
                 <v-btn @click="addDaySubject">Add</v-btn>
               </v-layout>
               <v-card v-if="hasDaySubjects" elevation="1">
                 <v-card-text>
-                  <v-layout class="pt-3" row v-for="(sub, i) in daySubjects" :key="i">
+                  <v-layout
+                    class="pt-3"
+                    row
+                    v-for="(sub, i) in daySubjects"
+                    :key="i"
+                  >
                     <!-- <v-layout> -->
-                    <span style="letter-spacing: 2px;">{{i + 1}}. {{sub}}</span>
+                    <span style="letter-spacing: 2px;"
+                      >{{ i + 1 }}. {{ sub }}</span
+                    >
                     <!-- </v-layout> -->
                     <v-layout class="justify-end">
-                      <v-icon right color="red" @click="removeDaySubject(i)">remove_circle</v-icon>
+                      <v-icon right color="red" @click="removeDaySubject(i)"
+                        >remove_circle</v-icon
+                      >
                     </v-layout>
                   </v-layout>
                 </v-card-text>
@@ -403,7 +516,13 @@
     <!-- ============== !-->
 
     <!-- Snackbar !-->
-    <v-snackbar v-model="snackbar" :timeout="timeout" multi-line bottom :color="color">
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      multi-line
+      bottom
+      :color="color"
+    >
       {{ msg }}
       <v-btn flat @click="snackbar === false">Close</v-btn>
     </v-snackbar>
@@ -454,12 +573,12 @@ export default {
         "../avatars/woman-9.svg",
         "../avatars/woman-10.svg",
         "../avatars/woman-11.svg",
-        "../avatars/woman-12.svg"
+        "../avatars/woman-12.svg",
       ],
       date: new Date().toISOString().substr(0, 10),
       drawer: false,
       isUser: null,
-      userPhoto: [],
+      userPhoto: null,
       userName: null,
       useruid: null,
       signOutModal: null,
@@ -490,7 +609,7 @@ export default {
         "Thursday",
         "Friday",
         "Saturday",
-        "Sunday"
+        "Sunday",
       ],
       hasDaySubjects: null,
       daySubjects: [],
@@ -520,7 +639,7 @@ export default {
         let actionCodeSettings = {
           url: "https://attendit.firebaseapp.com/signup",
           // url: "http://localhost:8080/signup",
-          handleCodeInApp: true
+          handleCodeInApp: true,
         };
 
         firebase
@@ -529,7 +648,7 @@ export default {
           .then(() => {
             window.localStorage.setItem("emailForSignIn", this.emailValue);
           })
-          .catch(e => {
+          .catch((e) => {
             console.log("Errarta: ", e);
           });
 
@@ -543,7 +662,7 @@ export default {
     getMessagingToken() {
       messaging
         .getToken()
-        .then(async token => {
+        .then(async (token) => {
           if (token) {
             const currentMessageToken = window.localStorage.getItem(
               "messagingToken"
@@ -570,7 +689,7 @@ export default {
         .then(() => {
           this.getMessagingToken();
         })
-        .catch(err => {
+        .catch((err) => {
           alert(
             "Couldn't enable push notifications. Your browser may not suppport it."
           );
@@ -603,14 +722,14 @@ export default {
           `https://us-central1-attendit.cloudfunctions.net/GeneralSubscription`,
           {
             token,
-            userUid
+            userUid,
           }
         )
-        .then(response => {
+        .then((response) => {
           window.localStorage.setItem("messagingToken", token);
           console.log(response);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -644,7 +763,7 @@ export default {
           .doc(this.useruid)
           .set(
             {
-              photoURL: this.userPhoto[0]
+              photoURL: this.userPhoto[0],
             },
             { merge: true }
           );
@@ -661,7 +780,7 @@ export default {
           .set(
             {
               displayName: this.userName,
-              attCriteria: this.attCriteria
+              attCriteria: this.attCriteria,
             },
             { merge: true }
           );
@@ -697,7 +816,7 @@ export default {
           .set(
             {
               allSubjects: this.subjects,
-              data: obj
+              data: obj,
             },
             { merge: true }
           );
@@ -735,7 +854,7 @@ export default {
           .doc(this.useruid)
           .set(
             {
-              timetable: obj
+              timetable: obj,
             },
             { merge: true }
           )
@@ -743,7 +862,7 @@ export default {
             db.collection("attData")
               .doc(this.useruid)
               .get()
-              .then(res => {
+              .then((res) => {
                 if (res.data().timetable[this.currentDay]) {
                   this.daySubjects = res.data().timetable[this.currentDay];
                   this.hasDaySubjects = true;
@@ -762,15 +881,15 @@ export default {
         this.snackbar = true;
       }
     },
-    ttIntro(){
+    ttIntro() {
       this.appIntro4 = false;
-      this.$router.go({path: '/'})
+      this.$router.go({ path: "/" });
     },
     tabChange() {
       db.collection("attData")
         .doc(this.useruid)
         .get()
-        .then(res => {
+        .then((res) => {
           if (res.data().timetable[this.currentDay]) {
             this.hasDaySubjects = true;
             this.daySubjects = res.data().timetable[this.currentDay];
@@ -797,7 +916,7 @@ export default {
           .set(
             {
               allSubjects: this.subjects,
-              data: obj
+              data: obj,
             },
             { merge: true }
           );
@@ -829,7 +948,7 @@ export default {
           .then(() => {
             this.$router.push({ name: "signup" });
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
           });
       }
@@ -842,7 +961,7 @@ export default {
         "Wednesday",
         "Thursday",
         "Friday",
-        "Saturday"
+        "Saturday",
       ];
       let months = [
         "Jan",
@@ -856,7 +975,7 @@ export default {
         "Sept",
         "Oct",
         "Nov",
-        "Dec"
+        "Dec",
       ];
 
       let obj = {};
@@ -876,35 +995,25 @@ export default {
       bus.$emit("dateValue", obj);
       this.modal = !this.modal;
     },
-    restoreAtt(){
-      bus.$emit('currentDate', this.currentFullDate);
-      this.restoreModal = !this.restoreModal
-    }
+    restoreAtt() {
+      bus.$emit("currentDate", this.currentFullDate);
+      this.restoreModal = !this.restoreModal;
+    },
 
     // nightMode() {
     //   this.mode = !this.mode;
     //   this.$emit("changeMode", this.mode);
     // },
-    // googleLogin() {
-    // const provider = new firebase.auth.GoogleAuthProvider();
+    googleLogin() {
+      const provider = new firebase.auth.GoogleAuthProvider();
 
-    // firebase.auth().signInWithRedirect(provider);
-
-    // firebase
-    //   .auth()
-    //   .signInWithPopup(provider)
-    //   .then(() => {
-    //     this.$router.push({ name: "home" });
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //   });
-    // }
+      firebase.auth().signInWithRedirect(provider);
+    },
   },
   mounted() {
     this.listenTokenRefresh();
 
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.$router.push({ name: "home" });
         db.collection("attData")
@@ -914,7 +1023,7 @@ export default {
               // displayName: user.displayName,
               // phoneNum: user.phoneNumber,
               uid: user.uid,
-              email: user.email
+              email: user.email,
               // photoURL: user.photoURL
             },
             { merge: true }
@@ -923,61 +1032,70 @@ export default {
     });
   },
   created() {
-    // firebase
-    //   .auth()
-    //   .getRedirectResult()
-    //   .then(() => {
-    //     this.$router.push({ name: "home" });
-    //   })
-    //   .catch(err => {
-    //     console.log("Errarta: ", err);
-    //   });
+    firebase
+      .auth()
+      .getRedirectResult()
+      .then((result) => {
+        // if(result){
+        //   console.log(result.additionalUserInfo.isNewUser)
+        // }
+
+        this.$router.push({ name: "home" });
+      })
+      .catch((err) => {
+        console.log("Errarta: ", err);
+      });
     const self = this;
 
-    if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
-      var email = window.localStorage.getItem("emailForSignIn");
-      if (!email) {
-        email = window.prompt("Please provide your email for confirmation");
-      }
-      firebase
-        .auth()
-        .signInWithEmailLink(email, window.location.href)
-        .then(function(result) {
-          window.localStorage.removeItem("emailForSignIn");
-          if (result.additionalUserInfo.isNewUser) {
-            window.localStorage.setItem(
-              "newUser",
-              result.additionalUserInfo.isNewUser
-            );
-            window.localStorage.setItem("appIntro", true);
-          }
-          self.appIntro = window.localStorage.getItem("appIntro");
-        })
-        .catch(function(error) {
-          console.log("Error: ", error);
-        });
-    }
+    // if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
+    //   var email = window.localStorage.getItem("emailForSignIn");
+    //   if (!email) {
+    //     email = window.prompt("Please provide your email for confirmation");
+    //   }
+    //   firebase
+    //     .auth()
+    //     .signInWithEmailLink(email, window.location.href)
+    //     .then(function(result) {
+    //       window.localStorage.removeItem("emailForSignIn");
+    //       if (result.additionalUserInfo.isNewUser) {
+    //         window.localStorage.setItem(
+    //           "newUser",
+    //           result.additionalUserInfo.isNewUser
+    //         );
+    //         window.localStorage.setItem("appIntro", true);
+    //       }
+    //       self.appIntro = window.localStorage.getItem("appIntro");
+    //     })
+    //     .catch(function(error) {
+    //       console.log("Error: ", error);
+    //     });
+    // }
 
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
+        this.links = [
+          { icon: 'get_app', text: "Installation Notes", route: 'install'},
+          { icon: 'settings', text: "Settings", route: 'settings'},
+          { icon: 'update', text: "Changelog", route: 'changelog'},
+        ];
         this.isUser = true;
-        // this.userPhoto = user.photoURL;
-        // this.userName = user.displayName;
+        this.userPhoto = user.photoURL;
+        this.userName = user.displayName;
         this.useruid = user.uid;
         db.collection("attData")
           .doc(this.useruid)
           .get()
-          .then(res => {
+          .then((res) => {
             if (
-              res.data().photoURL !== undefined &&  
+              res.data().photoURL !== undefined &&
               res.data().displayName !== undefined
             ) {
-              this.userPhoto.push(res.data().photoURL);
+              // this.userPhoto.push(res.data().photoURL);
               this.userName = res.data().displayName;
               this.attCriteria = res.data().attCriteria;
               this.attDates = res.data().attendance;
-              for(let i in this.attDates){
-                this.objectDates[this.attDates[i]] = ['green']
+              for (let i in this.attDates) {
+                this.objectDates[this.attDates[i]] = ["green"];
               }
 
               if (res.data().allSubjects.length > 0) {
@@ -995,11 +1113,15 @@ export default {
 
         this.links = [
           { icon: "account_circle", text: "Sign In", route: "signup" },
-          { icon: "assignment", text: "Privacy Policy", route: "privacypolicy" }
+          {
+            icon: "assignment",
+            text: "Privacy Policy",
+            route: "privacypolicy",
+          },
           // { icon: 'get_app', text: "Installation Notes", route: 'install'}
         ];
       }
     });
-  }
+  },
 };
 </script>

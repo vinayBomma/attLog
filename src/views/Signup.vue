@@ -1,7 +1,7 @@
 <template>
   <div>
     <section id="full-carousel">
-      <v-carousel height="100%" :cycle="cycle" hide-controls>
+      <v-carousel height="100%" :cycle="cycle">
         <v-carousel-item v-for="(slide, i) in slides" :key="i">
             <v-sheet height="92vh" :style="slide.color">
             <v-layout align-start justify-center>
@@ -66,7 +66,7 @@ export default {
             "We embrace powerful new technologies which help us simplify user experience. When there is a new update available, Attend It updates without any interruptions!"
         }
       ],
-      cycle: false
+      cycle: true
     };
   }
 };

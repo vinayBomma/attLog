@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import db from "./configFirebase";
+// import db from "./configFirebase";
 
 const Navbar = () => import("./components/Navbar");
 
