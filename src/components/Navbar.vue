@@ -16,6 +16,9 @@
       <v-toolbar-title v-else-if="$route.name === 'add_subjects'"
         >Subjects</v-toolbar-title
       >
+      <v-toolbar-title v-else-if="$route.name === 'settings'"
+        >Settings</v-toolbar-title
+      >
       <v-spacer></v-spacer>
 
       <v-btn
@@ -73,7 +76,7 @@
           width="290px"
         >
           <template v-slot:activator="{ on }">
-            <v-icon v-model="date" v-on="on">today</v-icon>
+            <v-icon v-model="date" v-on="on">event</v-icon>
           </template>
           <v-date-picker
             v-model="date"
@@ -294,15 +297,30 @@
             <v-list-tile-title>{{ link.text }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-      </v-list>
 
-      <v-list v-if="isUser && !disabled">
         <v-list-tile>
-          <!-- <v-list-tile-action> -->
           <v-btn @click="getMessagingToken" round block
             >Enable Notifications</v-btn
           >
-          <!-- </v-list-tile-action> -->
+        </v-list-tile>
+      </v-list>
+
+      <v-list v-if="isUser && !disabled"> </v-list>
+
+      <v-divider v-if="isUser"></v-divider>
+
+      <v-list>
+        <v-list-tile
+          v-for="link in functionLinks"
+          :key="link.id"
+          @click="featureOption(link.id)"
+        >
+          <v-list-tile-action>
+            <v-icon>{{ link.icon }}</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>{{ link.text }}</v-list-tile-title>
+          </v-list-tile-content>
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
@@ -379,12 +397,13 @@
     <!-- ==============  !-->
 
     <!-- Additional Info Intro !-->
-    <!-- <v-dialog v-model="appIntro2" persistent>
+    <v-dialog v-model="appIntro2" persistent>
       <v-card>
         <v-card-title
           class="justify-center subheading"
           style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-        >Additional Information</v-card-title>
+          >Additional Information</v-card-title
+        >
         <v-card-text>
           <v-layout row wrap>
             <v-text-field
@@ -409,11 +428,75 @@
           <v-btn round @click="additionalInfo">Next</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog> -->
+    </v-dialog>
     <!-- ==============  !-->
 
+    <!-- ============= Report App =============== -->
+    <v-dialog v-model="reportBugsDialog" max-width="500">
+      <v-card>
+        <v-card-title
+          class="subheading justify-center"
+          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+          >Report Bug</v-card-title
+        >
+        <v-card-text>
+          <v-textarea
+            auto-grow
+            color="cyan"
+            outline
+            label="Description"
+            v-model="reportText"
+          ></v-textarea>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            aria-label="No"
+            flat
+            @click="reportBugsDialog = !reportBugsDialog"
+            >Cancel</v-btn
+          >
+          <v-btn aria-label="Yes" round color="cyan" @click="bugReport"
+            >Yes</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- ======================================== -->
+
+    <!-- ============= App Version =============== -->
+    <v-dialog v-model="appVersionDialog" max-width="500">
+      <v-card>
+        <v-card-title
+          class="subheading justify-center"
+          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+          >App Version</v-card-title
+        >
+        <v-card-text>
+          <v-layout class="justify-center">
+            <img :src="logo" alt="Attend It Logo" height="100" width="100" />
+            <br />
+          </v-layout>
+          <v-layout class="justify-center mt-2">
+            <span class="subheading text-center">v2.0</span>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            aria-label="Close"
+            round
+            color="cyan"
+            @click="appVersionDialog = !appVersionDialog"
+            >Close</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- ========================================= -->
+
     <!-- Add Subjects Intro !-->
-    <v-dialog v-model="appIntro3" persistent>
+    <!-- <v-dialog v-model="appIntro3" persistent>
       <v-card>
         <v-card-title
           class="justify-center subheading"
@@ -431,9 +514,7 @@
           <v-card v-if="hasSubject" elevation="1">
             <v-card-text>
               <v-layout class="pt-3" row v-for="(sub, i) in subjects" :key="i">
-                <!-- <v-layout> -->
                 <span style="letter-spacing: 2px;">{{ i + 1 }}. {{ sub }}</span>
-                <!-- </v-layout> -->
                 <v-layout class="justify-end">
                   <v-icon right color="red" @click="removeSubject(i)"
                     >remove_circle</v-icon
@@ -448,11 +529,11 @@
           <v-btn round @click="saveSubjects">Save</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <!-- ============== !-->
 
     <!-- Create Timetable Intro !-->
-    <v-dialog v-model="appIntro4" persistent scrollable lazy>
+    <!-- <v-dialog v-model="appIntro4" persistent scrollable lazy>
       <v-card>
         <v-card-title
           class="justify-center subheading"
@@ -490,11 +571,9 @@
                     v-for="(sub, i) in daySubjects"
                     :key="i"
                   >
-                    <!-- <v-layout> -->
                     <span style="letter-spacing: 2px;"
                       >{{ i + 1 }}. {{ sub }}</span
                     >
-                    <!-- </v-layout> -->
                     <v-layout class="justify-end">
                       <v-icon right color="red" @click="removeDaySubject(i)"
                         >remove_circle</v-icon
@@ -512,7 +591,7 @@
           <v-btn round v-if="lastDay" @click="appIntro4 = false">Close</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <!-- ============== !-->
 
     <!-- Snackbar !-->
@@ -584,6 +663,7 @@ export default {
       signOutModal: null,
       signOutUser: null,
       links: [],
+      functionLinks: [],
       mode: false,
       disabled: false,
       register: null,
@@ -625,6 +705,10 @@ export default {
       objectDates: {},
       attDates: [],
       restoreModal: null,
+      reportBugsDialog: null,
+      reportText: null,
+      appVersionDialog: null,
+      logo: "../android-chrome-192x192.png",
     };
   },
   methods: {
@@ -1009,6 +1093,34 @@ export default {
 
       firebase.auth().signInWithRedirect(provider);
     },
+    featureOption(option) {
+      if (option == 1) {
+        window.open("mailto:secvinay@gmail.com", "_blank");
+      } else if (option == 2) {
+        if (navigator.share) {
+          navigator.share({
+            title: "Attend It",
+            text: `Log your attendance with Attend It. Available on all platforms!`,
+            url: "https://attendit.web.app",
+          });
+        } else {
+          window.open(
+            "https://twitter.com/intent/tweet?url=https%3A%2F%2Fattendit.web.app%2F&text=Log+your+attendance+with+Attend+It%21+Available+on+all+platforms%21&hashtags=attendance,college",
+            "_blank"
+          );
+        }
+      } else if (option == 3) {
+        this.appVersionDialog = true;
+      } else if (option == 4) {
+        this.reportBugsDialog = true;
+      }
+    },
+    bugReport() {
+      this.msg = `Bug report sent successfully`;
+      this.color = "green";
+      this.snackbar = true;
+      this.reportBugsDialog = !this.reportBugsDialog;
+    },
   },
   mounted() {
     this.listenTokenRefresh();
@@ -1074,9 +1186,21 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.links = [
-          { icon: 'get_app', text: "Installation Notes", route: 'install'},
-          { icon: 'settings', text: "Settings", route: 'settings'},
-          { icon: 'update', text: "Changelog", route: 'changelog'},
+          { icon: "settings", text: "Settings", route: "settings" },
+          { icon: "info_outline", text: "About", route: "about" },
+          { icon: "update", text: "Changelog", route: "changelog" },
+          { icon: "get_app", text: "Install Notes", route: "install" },
+          // {
+          //   icon: "assignment",
+          //   text: "Privacy Policy",
+          //   route: "privacypolicy",
+          // },
+        ];
+        this.functionLinks = [
+          { icon: "email", text: "Contact Us", id: 1 },
+          { icon: "share", text: "Share", id: 2 },
+          { icon: "new_releases", text: "App Version", id: 3 },
+          { icon: "bug_report", text: "Report Bug", id: 4 },
         ];
         this.isUser = true;
         this.userPhoto = user.photoURL;
@@ -1118,7 +1242,8 @@ export default {
             text: "Privacy Policy",
             route: "privacypolicy",
           },
-          // { icon: 'get_app', text: "Installation Notes", route: 'install'}
+          // { icon: 'get_app', text: "Installation Notes", route: 'install'},
+          // { icon: "update", text: "Changelog", route: "changelog" },
         ];
       }
     });

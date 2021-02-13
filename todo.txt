@@ -1,21 +1,10 @@
-notification drawer:
-install notes
-About
-contact us
-privacy policy
-changelog
-settings
-feedback
-report bug
-share app
+changelog, install notes, about app
 
 in settings:
-change att criteria
+change att criteria, default criteria fix
+app intro code check
 reset attendance
 delete all subjects
-feedback
-report bug
-share app
 
 push notifications
 
