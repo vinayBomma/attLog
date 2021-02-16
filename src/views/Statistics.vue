@@ -324,7 +324,11 @@ export default {
         this.style = "opacity: 1";
         this.items = res.data().allSubjects;
         this.currentItem = res.data().allSubjects[0];
-        this.attCriteria = res.data().attCriteria;
+        if(this.attCriteria){
+          this.attCriteria = res.data().attCriteria;
+        }else{
+          this.attCriteria = 75
+        }
 
         let statData = res.data().data[this.currentItem];
 

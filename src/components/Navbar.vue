@@ -268,7 +268,7 @@
       <!-- Profile Photo !-->
       <v-layout column align-center v-if="userPhoto && isUser">
         <v-flex>
-          <v-avatar size="100">
+          <v-avatar size="80">
             <img :src="userPhoto" alt="Profile Photo" />
           </v-avatar>
         </v-flex>

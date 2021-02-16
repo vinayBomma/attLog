@@ -2,7 +2,12 @@
   <section>
     <v-list three-line subheader style="background-color: #1e1e1e">
       <v-subheader>User Controls</v-subheader>
-      <v-list-tile ripple v-for="setting in userSettings" :key="setting.id" @click="userControlSettings(setting.id)">
+      <v-list-tile
+        ripple
+        v-for="setting in userSettings"
+        :key="setting.id"
+        @click="userControlSettings(setting.id)"
+      >
         <v-list-tile-action>
           <v-icon>{{ setting.icon }}</v-icon>
         </v-list-tile-action>
@@ -97,7 +102,7 @@
     </v-dialog>
     <!-- ========================================= -->
 
-     <!-- ============= Attendance Criteria =============== -->
+    <!-- ============= Attendance Criteria =============== -->
     <v-dialog v-model="attCriteria" persistent max-width="600">
       <v-card>
         <v-card-title
@@ -121,69 +126,73 @@
         </v-card-text>
         <v-card-actions class="justify-end pa-3">
           <v-btn flat @click="attCriteria = !attCriteria">Cancel</v-btn>
-          <v-btn round color="cyan" @click="saveToDb('attCriteria')">Save</v-btn>
+          <v-btn round color="cyan" @click="saveToDb('attCriteria')"
+            >Save</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- ============================================ -->
 
+    <!-- ============= Delete Subjects =============== -->
 
-     <!-- ============= Delete Subjects =============== -->
-
-     <v-dialog v-model="deleteSubDialog" max-width="600">
-        <v-card>
-          <v-card-title
-            class="subheading justify-center"
-            style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-            >Delete Subjects</v-card-title
+    <v-dialog v-model="deleteSubDialog" max-width="600">
+      <v-card>
+        <v-card-title
+          class="subheading justify-center"
+          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+          >Delete Subjects</v-card-title
+        >
+        <v-card-text
+          class="subheading"
+          style="text-align: center; word-spacing: 2px; letter-spacing: 2px"
+          >Are you sure you want to delete all subjects?</v-card-text
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            aria-label="Cancel"
+            flat
+            @click="deleteSubDialog = !deleteSubDialog"
+            >Cancel</v-btn
           >
-          <v-card-text
-            class="subheading"
-            style="text-align: center; word-spacing: 2px; letter-spacing: 2px"
-            >Are you sure you want to delete all subjects?</v-card-text
+          <v-btn aria-label="Yes" round color="cyan" @click="saveToDb('delete')"
+            >Yes</v-btn
           >
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn aria-label="Cancel" flat @click="deleteSubDialog = !deleteSubDialog"
-              >Cancel</v-btn
-            >
-            <v-btn aria-label="Yes" round color="cyan" @click="saveToDb('delete')"
-              >Yes</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-     <!-- ========================================= -->
+    <!-- ========================================= -->
 
+    <!-- ============= Reset =============== -->
 
-     <!-- ============= Reset =============== -->
-
-     <v-dialog v-model="resetDialog" max-width="600">
-        <v-card>
-          <v-card-title
-            class="subheading justify-center"
-            style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-            >Reset Attendance</v-card-title
+    <v-dialog v-model="resetDialog" max-width="600">
+      <v-card>
+        <v-card-title
+          class="subheading justify-center"
+          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
+          >Reset Attendance</v-card-title
+        >
+        <v-card-text
+          class="subheading"
+          style="text-align: center; word-spacing: 2px; letter-spacing: 2px"
+          >Are you sure you want to reset your attendance data? This operation
+          deletes all subjects and timetable as well!</v-card-text
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn aria-label="Cancel" flat @click="resetDialog = !resetDialog"
+            >Cancel</v-btn
           >
-          <v-card-text
-            class="subheading"
-            style="text-align: center; word-spacing: 2px; letter-spacing: 2px"
-            >Are you sure you want to reset your attendance data? This operation deletes all subjects and timetable as well!</v-card-text
+          <v-btn aria-label="Yes" round color="cyan" @click="saveToDb('reset')"
+            >Yes</v-btn
           >
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn aria-label="Cancel" flat @click="resetDialog = !resetDialog"
-              >Cancel</v-btn
-            >
-            <v-btn aria-label="Yes" round color="cyan" @click="saveToDb('reset')"
-              >Yes</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-     <!-- ========================================= -->
+    <!-- ========================================= -->
 
     <v-snackbar
       v-model="snackbar"
@@ -199,6 +208,9 @@
 </template>
 
 <script>
+import { db } from "../configFirebase";
+import firebase from "firebase/app";
+
 export default {
   data() {
     return {
@@ -257,7 +269,7 @@ export default {
       appVersionDialog: null,
       logo: "../android-chrome-192x192.png",
       attCriteria: null,
-      attCriteriaValue: 75,
+      attCriteriaValue: null,
       deleteSubDialog: null,
       resetDialog: null,
     };
@@ -291,17 +303,68 @@ export default {
       this.snackbar = true;
       this.reportBugsDialog = !this.reportBugsDialog;
     },
-    userControlSettings(option){
-      if(option == 1){
+    userControlSettings(option) {
+      let user = firebase.auth().currentUser;
+      if (option == 1) {
+        db.collection("attData")
+          .doc(user.uid)
+          .get()
+          .then((res) => {
+            this.attCriteriaValue = res.data().attCriteria;
+          });
         this.attCriteria = true;
-      } else if(option == 2){
-        this.deleteSubDialog = !this.deleteSubDialog
-      } else if(option == 3){
-        this.resetDialog = !this.resetDialog
+      } else if (option == 2) {
+        this.deleteSubDialog = !this.deleteSubDialog;
+      } else if (option == 3) {
+        this.resetDialog = !this.resetDialog;
       }
     },
-    saveToDb(){
-    }
+    saveToDb(option) {
+      let user = firebase.auth().currentUser;
+      if (option == "attCriteria") {
+        db.collection("attData")
+          .doc(user.uid)
+          .set(
+            {
+              attCriteria: this.attCriteriaValue,
+            },
+            { merge: true }
+          );
+        this.msg = `Attendance criteria modified successfully`;
+        this.color = "green";
+        this.snackbar = true;
+        this.attCriteria = !this.attCriteria;
+      }else if(option == "delete"){
+        db.collection("attData")
+          .doc(user.uid)
+          .set(
+            {
+              allSubjects: firebase.firestore.FieldValue.delete(),
+            },
+            { merge: true }
+          );
+        this.msg = `All the subjects have been deleted!`;
+        this.color = "green";
+        this.snackbar = true;
+        this.deleteSubDialog = !this.deleteSubDialog;
+      }else if(option == 'reset'){
+        db.collection("attData")
+          .doc(user.uid)
+          .set(
+            {
+              allSubjects: firebase.firestore.FieldValue.delete(),
+              attendance: firebase.firestore.FieldValue.delete(),
+              data: firebase.firestore.FieldValue.delete(),
+              timetable: firebase.firestore.FieldValue.delete(),
+            },
+            { merge: true }
+          );
+        this.msg = `Attendance data has been reset`;
+        this.color = "green";
+        this.snackbar = true;
+        this.resetDialog = !this.resetDialog;
+      }
+    },
   },
 };
 </script>
