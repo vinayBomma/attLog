@@ -63,21 +63,21 @@ const router = new Router({
       name: 'privacy_policy',
       component: () => import('./views/privacyPolicy.vue'),
     },
-    // {
-    //   path: '/changelog',
-    //   name: 'changelog',
-    //   component: () => import('./views/Changelog.vue'),
-    // },
-    // {  
-    //   path: '/install_notes',
-    //   name: 'installNotes',
-    //   component: () => import('./views/installNotes.vue'),
-    // },
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   component: () => import('./views/About.vue'),
-    // },
+    {
+      path: '/changelog',
+      name: 'changelog',
+      component: () => import('./views/Changelog.vue'),
+    },
+    {  
+      path: '/install_notes',
+      name: 'installNotes',
+      component: () => import('./views/installNotes.vue'),
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('./views/About.vue'),
+    },
   ]
 })
 

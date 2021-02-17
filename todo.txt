@@ -1,16 +1,13 @@
-changelog, install notes, about app
-
-in settings:
-change att criteria, default criteria fix
 app intro code check
-reset attendance
-delete all subjects
-
 push notifications
+windows add link in installNotes
+shareapi add windows and play store link
 
 att status on home page - 2 (You have %d leaves remaininng)
 cross platform find more new info installation instructions
 remove firebase messaging as well
+driver.js
+vuetour
 
 
 production tips:

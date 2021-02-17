@@ -19,6 +19,15 @@
       <v-toolbar-title v-else-if="$route.name === 'settings'"
         >Settings</v-toolbar-title
       >
+      <v-toolbar-title v-else-if="$route.name === 'changelog'"
+        >Changelog</v-toolbar-title
+      >
+      <v-toolbar-title v-else-if="$route.name === 'installNotes'"
+        >Install Notes</v-toolbar-title
+      >
+      <v-toolbar-title v-else-if="$route.name === 'about'"
+        >About</v-toolbar-title
+      >
       <v-spacer></v-spacer>
 
       <v-btn
@@ -29,6 +38,22 @@
         >Continue with
         <img src="../../public/google.png" class="ml-2" alt="Google" />
       </v-btn>
+
+      <template
+        v-if="
+          isUser &&
+            ($route.name == 'changelog' ||
+              $route.name == 'about' ||
+              $route.name == 'installNotes')
+        "
+      >
+        <v-btn
+          style="letter-spacing: 1px"
+          flat
+          @click="$router.push({ path: '/' })"
+          >Home</v-btn
+        >
+      </template>
 
       <!-- Home Reset Attendance !-->
       <template
@@ -298,14 +323,14 @@
           </v-list-tile-content>
         </v-list-tile>
 
-        <v-list-tile>
+        <!-- <v-list-tile>
           <v-btn @click="getMessagingToken" round block
             >Enable Notifications</v-btn
           >
-        </v-list-tile>
+        </v-list-tile> -->
       </v-list>
 
-      <v-list v-if="isUser && !disabled"> </v-list>
+      <!-- <v-list v-if="isUser && !disabled"> </v-list> -->
 
       <v-divider v-if="isUser"></v-divider>
 
@@ -478,7 +503,7 @@
             <br />
           </v-layout>
           <v-layout class="justify-center mt-2">
-            <span class="subheading text-center">v2.0</span>
+            <span class="subheading text-center">v2.1</span>
           </v-layout>
         </v-card-text>
         <v-card-actions>
@@ -1095,7 +1120,7 @@ export default {
     },
     featureOption(option) {
       if (option == 1) {
-        window.open("mailto:secvinay@gmail.com", "_blank");
+        window.open("mailto:secvinay@gmail.com?subject=Suggestions%20%5C%20Queries%20%5C%20Feedback", "_blank");
       } else if (option == 2) {
         if (navigator.share) {
           navigator.share({
@@ -1189,7 +1214,7 @@ export default {
           { icon: "settings", text: "Settings", route: "settings" },
           { icon: "info_outline", text: "About", route: "about" },
           { icon: "update", text: "Changelog", route: "changelog" },
-          { icon: "get_app", text: "Install Notes", route: "install" },
+          { icon: "get_app", text: "Install Notes", route: "install_notes" },
           // {
           //   icon: "assignment",
           //   text: "Privacy Policy",
@@ -1237,13 +1262,14 @@ export default {
 
         this.links = [
           { icon: "account_circle", text: "Sign In", route: "signup" },
+          { icon: "info_outline", text: "About", route: "about" },
+          { icon: "update", text: "Changelog", route: "changelog" },
+          { icon: "get_app", text: "Install Notes", route: "install_notes" },
           {
             icon: "assignment",
             text: "Privacy Policy",
             route: "privacypolicy",
           },
-          // { icon: 'get_app', text: "Installation Notes", route: 'install'},
-          // { icon: "update", text: "Changelog", route: "changelog" },
         ];
       }
     });

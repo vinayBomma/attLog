@@ -85,7 +85,7 @@
             <br />
           </v-layout>
           <v-layout class="justify-center mt-2">
-            <span class="subheading text-center">v2.0</span>
+            <span class="subheading text-center">v2.1</span>
           </v-layout>
         </v-card-text>
         <v-card-actions>
