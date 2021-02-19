@@ -280,7 +280,9 @@ export default {
         if (navigator.share) {
           navigator.share({
             title: "Attend It",
-            text: `Log your attendance with Attend It. Available on all platforms!`,
+            text: `Log your attendance with Attend It. Available on all platforms!<br>
+                  Play Store: <a href="https://play.google.com/store/apps/details?id=com.chromium.twa.attendIt">https://play.google.com/store/apps/details?id=com.chromium.twa.attendIt</a><br>
+                  Windows Store: <a href="https://www.microsoft.com/store/productId/9PF8BJRD290V">https://www.microsoft.com/store/productId/9PF8BJRD290V</a>`,
             url: "https://attendit.web.app",
           });
         } else {

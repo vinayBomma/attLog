@@ -71,7 +71,7 @@ export default {
           img: "../windows.png",
           name: "Windows",
           text: `<ul><li class="subheading font-weight-thin mx-2"
-              style="letter-spacing: 1px">Open the webapp using the latest Chrome browser and click the install button at top right of the address bar.</li><li class="subheading font-weight-thin mx-2" style="letter-spacing: 1px">Install the app from the <a href="https://attendit.web.app/"
+              style="letter-spacing: 1px">Open the webapp using the latest Chrome browser and click the install button at top right of the address bar.</li><li class="subheading font-weight-thin mx-2" style="letter-spacing: 1px">Install the app from the <a href="https://www.microsoft.com/store/productId/9PF8BJRD290V"
                 style="text-decoration: underline; color: white"
                 target="_blank">Windows Store</a></li></ul>`,
         },

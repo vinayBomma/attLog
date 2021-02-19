@@ -1,10 +1,6 @@
-app intro code check
 push notifications
-windows add link in installNotes
-shareapi add windows and play store link
 
 att status on home page - 2 (You have %d leaves remaininng)
-cross platform find more new info installation instructions
 remove firebase messaging as well
 driver.js
 vuetour

@@ -23,7 +23,7 @@
                     >
                   </v-layout>
                 </v-card-title>
-                <v-card-text>Status: Nothing to show yet!</v-card-text>
+                <!-- <v-card-text>Status: Nothing to show yet!</v-card-text> -->
               </v-card>
             </v-flex>
             <v-layout class="align-center">

@@ -253,8 +253,10 @@
       <!-- ============== !-->
     </v-toolbar>
 
-    <!-- Sign Out !-->
+
     <v-navigation-drawer v-model="drawer" app>
+
+      <!-- Sign Out !-->
       <v-dialog v-model="signOutModal" max-width="600">
         <template v-slot:activator="{ on }">
           <v-layout align-start justify-end row class="pa-3">
@@ -330,8 +332,6 @@
         </v-list-tile> -->
       </v-list>
 
-      <!-- <v-list v-if="isUser && !disabled"> </v-list> -->
-
       <v-divider v-if="isUser"></v-divider>
 
       <v-list>
@@ -349,112 +349,6 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-
-    <!-- Sign In Dialog !-->
-    <!-- <v-dialog v-model="register" persistent>
-      <v-card
-        style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
-      >
-        <v-card-title class="headline justify-center">Sign Up</v-card-title>
-        <v-card-text>
-          <v-layout row>
-            <v-flex xs-3 md-4>
-              <v-text-field
-                label="Email"
-                color="white"
-                v-model="emailValue"
-                autofocus
-                prepend-icon="email"
-                persistent-hint
-                hint="Your email is not shared with third-parties!"
-              ></v-text-field>
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-        <v-card-actions class="justify-end pa-3">
-          <v-btn @click="register = false" flat>Cancel</v-btn>
-          <v-btn @click="sendEmailLink" round>Next</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-    <!-- ==============  !-->
-
-    <!-- Sign In Email Link Dialog !-->
-    <!-- <v-dialog v-model="emailLink" persistent>
-      <v-card
-        style="border-radius: 20px;background-image: linear-gradient( 108deg,  rgba(0,166,81,1) 9.3%, rgba(0,209,174,1) 118.3% );"
-      >
-        <v-card-title class="justify-center">
-          <v-icon x-large color="white">check_circle</v-icon>
-        </v-card-title>
-        <v-card-text
-          class="subheading"
-          style="text-align: center; word-spacing: 2px; letter-spacing: 2px"
-        >Further instructions have been sent to {{emailValue}}. Please check your email!</v-card-text>
-        <v-card-actions class="justify-end pa-3">
-          <v-btn @click="emailLink = null" round>Okay</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-    <!-- ==============  !-->
-
-    <!-- Choose Avatar Intro !-->
-    <!-- <v-dialog v-model="appIntro" persistent>
-      <v-card>
-        <v-card-title
-          class="justify-center subheading"
-          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-        >Choose Your Avatar</v-card-title>
-        <v-card-text>
-          <v-layout row wrap>
-            <v-flex xs-4 md-3 v-for="(avt, j) in avatars" :key="avt">
-              <v-card flat hover @click="avatarSelect($event)">
-                <img :src="avatars[j]" width="75" height="75" />
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-        <v-card-actions class="justify-end pa-3">
-          <v-btn round @click="avatarNext">Next</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-    <!-- ==============  !-->
-
-    <!-- Additional Info Intro !-->
-    <v-dialog v-model="appIntro2" persistent>
-      <v-card>
-        <v-card-title
-          class="justify-center subheading"
-          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-          >Additional Information</v-card-title
-        >
-        <v-card-text>
-          <v-layout row wrap>
-            <v-text-field
-              label="Name"
-              color="white"
-              v-model="userName"
-              autofocus
-              prepend-icon="person"
-            ></v-text-field>
-            <v-flex xs12>
-              <v-slider
-                v-model="attCriteria"
-                label="Attendance Criteria"
-                min="30"
-                step="5"
-                thumb-label
-              ></v-slider>
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-        <v-card-actions class="justify-end pa-3">
-          <v-btn round @click="additionalInfo">Next</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- ==============  !-->
 
     <!-- ============= Report App =============== -->
     <v-dialog v-model="reportBugsDialog" max-width="500">
@@ -520,105 +414,6 @@
     </v-dialog>
     <!-- ========================================= -->
 
-    <!-- Add Subjects Intro !-->
-    <!-- <v-dialog v-model="appIntro3" persistent>
-      <v-card>
-        <v-card-title
-          class="justify-center subheading"
-          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-          >Add Subjects</v-card-title
-        >
-        <v-card-text>
-          <v-layout row>
-            <v-text-field
-              v-model="subjectName"
-              label="Add Subject"
-            ></v-text-field>
-            <v-btn @click="addSubject">Add</v-btn>
-          </v-layout>
-          <v-card v-if="hasSubject" elevation="1">
-            <v-card-text>
-              <v-layout class="pt-3" row v-for="(sub, i) in subjects" :key="i">
-                <span style="letter-spacing: 2px;">{{ i + 1 }}. {{ sub }}</span>
-                <v-layout class="justify-end">
-                  <v-icon right color="red" @click="removeSubject(i)"
-                    >remove_circle</v-icon
-                  >
-                </v-layout>
-              </v-layout>
-            </v-card-text>
-          </v-card>
-        </v-card-text>
-        <v-card-actions class="justify-end pa-3">
-          <v-btn flat @click="appIntro3 = false">Skip</v-btn>
-          <v-btn round @click="saveSubjects">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-    <!-- ============== !-->
-
-    <!-- Create Timetable Intro !-->
-    <!-- <v-dialog v-model="appIntro4" persistent scrollable lazy>
-      <v-card>
-        <v-card-title
-          class="justify-center subheading"
-          style="letter-spacing: 2px; background-image: radial-gradient( circle farthest-corner at -0.2% 99.7%,  rgba(190,53,145,1) 0%, rgba(239,69,115,1) 100.2% );"
-          >Create Timetable</v-card-title
-        >
-        <v-card-text>
-          <v-tabs
-            v-model="currentDay"
-            color="transparent"
-            fixed-tabs
-            show-arrows
-            slider-color="blue"
-            @change="tabChange"
-          >
-            <v-tab v-for="day in days" :key="day" :href="'#' + day">{{
-              day
-            }}</v-tab>
-          </v-tabs>
-          <v-tabs-items v-model="currentDay">
-            <v-tab-item v-for="(day, index) in days" :key="index" :value="day">
-              <v-layout row class="mt-3">
-                <v-select
-                  v-model="currentSubject"
-                  :items="subjects"
-                  label="Choose Subject"
-                ></v-select>
-                <v-btn @click="addDaySubject">Add</v-btn>
-              </v-layout>
-              <v-card v-if="hasDaySubjects" elevation="1">
-                <v-card-text>
-                  <v-layout
-                    class="pt-3"
-                    row
-                    v-for="(sub, i) in daySubjects"
-                    :key="i"
-                  >
-                    <span style="letter-spacing: 2px;"
-                      >{{ i + 1 }}. {{ sub }}</span
-                    >
-                    <v-layout class="justify-end">
-                      <v-icon right color="red" @click="removeDaySubject(i)"
-                        >remove_circle</v-icon
-                      >
-                    </v-layout>
-                  </v-layout>
-                </v-card-text>
-              </v-card>
-            </v-tab-item>
-          </v-tabs-items>
-        </v-card-text>
-        <v-card-actions class="justify-end pa-3">
-          <v-btn flat @click="ttIntro">Skip</v-btn>
-          <v-btn round @click="saveTimetable">Save</v-btn>
-          <v-btn round v-if="lastDay" @click="appIntro4 = false">Close</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-    <!-- ============== !-->
-
     <!-- Snackbar !-->
     <v-snackbar
       v-model="snackbar"
@@ -645,40 +440,6 @@ import { messaging } from "../configFirebase";
 export default {
   data() {
     return {
-      avatars: [
-        "../avatars/man-6.svg",
-        "../avatars/man-5.svg",
-        "../avatars/man-13.svg",
-        "../avatars/man-17.svg",
-        "../avatars/man-18.svg",
-        "../avatars/man-14.svg",
-        "../avatars/man-1.svg",
-        "../avatars/man-8.svg",
-        "../avatars/man-9.svg",
-        "../avatars/man-10.svg",
-        "../avatars/man-15.svg",
-        "../avatars/man-19.svg",
-        "../avatars/businessman.svg",
-        "../avatars/man-20.svg",
-        "../avatars/man-33.svg",
-        "../avatars/man-30.svg",
-        "../avatars/man-22.svg",
-        "../avatars/man-23.svg",
-        "../avatars/man-28.svg",
-        "../avatars/man-34.svg",
-        "../avatars/woman.svg",
-        "../avatars/woman-1.svg",
-        "../avatars/woman-2.svg",
-        "../avatars/woman-3.svg",
-        "../avatars/businesswoman.svg",
-        "../avatars/woman-4.svg",
-        "../avatars/woman-5.svg",
-        "../avatars/woman-7.svg",
-        "../avatars/woman-9.svg",
-        "../avatars/woman-10.svg",
-        "../avatars/woman-11.svg",
-        "../avatars/woman-12.svg",
-      ],
       date: new Date().toISOString().substr(0, 10),
       drawer: false,
       isUser: null,
@@ -692,16 +453,10 @@ export default {
       mode: false,
       disabled: false,
       register: null,
-      emailLink: null,
-      emailValue: null,
       snackbar: false,
       msg: null,
       timeout: 3000,
       color: undefined,
-      appIntro: null,
-      appIntro2: null,
-      attCriteria: 30,
-      appIntro3: null,
       subjectName: null,
       hasSubject: null,
       subjects: [],
@@ -737,167 +492,6 @@ export default {
     };
   },
   methods: {
-    sendEmailLink() {
-      if (
-        RegExp(
-          "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-        ).test(this.emailValue)
-      ) {
-        this.register = false;
-
-        let actionCodeSettings = {
-          url: "https://attendit.firebaseapp.com/signup",
-          // url: "http://localhost:8080/signup",
-          handleCodeInApp: true,
-        };
-
-        firebase
-          .auth()
-          .sendSignInLinkToEmail(this.emailValue, actionCodeSettings)
-          .then(() => {
-            window.localStorage.setItem("emailForSignIn", this.emailValue);
-          })
-          .catch((e) => {
-            console.log("Errarta: ", e);
-          });
-
-        this.emailLink = true;
-      } else {
-        this.msg = "Enter a valid email!";
-        this.color = "red";
-        this.snackbar = true;
-      }
-    },
-    getMessagingToken() {
-      messaging
-        .getToken()
-        .then(async (token) => {
-          if (token) {
-            const currentMessageToken = window.localStorage.getItem(
-              "messagingToken"
-            );
-            // console.log("token will be updated", currentMessageToken != token);
-
-            if (currentMessageToken != token) {
-              await this.saveToken(token);
-            }
-          } else {
-            console.log(
-              "No Instance ID token available. Request permission to generate one."
-            );
-            this.notificationsPermisionRequest();
-          }
-        })
-        .catch(function(err) {
-          console.log("An error occurred while retrieving token. ", err);
-        });
-    },
-    notificationsPermisionRequest() {
-      messaging
-        .requestPermission()
-        .then(() => {
-          this.getMessagingToken();
-        })
-        .catch((err) => {
-          alert(
-            "Couldn't enable push notifications. Your browser may not suppport it."
-          );
-          console.log("Unable to get permission to notify.", err);
-        });
-    },
-    listenTokenRefresh() {
-      const currentMessageToken = window.localStorage.getItem("messagingToken");
-      // console.log("currentMessageToken", currentMessageToken);
-      if (!currentMessageToken) {
-        messaging.onTokenRefresh(function() {
-          messaging
-            .getToken()
-            .then(function(token) {
-              this.saveToken(token);
-            })
-            .catch(function(err) {
-              console.log("Unable to retrieve refreshed token ", err);
-            });
-        });
-      } else {
-        this.disabled = true;
-      }
-    },
-    saveToken(token) {
-      let userUid = this.useruid;
-      // console.log("tokens", token);
-      axios
-        .post(
-          `https://us-central1-attendit.cloudfunctions.net/GeneralSubscription`,
-          {
-            token,
-            userUid,
-          }
-        )
-        .then((response) => {
-          window.localStorage.setItem("messagingToken", token);
-          console.log(response);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    avatarSelect(event) {
-      if (event.target.localName === "img") {
-        if (event.target.classList.contains("green")) {
-          event.target.classList.remove("green");
-          this.userPhoto.splice(
-            this.userPhoto.indexOf(event.target.attributes[0].value),
-            1
-          );
-        } else {
-          event.target.classList.add("green");
-          this.userPhoto.push(event.target.attributes[0].value);
-        }
-      }
-    },
-    avatarNext() {
-      if (this.userPhoto.length > 1) {
-        this.msg = "Please select any one Avatar!";
-        this.color = "red";
-        this.snackbar = true;
-      } else if (this.userPhoto.length < 1) {
-        this.msg = "Please select an Avatar!";
-        this.color = "red";
-        this.snackbar = true;
-      } else {
-        this.appIntro = false;
-        this.appIntro2 = true;
-        db.collection("attData")
-          .doc(this.useruid)
-          .set(
-            {
-              photoURL: this.userPhoto[0],
-            },
-            { merge: true }
-          );
-      }
-    },
-    additionalInfo() {
-      if (!this.userName) {
-        this.msg = "Please enter your name!";
-        this.color = "red";
-        this.snackbar = true;
-      } else {
-        db.collection("attData")
-          .doc(this.useruid)
-          .set(
-            {
-              displayName: this.userName,
-              attCriteria: this.attCriteria,
-            },
-            { merge: true }
-          );
-        this.appIntro2 = false;
-        this.appIntro3 = true;
-        window.localStorage.removeItem("newUser");
-      }
-    },
     addSubject() {
       if (this.subjectName) {
         this.hasSubject = true;
@@ -989,10 +583,6 @@ export default {
         this.color = "red";
         this.snackbar = true;
       }
-    },
-    ttIntro() {
-      this.appIntro4 = false;
-      this.$router.go({ path: "/" });
     },
     tabChange() {
       db.collection("attData")
@@ -1125,7 +715,9 @@ export default {
         if (navigator.share) {
           navigator.share({
             title: "Attend It",
-            text: `Log your attendance with Attend It. Available on all platforms!`,
+            text: `Log your attendance with Attend It. Available on all platforms!<br>
+                  Play Store: <a href="https://play.google.com/store/apps/details?id=com.chromium.twa.attendIt">https://play.google.com/store/apps/details?id=com.chromium.twa.attendIt</a><br>
+                  Windows Store: <a href="https://www.microsoft.com/store/productId/9PF8BJRD290V">https://www.microsoft.com/store/productId/9PF8BJRD290V</a>`,
             url: "https://attendit.web.app",
           });
         } else {
@@ -1148,8 +740,6 @@ export default {
     },
   },
   mounted() {
-    this.listenTokenRefresh();
-
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.$router.push({ name: "home" });
@@ -1182,31 +772,6 @@ export default {
       .catch((err) => {
         console.log("Errarta: ", err);
       });
-    const self = this;
-
-    // if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
-    //   var email = window.localStorage.getItem("emailForSignIn");
-    //   if (!email) {
-    //     email = window.prompt("Please provide your email for confirmation");
-    //   }
-    //   firebase
-    //     .auth()
-    //     .signInWithEmailLink(email, window.location.href)
-    //     .then(function(result) {
-    //       window.localStorage.removeItem("emailForSignIn");
-    //       if (result.additionalUserInfo.isNewUser) {
-    //         window.localStorage.setItem(
-    //           "newUser",
-    //           result.additionalUserInfo.isNewUser
-    //         );
-    //         window.localStorage.setItem("appIntro", true);
-    //       }
-    //       self.appIntro = window.localStorage.getItem("appIntro");
-    //     })
-    //     .catch(function(error) {
-    //       console.log("Error: ", error);
-    //     });
-    // }
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
@@ -1215,11 +780,6 @@ export default {
           { icon: "info_outline", text: "About", route: "about" },
           { icon: "update", text: "Changelog", route: "changelog" },
           { icon: "get_app", text: "Install Notes", route: "install_notes" },
-          // {
-          //   icon: "assignment",
-          //   text: "Privacy Policy",
-          //   route: "privacypolicy",
-          // },
         ];
         this.functionLinks = [
           { icon: "email", text: "Contact Us", id: 1 },
