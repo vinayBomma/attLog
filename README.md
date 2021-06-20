@@ -1,4 +1,8 @@
-# attlog
+# Attend It
+
+[Play Store](https://play.google.com/store/apps/details?id=com.chromium.twa.attendIt)
+
+[Web App](https://attendit.web.app)
 
 ## Project setup
 ```
